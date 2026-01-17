@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
+import Courses from "./pages/Courses";
 import Tuition from "./pages/Tuition";
 import Payments from "./pages/Payments";
 import Receipts from "./pages/Receipts";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/alunos" element={<Students />} />
+            <Route path="/cursos" element={<Courses />} />
             <Route path="/mensalidades" element={<Tuition />} />
             <Route path="/pagamentos" element={<Payments />} />
             <Route path="/recibos" element={<Receipts />} />
