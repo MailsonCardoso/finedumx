@@ -435,32 +435,34 @@ export default function Students() {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="monthly_fee">Valor da Mensalidade (R$)</Label>
-                  <Input
-                    id="monthly_fee"
-                    type="number"
-                    step="0.01"
-                    value={formData.monthly_fee}
-                    onChange={(e) => setFormData({ ...formData, monthly_fee: parseFloat(e.target.value) })}
-                    placeholder="0.00"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) => setFormData({ ...formData, status: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ativo">Ativo</SelectItem>
-                      <SelectItem value="inativo">Inativo</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="monthly_fee">Valor da Mensalidade (R$)</Label>
+                    <Input
+                      id="monthly_fee"
+                      type="number"
+                      step="0.01"
+                      value={formData.monthly_fee}
+                      onChange={(e) => setFormData({ ...formData, monthly_fee: parseFloat(e.target.value) })}
+                      placeholder="0.00"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                      value={formData.status || "ativo"}
+                      onValueChange={(value) => setFormData({ ...formData, status: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ativo">Ativo</SelectItem>
+                        <SelectItem value="inativo">Inativo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
               <DialogFooter>
