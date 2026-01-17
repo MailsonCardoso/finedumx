@@ -166,7 +166,6 @@ export default function Courses() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                                    <TableHead className="font-bold h-14 text-foreground w-[50px]">ID</TableHead>
                                     <TableHead className="font-bold h-14 text-foreground">Nome do Curso</TableHead>
                                     <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
                                 </TableRow>
@@ -174,7 +173,7 @@ export default function Courses() {
                             <TableBody>
                                 {isLoading ? (
                                     <TableRow>
-                                        <TableCell colSpan={3} className="h-48 text-center">
+                                        <TableCell colSpan={2} className="h-48 text-center">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                                 <p className="text-muted-foreground">Carregando cursos...</p>
@@ -192,7 +191,6 @@ export default function Courses() {
                                                 transition={{ delay: i * 0.05 }}
                                                 className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
                                             >
-                                                <TableCell className="py-4 font-medium text-muted-foreground">#{course.id}</TableCell>
                                                 <TableCell className="py-4 font-medium text-foreground">
                                                     <div className="flex items-center gap-2">
                                                         <BookOpen className="w-4 h-4 text-primary/70" />
@@ -213,7 +211,7 @@ export default function Courses() {
                                         ))}
                                         {!isLoading && filteredCourses.length === 0 && (
                                             <TableRow>
-                                                <TableCell colSpan={3} className="h-32 text-center text-muted-foreground">
+                                                <TableCell colSpan={2} className="h-32 text-center text-muted-foreground">
                                                     Nenhum curso encontrado.
                                                 </TableCell>
                                             </TableRow>
