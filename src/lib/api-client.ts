@@ -1,4 +1,5 @@
-const API_BASE_URL = "/api";
+const isProd = import.meta.env.PROD;
+const API_BASE_URL = isProd ? "https://app.platformx.com.br/api" : "/api";
 
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = localStorage.getItem('auth_token');
