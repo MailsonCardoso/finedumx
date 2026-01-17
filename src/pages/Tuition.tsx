@@ -150,7 +150,7 @@ export default function Tuition() {
     const phone = tuition.student.phone.replace(/\D/g, '');
 
     // Format message
-    const message = `Olá ${tuition.student.name}! 👋
+    const message = `Olá ${tuition.student.name}!
 
 Sua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.
 
