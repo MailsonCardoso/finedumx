@@ -2,9 +2,3 @@
     RewriteEngine On
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
-
-# Force CORS headers at Apache level if Laravel middleware is bypassed
-Header set Access-Control-Allow-Origin "https://financeiro.platformx.com.br"
-Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
-Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-Header set Access-Control-Allow-Credentials "true"
