@@ -158,6 +158,7 @@ Para facilitar o pagamento, utilize nossa chave PIX:
 *98988221217*
 
 Qualquer dúvida, estamos à disposição!
+Conversar com *+55 98988221217* no WhatsApp
 
 *ESCOLA DE MUSICA VEM CANTAR*`;
 
