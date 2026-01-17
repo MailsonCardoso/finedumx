@@ -35,6 +35,11 @@ class TuitionController extends Controller
             'amount' => 'required|numeric',
         ]);
 
+        $student = \App\Models\Student::findOrFail($validated['student_id']);
+        if ($student->status !== 'ativo') {
+            return response()->json(['message' => 'Não é possível gerar mensalidade para aluno inativo'], 422);
+        }
+
         $validated['status'] = 'pendente';
 
         // Simple check just to avoid simple duplicates for same month
@@ -58,7 +63,7 @@ class TuitionController extends Controller
             'month' => 'required|integer', // 1-12
         ]);
 
-        $students = \App\Models\Student::all();
+        $students = \App\Models\Student::where('status', 'ativo')->get();
         $count = 0;
 
         foreach ($students as $student) {
