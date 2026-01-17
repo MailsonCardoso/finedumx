@@ -81,6 +81,52 @@ export default function Tuition() {
     }
   });
 
+  // Payment Modal
+  const [isPayOpen, setIsPayOpen] = useState(false);
+  const [selectedTuition, setSelectedTuition] = useState<Tuition | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState("pix");
+
+  // Queries
+  const { data: tuitions = [], isLoading } = useQuery<Tuition[]>({
+    queryKey: ['tuitions'],
+    queryFn: () => apiFetch('/tuitions'),
+  });
+
+  // Mutations
+  const payMutation = useMutation({
+    mutationFn: (data: any) => apiFetch('/payments', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tuitions'] });
+      queryClient.invalidateQueries({ queryKey: ['students'] });
+      toast.success("Pagamento confirmado com sucesso!");
+      setIsPayOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao processar pagamento");
+    }
+  });
+
+  // Handlers
+  const handlePayClick = (tuition: Tuition) => {
+    setSelectedTuition(tuition);
+    setIsPayOpen(true);
+  };
+
+  const confirmPayment = () => {
+    if (!selectedTuition) return;
+
+    payMutation.mutate({
+      student_id: selectedTuition.student_id,
+      tuition_id: selectedTuition.id,
+      method: paymentMethod,
+      amount: selectedTuition.amount,
+      payment_date: new Date().toISOString().split('T')[0]
+    });
+  };
+
   const handleGenerateClick = () => {
     const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     const monthName = months[parseInt(generateMonth) - 1];
@@ -92,6 +138,37 @@ export default function Tuition() {
       month: parseInt(generateMonth)
     });
   };
+
+  // Helpers
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
+    // Add time to force timezone to be treated loosely or use verify backend format
+    // Assuming backend sends YYYY-MM-DD
+    return new Date(dateString + 'T12:00:00').toLocaleDateString('pt-BR');
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "pago": return <StatusBadge status="success">Pago</StatusBadge>;
+      case "pendente": return <StatusBadge status="warning">Pendente</StatusBadge>;
+      case "atrasado": return <StatusBadge status="danger">Atrasado</StatusBadge>;
+      default: return null;
+    }
+  };
+
+  const filteredTuitions = tuitions.filter(t => {
+    const matchesSearch = t.student?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.reference.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'todos' || t.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <MainLayout>
