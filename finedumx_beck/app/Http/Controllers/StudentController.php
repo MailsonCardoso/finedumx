@@ -29,8 +29,8 @@ class StudentController extends Controller
             'email' => 'required|email|unique:students',
             'phone' => 'nullable|string',
             'course' => 'nullable|string',
-            'due_day' => 'integer',
-            'monthly_fee' => 'required|numeric',
+            'due_day' => 'required|integer|min:1|max:31',
+            'monthly_fee' => 'required|numeric|min:0',
         ]);
 
         $student = Student::create($validated);
