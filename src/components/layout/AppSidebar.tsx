@@ -11,11 +11,15 @@ import {
   ChevronRight,
   LogOut,
   GraduationCap,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { removeAuthToken, apiFetch } from "@/lib/api-client";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface AppSidebarProps {
   collapsed: boolean;
@@ -34,6 +38,21 @@ const menuItems = [
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await apiFetch('/logout', { method: 'POST' });
+    } catch (error) {
+      console.error("Erro ao deslogar no servidor:", error);
+    } finally {
+      removeAuthToken();
+      toast.success("Sessão encerrada");
+      navigate("/");
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <aside
@@ -124,10 +143,15 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate("/")}
-                className="h-9 px-3"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
               >
-                <LogOut className="w-4 h-4" />
+                {isLoggingOut ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <LogOut className="w-4 h-4" />
+                )}
               </Button>
             </>
           )}
