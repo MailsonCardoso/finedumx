@@ -61,28 +61,39 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($students as $sData) {
-            $student = Student::create($sData);
+            $student = Student::firstOrCreate(
+                ['email' => $sData['email']],
+                $sData
+            );
 
             // Create Tuitions for Jan and Feb
-            $t1 = Tuition::create([
-                'student_id' => $student->id,
-                'reference' => 'Jan/2025',
-                'due_date' => '2025-01-' . str_pad($student->due_day, 2, '0', STR_PAD_LEFT),
-                'amount' => $student->monthly_fee,
-                'status' => $student->status === 'em_dia' ? 'pago' : ($student->status === 'atrasado' ? 'atrasado' : 'pendente'),
-            ]);
+            $t1 = Tuition::firstOrCreate(
+                [
+                    'student_id' => $student->id,
+                    'reference' => 'Jan/2025'
+                ],
+                [
+                    'due_date' => '2025-01-' . str_pad((string) $student->due_day, 2, '0', STR_PAD_LEFT),
+                    'amount' => $student->monthly_fee,
+                    'status' => $student->status === 'em_dia' ? 'pago' : ($student->status === 'atrasado' ? 'atrasado' : 'pendente'),
+                ]
+            );
 
             // If paid, create a payment record
             if ($t1->status === 'pago') {
-                Payment::create([
-                    'student_id' => $student->id,
-                    'tuition_id' => $t1->id,
-                    'type' => 'Mensalidade Jan/2025',
-                    'method' => 'pix',
-                    'payment_date' => '2025-01-05',
-                    'amount' => $t1->amount,
-                    'status' => 'confirmado',
-                ]);
+                Payment::firstOrCreate(
+                    [
+                        'tuition_id' => $t1->id
+                    ],
+                    [
+                        'student_id' => $student->id,
+                        'type' => 'Mensalidade Jan/2025',
+                        'method' => 'pix',
+                        'payment_date' => '2025-01-05',
+                        'amount' => $t1->amount,
+                        'status' => 'confirmado',
+                    ]
+                );
             }
         }
     }
