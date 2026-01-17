@@ -58,6 +58,13 @@ export default function Tuition() {
   const [generateYear, setGenerateYear] = useState(new Date().getFullYear().toString());
   const [generateMonth, setGenerateMonth] = useState((new Date().getMonth() + 1).toString());
 
+  // Receipt Modal
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+
+  const handlePrintReceipt = () => {
+    window.print();
+  };
+
   const generateMutation = useMutation({
     mutationFn: (data: { reference: string, year: number, month: number }) =>
       apiFetch('/tuitions/generate-batch', {
@@ -212,6 +219,10 @@ export default function Tuition() {
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 text-muted-foreground"
+                                onClick={() => {
+                                  setSelectedTuition(tuition);
+                                  setIsReceiptOpen(true);
+                                }}
                                 title="Imprimir Recibo"
                               >
                                 <Printer className="w-4 h-4" />
@@ -339,6 +350,79 @@ export default function Tuition() {
               <Button onClick={handleGenerateClick} disabled={generateMutation.isPending}>
                 {generateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Gerar Agora
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Receipt Modal */}
+        <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
+          <DialogContent className="max-w-3xl">
+            <div id="receipt-area" className="p-8 bg-white text-black border-2 border-dashed border-gray-300 rounded-lg">
+              <style>
+                {`
+                    @media print {
+                      body * {
+                        visibility: hidden;
+                      }
+                      #receipt-area, #receipt-area * {
+                        visibility: visible;
+                      }
+                      #receipt-area {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        border: none !important;
+                      }
+                      .no-print {
+                        display: none !important;
+                      }
+                    }
+                  `}
+              </style>
+
+              <div className="text-center border-b-2 border-black pb-6 mb-6">
+                <h1 className="text-3xl font-bold uppercase tracking-wider">ESCOLA DE MUSICA VEM CANTAR</h1>
+                <p className="text-sm text-gray-600 mt-2">Rua da Música, 123 - Centro, São Paulo - SP</p>
+                <p className="text-sm text-gray-600">CNPJ: 12.345.678/0001-90 | Tel: (11) 99999-9999</p>
+              </div>
+
+              <div className="flex justify-between items-center mb-8">
+                <div className="text-xl font-bold border-2 border-black p-2 px-4 rounded">
+                  RECIBO Nº {selectedTuition?.id.toString().padStart(6, '0')}
+                </div>
+                <div className="text-xl font-bold">
+                  VALOR: {selectedTuition && formatCurrency(Number(selectedTuition.amount))}
+                </div>
+              </div>
+
+              <div className="space-y-6 text-lg leading-relaxed">
+                <p>
+                  Recebemos de <span className="font-bold underline decoration-dotted underline-offset-4">{selectedTuition?.student?.name}</span>
+                </p>
+                <p>
+                  A importância de <span className="font-bold">{selectedTuition && formatCurrency(Number(selectedTuition.amount))}</span>
+                </p>
+                <p>
+                  Referente à mensalidade de <span className="font-bold">{selectedTuition?.reference}</span>.
+                </p>
+                <p>
+                  Para clareza e verdade, firmamos o presente.
+                </p>
+              </div>
+
+              <div className="mt-16 text-center flex flex-col items-center justify-center">
+                <div className="w-64 border-b border-black mb-2"></div>
+                <p className="font-bold">ESCOLA DE MUSICA VEM CANTAR</p>
+                <p className="text-sm text-gray-500">{new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+              </div>
+            </div>
+
+            <DialogFooter className="no-print">
+              <Button variant="outline" onClick={() => setIsReceiptOpen(false)}>Fechar</Button>
+              <Button onClick={handlePrintReceipt} className="gap-2">
+                <Printer className="w-4 h-4" /> Imprimir
               </Button>
             </DialogFooter>
           </DialogContent>

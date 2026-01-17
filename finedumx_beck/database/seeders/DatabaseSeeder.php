@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
         SchoolSetting::updateOrCreate(
             ['cnpj' => '12.345.678/0001-90'],
             [
-                'name' => 'Colégio FinEdu',
+                'name' => 'ESCOLA DE MUSICA VEM CANTAR',
                 'phone' => '(11) 3456-7890',
                 'email' => 'contato@finedu.edu.br',
                 'address' => 'Rua da Educação, 123 - São Paulo, SP',
