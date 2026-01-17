@@ -17,7 +17,10 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('cpf', $request->cpf)->first();
+        $cpf = preg_replace('/\D/', '', $request->cpf);
+        $user = User::all()->first(function ($u) use ($cpf) {
+            return preg_replace('/\D/', '', $u->cpf) === $cpf;
+        });
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([

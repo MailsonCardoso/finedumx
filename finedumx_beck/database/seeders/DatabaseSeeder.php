@@ -18,21 +18,25 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Default User
-        User::create([
-            'name' => 'Admin FinEdu',
-            'cpf' => '019.358.063.27',
-            'email' => 'admin@finedu.com',
-            'password' => bcrypt('@Secur1t1@'),
-        ]);
+        User::updateOrCreate(
+            ['cpf' => '019.358.063-27'],
+            [
+                'name' => 'Admin FinEdu',
+                'email' => 'admin@finedu.com',
+                'password' => bcrypt('@Secur1t1@'),
+            ]
+        );
 
         // School Settings
-        SchoolSetting::create([
-            'name' => 'Colégio FinEdu',
-            'cnpj' => '12.345.678/0001-90',
-            'phone' => '(11) 3456-7890',
-            'email' => 'contato@finedu.edu.br',
-            'address' => 'Rua da Educação, 123 - São Paulo, SP',
-        ]);
+        SchoolSetting::updateOrCreate(
+            ['cnpj' => '12.345.678/0001-90'],
+            [
+                'name' => 'Colégio FinEdu',
+                'phone' => '(11) 3456-7890',
+                'email' => 'contato@finedu.edu.br',
+                'address' => 'Rua da Educação, 123 - São Paulo, SP',
+            ]
+        );
 
         // Students
         $students = [
