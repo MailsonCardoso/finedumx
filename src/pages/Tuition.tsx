@@ -27,7 +27,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign } from "lucide-react";
+import { Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
@@ -36,6 +36,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface Student {
   id: number;
   name: string;
+  phone: string;
 }
 
 interface Tuition {
@@ -137,6 +138,34 @@ export default function Tuition() {
       year: parseInt(generateYear),
       month: parseInt(generateMonth)
     });
+  };
+
+  const handleWhatsAppClick = (tuition: Tuition) => {
+    if (!tuition.student?.phone) {
+      toast.error("Aluno sem telefone cadastrado");
+      return;
+    }
+
+    // Remove formatting from phone (keep only numbers)
+    const phone = tuition.student.phone.replace(/\D/g, '');
+
+    // Format message
+    const message = `Olá ${tuition.student.name}! 👋
+
+Sua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.
+
+Para facilitar o pagamento, utilize nossa chave PIX:
+*98988221217*
+
+Qualquer dúvida, estamos à disposição!
+
+*ESCOLA DE MUSICA VEM CANTAR*`;
+
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+
+    // Open WhatsApp Web
+    window.open(`https://wa.me/55${phone}?text=${encodedMessage}`, '_blank');
   };
 
   // Helpers
@@ -290,15 +319,26 @@ export default function Tuition() {
                         <TableCell className="py-4 text-right pr-6">
                           <div className="flex items-center justify-end gap-2">
                             {tuition.status !== 'pago' && (
-                              <Button
-                                size="sm"
-                                className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                                onClick={() => handlePayClick(tuition)}
-                                title="Confirmar Pagamento"
-                              >
-                                <DollarSign className="w-4 h-4 mr-1.5" />
-                                Receber
-                              </Button>
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                  onClick={() => handleWhatsAppClick(tuition)}
+                                  title="Enviar Lembrete WhatsApp"
+                                >
+                                  <MessageCircle className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                                  onClick={() => handlePayClick(tuition)}
+                                  title="Confirmar Pagamento"
+                                >
+                                  <DollarSign className="w-4 h-4 mr-1.5" />
+                                  Receber
+                                </Button>
+                              </>
                             )}
 
                             {tuition.status === 'pago' && (
