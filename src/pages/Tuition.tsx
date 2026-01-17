@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -9,117 +12,338 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Bell, Printer, Plus } from "lucide-react";
-import { tuitions } from "@/data/mockData";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api-client";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface Student {
+  id: number;
+  name: string;
+}
+
+interface Tuition {
+  id: number;
+  student_id: number;
+  reference: string;
+  due_date: string;
+  amount: number;
+  status: 'pago' | 'pendente' | 'atrasado';
+  student: Student;
+}
 
 export default function Tuition() {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos");
+  const queryClient = useQueryClient();
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("pt-BR");
-  };
+  // Batch Generation Modal
+  const [isGenerateOpen, setIsGenerateOpen] = useState(false);
+  const [generateYear, setGenerateYear] = useState(new Date().getFullYear().toString());
+  const [generateMonth, setGenerateMonth] = useState((new Date().getMonth() + 1).toString());
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pago":
-        return <StatusBadge status="success">Pago</StatusBadge>;
-      case "pendente":
-        return <StatusBadge status="warning">Pendente</StatusBadge>;
-      case "atrasado":
-        return <StatusBadge status="danger">Atrasado</StatusBadge>;
-      default:
-        return null;
+  const generateMutation = useMutation({
+    mutationFn: (data: { reference: string, year: number, month: number }) =>
+      apiFetch('/tuitions/generate-batch', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['tuitions'] });
+      toast.success(data.message || "Mensalidades geradas com sucesso!");
+      setIsGenerateOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao gerar mensalidades");
     }
-  };
+  });
 
-  const handleSendReminder = (studentName: string) => {
-    toast.success(`Cobrança enviada para ${studentName}`);
-  };
+  const handleGenerateClick = () => {
+    const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const monthName = months[parseInt(generateMonth) - 1];
+    const reference = `${monthName}/${generateYear}`;
 
-  const handlePrint = (reference: string, studentName: string) => {
-    toast.info(`Imprimindo boleto ${reference} - ${studentName}`);
+    generateMutation.mutate({
+      reference,
+      year: parseInt(generateYear),
+      month: parseInt(generateMonth)
+    });
   };
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        >
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Mensalidades</h1>
-            <p className="text-muted-foreground mt-1">
-              Gerencie as cobranças geradas
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">Mensalidades</h1>
+            <p className="text-muted-foreground mt-1 text-lg">
+              Gerencie e dê baixa nas mensalidades dos alunos.
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="w-4 h-4" />
+          <Button
+            onClick={() => setIsGenerateOpen(true)}
+            className="gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+          >
+            <Plus className="w-5 h-5" />
             Gerar Mensalidades
           </Button>
-        </div>
+        </motion.div>
+
+        {/* Filters */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-col sm:flex-row gap-4 bg-muted/30 p-4 rounded-2xl border border-border/50 backdrop-blur-sm"
+        >
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nome do aluno..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-11 bg-background/50 border-border/50 focus:border-primary"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[200px] h-11 bg-background/50">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <SelectValue placeholder="Status" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="pendente">Pendentes</SelectItem>
+              <SelectItem value="atrasado">Atrasadas</SelectItem>
+              <SelectItem value="pago">Pagas</SelectItem>
+            </SelectContent>
+          </Select>
+        </motion.div>
 
         {/* Table */}
-        <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-card/50 backdrop-blur-md rounded-2xl shadow-soft border border-border/50 overflow-hidden"
+        >
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="font-semibold">Referência</TableHead>
-                  <TableHead className="font-semibold">Aluno</TableHead>
-                  <TableHead className="font-semibold">Vencimento</TableHead>
-                  <TableHead className="font-semibold">Valor</TableHead>
-                  <TableHead className="font-semibold">Status</TableHead>
-                  <TableHead className="font-semibold text-right">Ações</TableHead>
+                <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
+                  <TableHead className="font-bold h-14 text-foreground">Referência</TableHead>
+                  <TableHead className="font-bold h-14 text-foreground">Aluno</TableHead>
+                  <TableHead className="font-bold h-14 text-foreground">Vencimento</TableHead>
+                  <TableHead className="font-bold h-14 text-foreground">Valor</TableHead>
+                  <TableHead className="font-bold h-14 text-foreground">Status</TableHead>
+                  <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tuitions.map((tuition) => (
-                  <TableRow 
-                    key={tuition.id}
-                    className="hover:bg-muted/30 transition-colors"
-                  >
-                    <TableCell className="font-medium">{tuition.reference}</TableCell>
-                    <TableCell>{tuition.studentName}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(tuition.dueDate)}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatCurrency(tuition.amount)}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(tuition.status)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleSendReminder(tuition.studentName)}
-                          title="Enviar cobrança"
-                        >
-                          <Bell className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handlePrint(tuition.reference, tuition.studentName)}
-                          title="Imprimir"
-                        >
-                          <Printer className="w-4 h-4" />
-                        </Button>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-48 text-center">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-muted-foreground">Carregando mensalidades...</p>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  <AnimatePresence mode="popLayout">
+                    {filteredTuitions.map((tuition, i) => (
+                      <motion.tr
+                        key={tuition.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
+                      >
+                        <TableCell className="py-4 font-medium">{tuition.reference}</TableCell>
+                        <TableCell className="py-4 font-medium text-foreground group-hover:text-primary transition-colors">
+                          {tuition.student?.name}
+                        </TableCell>
+                        <TableCell className="py-4 text-muted-foreground">
+                          {formatDate(tuition.due_date)}
+                        </TableCell>
+                        <TableCell className="py-4 font-bold text-foreground">
+                          {formatCurrency(Number(tuition.amount))}
+                        </TableCell>
+                        <TableCell className="py-4">{getStatusBadge(tuition.status)}</TableCell>
+                        <TableCell className="py-4 text-right pr-6">
+                          <div className="flex items-center justify-end gap-2">
+                            {tuition.status !== 'pago' && (
+                              <Button
+                                size="sm"
+                                className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                                onClick={() => handlePayClick(tuition)}
+                                title="Confirmar Pagamento"
+                              >
+                                <DollarSign className="w-4 h-4 mr-1.5" />
+                                Receber
+                              </Button>
+                            )}
+
+                            {tuition.status === 'pago' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 text-muted-foreground"
+                                title="Imprimir Recibo"
+                              >
+                                <Printer className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </motion.tr>
+                    ))}
+                    {!isLoading && filteredTuitions.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                          Nenhuma mensalidade encontrada.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </AnimatePresence>
+                )}
               </TableBody>
             </Table>
           </div>
-        </div>
+        </motion.div>
+
+        {/* Payment Confirmation Modal */}
+        <Dialog open={isPayOpen} onOpenChange={setIsPayOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmar Recebimento</DialogTitle>
+              <DialogDescription>
+                Confirme os dados do pagamento para dar baixa na mensalidade.
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedTuition && (
+              <div className="space-y-4 py-4">
+                <div className="bg-muted/50 p-4 rounded-lg space-y-2 border border-border/50">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Aluno:</span>
+                    <span className="font-semibold">{selectedTuition.student?.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Referência:</span>
+                    <span className="font-medium">{selectedTuition.reference}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Valor:</span>
+                    <span className="font-bold text-primary text-lg">{formatCurrency(Number(selectedTuition.amount))}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Forma de Pagamento</Label>
+                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pix">Pix</SelectItem>
+                      <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                      <SelectItem value="cartao_credito">Cartão de Crédito</SelectItem>
+                      <SelectItem value="cartao_debito">Cartão de Débito</SelectItem>
+                      <SelectItem value="transferencia">Transferência Bancária</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsPayOpen(false)}>Cancelar</Button>
+              <Button onClick={confirmPayment} className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={payMutation.isPending}>
+                {payMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
+                Confirmar Baixa
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Batch Generation Modal */}
+        <Dialog open={isGenerateOpen} onOpenChange={setIsGenerateOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Gerar Mensalidades em Lote</DialogTitle>
+              <DialogDescription>
+                Isso irá gerar mensalidades para <b>todos os alunos ativos</b> para o mês selecionado.
+                Mensalidades que já existem não serão duplicadas.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div className="space-y-2">
+                <Label>Mês</Label>
+                <Select value={generateMonth} onValueChange={setGenerateMonth}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Janeiro</SelectItem>
+                    <SelectItem value="2">Fevereiro</SelectItem>
+                    <SelectItem value="3">Março</SelectItem>
+                    <SelectItem value="4">Abril</SelectItem>
+                    <SelectItem value="5">Maio</SelectItem>
+                    <SelectItem value="6">Junho</SelectItem>
+                    <SelectItem value="7">Julho</SelectItem>
+                    <SelectItem value="8">Agosto</SelectItem>
+                    <SelectItem value="9">Setembro</SelectItem>
+                    <SelectItem value="10">Outubro</SelectItem>
+                    <SelectItem value="11">Novembro</SelectItem>
+                    <SelectItem value="12">Dezembro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Ano</Label>
+                <Input
+                  type="number"
+                  value={generateYear}
+                  onChange={(e) => setGenerateYear(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsGenerateOpen(false)}>Cancelar</Button>
+              <Button onClick={handleGenerateClick} disabled={generateMutation.isPending}>
+                {generateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Gerar Agora
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </MainLayout>
   );

@@ -8,6 +8,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AuthController;
 
+use App\Http\Controllers\TuitionController;
+
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -18,7 +20,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     Route::apiResource('students', StudentController::class);
+
+    // Payments
     Route::get('/payments', [PaymentController::class, 'index']);
+    Route::post('/payments', [PaymentController::class, 'store']);
+
+    // Tuitions (Mensalidades)
+    Route::post('/tuitions/generate-batch', [TuitionController::class, 'generateBatch']);
+    Route::apiResource('tuitions', TuitionController::class);
+
     Route::get('/settings', [SettingController::class, 'index']);
     Route::put('/settings', [SettingController::class, 'update']);
 });
