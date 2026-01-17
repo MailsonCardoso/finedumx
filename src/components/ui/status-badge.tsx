@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type StatusType = "success" | "warning" | "danger";
+type StatusType = "success" | "warning" | "danger" | "neutral";
 
 interface StatusBadgeProps {
   status: StatusType;
@@ -12,6 +12,7 @@ const statusStyles: Record<StatusType, string> = {
   success: "bg-success-light text-success",
   warning: "bg-warning-light text-warning-foreground",
   danger: "bg-danger-light text-danger",
+  neutral: "bg-muted text-muted-foreground",
 };
 
 export function StatusBadge({ status, children, className }: StatusBadgeProps) {
@@ -27,7 +28,8 @@ export function StatusBadge({ status, children, className }: StatusBadgeProps) {
         "w-1.5 h-1.5 rounded-full",
         status === "success" && "bg-success",
         status === "warning" && "bg-warning",
-        status === "danger" && "bg-danger"
+        status === "danger" && "bg-danger",
+        status === "neutral" && "bg-muted-foreground"
       )} />
       {children}
     </span>

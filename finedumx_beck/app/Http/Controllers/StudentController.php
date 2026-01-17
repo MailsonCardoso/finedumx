@@ -51,7 +51,7 @@ class StudentController extends Controller
             'course' => 'nullable|string',
             'due_day' => 'integer',
             'monthly_fee' => 'sometimes|required|numeric',
-            'status' => 'sometimes|in:em_dia,a_vencer,atrasado',
+            'status' => 'sometimes|required|string',
         ]);
 
         $student->update($validated);

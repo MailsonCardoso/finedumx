@@ -53,11 +53,11 @@ class DatabaseSeeder extends Seeder
 
         // Students
         $students = [
-            ['name' => 'Ana Silva', 'course' => 'Ensino Fundamental', 'due_day' => 10, 'monthly_fee' => 850, 'status' => 'em_dia', 'email' => 'ana@email.com', 'phone' => '(11) 99999-0001'],
-            ['name' => 'Bruno Costa', 'course' => 'Ensino Médio', 'due_day' => 15, 'monthly_fee' => 1200, 'status' => 'a_vencer', 'email' => 'bruno@email.com', 'phone' => '(11) 99999-0002'],
-            ['name' => 'Carla Mendes', 'course' => 'Educação Infantil', 'due_day' => 5, 'monthly_fee' => 650, 'status' => 'atrasado', 'email' => 'carla@email.com', 'phone' => '(11) 99999-0003'],
-            ['name' => 'Daniel Oliveira', 'course' => 'Ensino Fundamental', 'due_day' => 10, 'monthly_fee' => 850, 'status' => 'em_dia', 'email' => 'daniel@email.com', 'phone' => '(11) 99999-0004'],
-            ['name' => 'Elena Ferreira', 'course' => 'Ensino Médio', 'due_day' => 20, 'monthly_fee' => 1200, 'status' => 'em_dia', 'email' => 'elena@email.com', 'phone' => '(11) 99999-0005'],
+            ['name' => 'Ana Silva', 'course' => 'Ensino Fundamental', 'due_day' => 10, 'monthly_fee' => 850, 'status' => 'ativo', 'email' => 'ana@email.com', 'phone' => '(11) 99999-0001'],
+            ['name' => 'Bruno Costa', 'course' => 'Ensino Médio', 'due_day' => 15, 'monthly_fee' => 1200, 'status' => 'ativo', 'email' => 'bruno@email.com', 'phone' => '(11) 99999-0002'],
+            ['name' => 'Carla Mendes', 'course' => 'Educação Infantil', 'due_day' => 5, 'monthly_fee' => 650, 'status' => 'inativo', 'email' => 'carla@email.com', 'phone' => '(11) 99999-0003'],
+            ['name' => 'Daniel Oliveira', 'course' => 'Ensino Fundamental', 'due_day' => 10, 'monthly_fee' => 850, 'status' => 'ativo', 'email' => 'daniel@email.com', 'phone' => '(11) 99999-0004'],
+            ['name' => 'Elena Ferreira', 'course' => 'Ensino Médio', 'due_day' => 20, 'monthly_fee' => 1200, 'status' => 'ativo', 'email' => 'elena@email.com', 'phone' => '(11) 99999-0005'],
         ];
 
         foreach ($students as $sData) {
@@ -75,7 +75,7 @@ class DatabaseSeeder extends Seeder
                 [
                     'due_date' => '2025-01-' . str_pad((string) $student->due_day, 2, '0', STR_PAD_LEFT),
                     'amount' => $student->monthly_fee,
-                    'status' => $student->status === 'em_dia' ? 'pago' : ($student->status === 'atrasado' ? 'atrasado' : 'pendente'),
+                    'status' => $student->name === 'Carla Mendes' ? 'atrasado' : ($student->name === 'Bruno Costa' ? 'pendente' : 'pago'),
                 ]
             );
 

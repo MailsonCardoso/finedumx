@@ -15,7 +15,7 @@ return new class extends Migration {
             $row->string('course')->nullable();
             $row->integer('due_day')->default(10);
             $row->decimal('monthly_fee', 10, 2);
-            $row->enum('status', ['em_dia', 'a_vencer', 'atrasado'])->default('em_dia');
+            $row->string('status')->default('ativo');
             $row->timestamps();
         });
     }

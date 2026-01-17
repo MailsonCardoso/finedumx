@@ -51,7 +51,7 @@ interface Student {
   course: string;
   due_day: number;
   monthly_fee: number;
-  status: 'em_dia' | 'a_vencer' | 'atrasado';
+  status: string;
 }
 
 interface StudentFormData {
@@ -61,6 +61,7 @@ interface StudentFormData {
   course: string;
   due_day: number;
   monthly_fee: number;
+  status: string;
 }
 
 const initialFormData: StudentFormData = {
@@ -70,7 +71,9 @@ const initialFormData: StudentFormData = {
   course: "",
   due_day: 10,
   monthly_fee: 0,
+  status: "ativo",
 };
+
 
 export default function Students() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -158,6 +161,7 @@ export default function Students() {
       course: student.course,
       due_day: student.due_day,
       monthly_fee: student.monthly_fee,
+      status: student.status,
     });
     setIsEditOpen(true);
   };
@@ -185,6 +189,10 @@ export default function Students() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case "ativo":
+        return <StatusBadge status="success">Ativo</StatusBadge>;
+      case "inativo":
+        return <StatusBadge status="neutral">Inativo</StatusBadge>;
       case "em_dia":
         return <StatusBadge status="success">Em dia</StatusBadge>;
       case "a_vencer":
@@ -192,7 +200,7 @@ export default function Students() {
       case "atrasado":
         return <StatusBadge status="danger">Atrasado</StatusBadge>;
       default:
-        return null;
+        return <StatusBadge status="neutral">{status}</StatusBadge>;
     }
   };
 
@@ -245,6 +253,8 @@ export default function Students() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos os status</SelectItem>
+              <SelectItem value="ativo">Ativo</SelectItem>
+              <SelectItem value="inativo">Inativo</SelectItem>
               <SelectItem value="em_dia">Em dia</SelectItem>
               <SelectItem value="a_vencer">A vencer</SelectItem>
               <SelectItem value="atrasado">Atrasado</SelectItem>
@@ -436,6 +446,21 @@ export default function Students() {
                     placeholder="0.00"
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) => setFormData({ ...formData, status: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ativo">Ativo</SelectItem>
+                      <SelectItem value="inativo">Inativo</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <DialogFooter>
