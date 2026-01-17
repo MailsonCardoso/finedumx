@@ -3,6 +3,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import {
   LayoutDashboard,
   Users,
+  BookOpen,
   Calendar,
   CreditCard,
   Receipt,
@@ -29,6 +30,7 @@ interface AppSidebarProps {
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: Users, label: "Alunos", path: "/alunos" },
+  { icon: BookOpen, label: "Cursos", path: "/cursos" },
   { icon: Calendar, label: "Mensalidades", path: "/mensalidades" },
   { icon: CreditCard, label: "Pagamentos", path: "/pagamentos" },
   { icon: Receipt, label: "Recibos", path: "/recibos" },

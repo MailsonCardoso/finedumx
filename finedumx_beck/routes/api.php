@@ -29,6 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tuitions/generate-batch', [TuitionController::class, 'generateBatch']);
     Route::apiResource('tuitions', TuitionController::class);
 
+    // Courses
+    Route::apiResource('courses', App\Http\Controllers\CourseController::class);
+
     Route::get('/settings', [SettingController::class, 'index']);
     Route::put('/settings', [SettingController::class, 'update']);
 });

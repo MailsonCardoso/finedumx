@@ -38,6 +38,19 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Courses
+        $courses = [
+            'Canto Individual',
+            'Canto em Grupo',
+            'Teclado',
+            'Bateria',
+            'Violão'
+        ];
+
+        foreach ($courses as $courseName) {
+            \App\Models\Course::firstOrCreate(['name' => $courseName]);
+        }
+
         // Students
         $students = [
             ['name' => 'Ana Silva', 'course' => 'Ensino Fundamental', 'due_day' => 10, 'monthly_fee' => 850, 'status' => 'em_dia', 'email' => 'ana@email.com', 'phone' => '(11) 99999-0001'],

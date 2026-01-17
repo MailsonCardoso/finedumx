@@ -92,6 +92,11 @@ export default function Students() {
     queryFn: () => apiFetch(`/students?search=${searchTerm}&status=${statusFilter}`),
   });
 
+  const { data: coursesData = [] } = useQuery({
+    queryKey: ['courses'],
+    queryFn: () => apiFetch('/courses'),
+  });
+
   // Mutations
   const createMutation = useMutation({
     mutationFn: (data: StudentFormData) =>
@@ -392,13 +397,20 @@ export default function Students() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="course">Curso/Série</Label>
-                    <Input
-                      id="course"
+                    <Label htmlFor="course">Curso</Label>
+                    <Select
                       value={formData.course}
-                      onChange={(e) => setFormData({ ...formData, course: e.target.value })}
-                      placeholder="Ex: 5º Ano"
-                    />
+                      onValueChange={(value) => setFormData({ ...formData, course: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {coursesData?.map((course: any) => (
+                          <SelectItem key={course.id} value={course.name}>{course.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="due_day">Dia Vencimento</Label>
