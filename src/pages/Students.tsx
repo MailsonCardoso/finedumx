@@ -95,6 +95,13 @@ export default function Students() {
     queryFn: () => apiFetch(`/students?search=${searchTerm}&status=${statusFilter}`),
   });
 
+  // Sort: Active students first
+  const sortedStudents = [...studentsData].sort((a, b) => {
+    if (a.status === 'ativo' && b.status !== 'ativo') return -1;
+    if (a.status !== 'ativo' && b.status === 'ativo') return 1;
+    return 0;
+  });
+
   const { data: coursesData = [] } = useQuery({
     queryKey: ['courses'],
     queryFn: () => apiFetch('/courses'),
@@ -293,7 +300,7 @@ export default function Students() {
                   </TableRow>
                 ) : (
                   <AnimatePresence mode="popLayout">
-                    {studentsData.map((student, i) => (
+                    {sortedStudents.map((student, i) => (
                       <motion.tr
                         key={student.id}
                         initial={{ opacity: 0 }}
@@ -336,7 +343,7 @@ export default function Students() {
             </Table>
           </div>
 
-          {!isLoading && studentsData.length === 0 && (
+          {!isLoading && sortedStudents.length === 0 && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

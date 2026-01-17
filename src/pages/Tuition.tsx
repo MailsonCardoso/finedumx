@@ -170,6 +170,16 @@ export default function Tuition() {
     return matchesSearch && matchesStatus;
   });
 
+  // Sort by status priority: atrasado > pendente > pago
+  const sortedTuitions = [...filteredTuitions].sort((a, b) => {
+    const statusOrder: Record<string, number> = {
+      'atrasado': 1,
+      'pendente': 2,
+      'pago': 3
+    };
+    return (statusOrder[a.status] || 999) - (statusOrder[b.status] || 999);
+  });
+
   return (
     <MainLayout>
       <div className="space-y-8">
@@ -257,7 +267,7 @@ export default function Tuition() {
                   </TableRow>
                 ) : (
                   <AnimatePresence mode="popLayout">
-                    {filteredTuitions.map((tuition, i) => (
+                    {sortedTuitions.map((tuition, i) => (
                       <motion.tr
                         key={tuition.id}
                         initial={{ opacity: 0 }}
@@ -309,7 +319,7 @@ export default function Tuition() {
                         </TableCell>
                       </motion.tr>
                     ))}
-                    {!isLoading && filteredTuitions.length === 0 && (
+                    {!isLoading && sortedTuitions.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                           Nenhuma mensalidade encontrada.
