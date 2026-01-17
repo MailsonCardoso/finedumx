@@ -4,101 +4,197 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, GraduationCap } from "lucide-react";
+import { motion } from "framer-motion";
+import { apiFetch, setAuthToken } from "@/lib/api-client";
+import { toast } from "sonner";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length > 11) value = value.slice(0, 11);
+
+    // Simple CPF mask: 000.000.000-00
+    if (value.length > 9) {
+      value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    } else if (value.length > 6) {
+      value = value.replace(/(\d{3})(\d{3})(\d{3})/, "$1.$2.$3");
+    } else if (value.length > 3) {
+      value = value.replace(/(\d{3})(\d{3})/, "$1.$2");
+    }
+
+    setCpf(value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate login
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsLoading(false);
-    navigate("/dashboard");
+
+    try {
+      const response = await apiFetch<{ access_token: string; user: any }>('/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          cpf: cpf, // O backend espera o CPF para bater com o admin criado
+          password: password,
+        }),
+      });
+
+      setAuthToken(response.access_token);
+      toast.success("Login realizado com sucesso!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast.error(error.message || "Falha na autenticação. Verifique suas credenciais.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background p-4">
+      {/* Animated Background Decoration */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 90, 0],
+            x: [0, 50, 0],
+            y: [0, 30, 0]
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[100px]"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.3, 1],
+            rotate: [0, -45, 0],
+            x: [0, -30, 0],
+            y: [0, 50, 0]
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[120px]"
+        />
+      </div>
+
+      <div className="w-full max-w-md relative">
         {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-lg">
-            <GraduationCap className="w-8 h-8 text-primary-foreground" />
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="flex justify-center mb-10"
+        >
+          <div className="relative group">
+            <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-xl group-hover:bg-primary/30 transition-colors" />
+            <div className="relative w-20 h-20 rounded-3xl bg-primary flex items-center justify-center shadow-2xl transition-transform hover:scale-105 duration-300">
+              <GraduationCap className="w-10 h-10 text-primary-foreground" />
+            </div>
           </div>
-        </div>
-        
+        </motion.div>
+
         {/* Card */}
-        <div className="bg-card rounded-2xl shadow-card border border-border/50 p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-foreground">FinEdu</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Sistema Financeiro Escolar
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-card/70 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-border/50 p-10 relative"
+        >
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">FinEdu</h1>
+            <p className="text-muted-foreground mt-2 font-medium">
+              Gestão Financeira Escolar Inteligente
             </p>
           </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
-                E-mail
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-2.5"
+            >
+              <Label htmlFor="cpf" className="text-sm font-semibold ml-1">
+                Acesse com seu CPF
               </Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-11"
+                id="cpf"
+                type="text"
+                placeholder="000.000.000-00"
+                value={cpf}
+                onChange={handleCpfChange}
+                className="h-12 rounded-xl bg-background/50 border-border/50 focus:border-primary transition-all px-4"
                 required
               />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">
-                Senha
-              </Label>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="space-y-2.5"
+            >
+              <div className="flex justify-between items-center ml-1">
+                <Label htmlFor="password" className="text-sm font-semibold">
+                  Sua senha
+                </Label>
+                <a href="#" className="text-xs text-primary hover:underline font-medium">
+                  Esqueceu?
+                </a>
+              </div>
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-11"
+                className="h-12 rounded-xl bg-background/50 border-border/50 focus:border-primary transition-all px-4"
                 required
               />
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full h-11 font-medium"
-              disabled={isLoading}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Entrando...
-                </>
-              ) : (
-                "Entrar no Sistema"
-              )}
-            </Button>
+              <Button
+                type="submit"
+                className="w-full h-12 font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all text-base"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                    Autenticando...
+                  </>
+                ) : (
+                  "Entrar agora"
+                )}
+              </Button>
+            </motion.div>
           </form>
-          
-          <p className="text-xs text-center text-muted-foreground mt-6">
-            Esqueceu sua senha?{" "}
-            <a href="#" className="text-primary hover:underline">
-              Recuperar acesso
-            </a>
-          </p>
-        </div>
-        
-        <p className="text-xs text-center text-muted-foreground mt-6">
-          © 2025 FinEdu. Todos os direitos reservados.
-        </p>
+
+          <div className="mt-8 pt-8 border-t border-border/50 text-center">
+            <p className="text-sm text-muted-foreground">
+              Ainda não tem acesso?{" "}
+              <a href="#" className="text-primary font-bold hover:underline">
+                Solicite agora
+              </a>
+            </p>
+          </div>
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="text-xs text-center text-muted-foreground mt-10 font-medium"
+        >
+          © 2026 FinEdu • Software de Alto Desempenho
+        </motion.p>
       </div>
     </div>
   );

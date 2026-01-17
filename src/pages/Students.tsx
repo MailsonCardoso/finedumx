@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Table,
   TableBody,
@@ -18,12 +19,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Search, Filter } from "lucide-react";
-import { students } from "@/data/mockData";
+import { Plus, Search, Filter, UserX, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api-client";
+
+interface Student {
+  id: number;
+  name: string;
+  course: string;
+  due_day: number;
+  monthly_fee: number;
+  status: 'em_dia' | 'a_vencer' | 'atrasado';
+}
 
 export default function Students() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
+
+  const { data: studentsData = [], isLoading } = useQuery<Student[]>({
+    queryKey: ['students', searchTerm, statusFilter],
+    queryFn: () => apiFetch(`/students?search=${searchTerm}&status=${statusFilter}`),
+  });
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -45,98 +61,144 @@ export default function Students() {
     }
   };
 
-  const filteredStudents = students.filter((student) => {
-    const matchesSearch = student.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "todos" || student.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        >
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Alunos</h1>
-            <p className="text-muted-foreground mt-1">
-              Gerencie os alunos e suas mensalidades
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">Alunos</h1>
+            <p className="text-muted-foreground mt-1 text-lg">
+              Gerencie a base de alunos e acompanhe o status financeiro de cada um.
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="w-4 h-4" />
+          <Button className="gap-2 shadow-lg shadow-primary/20 h-11 px-6">
+            <Plus className="w-5 h-5" />
             Novo Aluno
           </Button>
-        </div>
+        </motion.div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-col sm:flex-row gap-4 bg-muted/30 p-4 rounded-2xl border border-border/50 backdrop-blur-sm"
+        >
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar aluno..."
+              placeholder="Buscar aluno por nome..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
+              className="pl-10 h-11 bg-background/50 border-border/50 focus:border-primary transition-all"
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="Filtrar status" />
+            <SelectTrigger className="w-full sm:w-[200px] h-11 bg-background/50">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <SelectValue placeholder="Filtrar status" />
+              </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="todos">Todos os status</SelectItem>
               <SelectItem value="em_dia">Em dia</SelectItem>
               <SelectItem value="a_vencer">A vencer</SelectItem>
               <SelectItem value="atrasado">Atrasado</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </motion.div>
 
         {/* Table */}
-        <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-card/50 backdrop-blur-md rounded-2xl shadow-soft border border-border/50 overflow-hidden"
+        >
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="font-semibold">Nome</TableHead>
-                  <TableHead className="font-semibold">Curso</TableHead>
-                  <TableHead className="font-semibold">Dia Venc.</TableHead>
-                  <TableHead className="font-semibold">Mensalidade</TableHead>
-                  <TableHead className="font-semibold">Status</TableHead>
+                <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
+                  <TableHead className="font-bold h-14 text-foreground">Nome</TableHead>
+                  <TableHead className="font-bold h-14 text-foreground">Curso</TableHead>
+                  <TableHead className="font-bold h-14 text-foreground text-center">Dia Venc.</TableHead>
+                  <TableHead className="font-bold h-14 text-foreground">Mensalidade</TableHead>
+                  <TableHead className="font-bold h-14 text-foreground">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredStudents.map((student) => (
-                  <TableRow 
-                    key={student.id}
-                    className="hover:bg-muted/30 cursor-pointer transition-colors"
-                  >
-                    <TableCell className="font-medium">{student.name}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {student.course}
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-48 text-center">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-muted-foreground">Carregando alunos...</p>
+                      </div>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      Dia {student.dueDay}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatCurrency(student.monthlyFee)}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(student.status)}</TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  <AnimatePresence mode="popLayout">
+                    {studentsData.map((student, i) => (
+                      <motion.tr
+                        key={student.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="group border-b border-border/40 hover:bg-primary/5 cursor-pointer transition-colors"
+                      >
+                        <TableCell className="py-4 font-semibold text-foreground group-hover:text-primary transition-colors">
+                          {student.name}
+                        </TableCell>
+                        <TableCell className="py-4 text-muted-foreground">
+                          {student.course}
+                        </TableCell>
+                        <TableCell className="py-4 text-center text-muted-foreground whitespace-nowrap">
+                          <span className="bg-muted px-2 py-1 rounded text-xs font-medium">Dia {student.due_day}</span>
+                        </TableCell>
+                        <TableCell className="py-4 font-bold text-foreground">
+                          {formatCurrency(student.monthly_fee)}
+                        </TableCell>
+                        <TableCell className="py-4">{getStatusBadge(student.status)}</TableCell>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                )}
               </TableBody>
             </Table>
           </div>
-          {filteredStudents.length === 0 && (
-            <div className="p-8 text-center text-muted-foreground">
-              Nenhum aluno encontrado.
-            </div>
+
+          {!isLoading && studentsData.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="p-16 text-center flex flex-col items-center gap-4"
+            >
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                <UserX className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-foreground">Nenhum aluno encontrado</h3>
+                <p className="text-muted-foreground max-w-xs mx-auto mt-2">
+                  Tente ajustar seus filtros ou termos de busca para encontrar o que procura.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => { setSearchTerm(""); setStatusFilter("todos"); }}
+                className="mt-2"
+              >
+                Limpar filtros
+              </Button>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       </div>
     </MainLayout>
   );

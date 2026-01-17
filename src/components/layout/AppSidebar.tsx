@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   LayoutDashboard,
   Users,
@@ -81,7 +82,6 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
       {/* Footer */}
       <div className="p-3 border-t border-sidebar-border">
-        <Separator className="mb-3" />
         <div className={cn(
           "flex items-center gap-3 p-2 rounded-lg",
           collapsed ? "justify-center" : ""
@@ -98,7 +98,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             </div>
           )}
         </div>
-        
+
         <div className="flex items-center gap-2 mt-3">
           <Button
             variant="ghost"
@@ -106,7 +106,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             onClick={onToggle}
             className={cn(
               "flex-1 h-9",
-              collapsed && "w-full"
+              collapsed && "w-9"
             )}
           >
             {collapsed ? (
@@ -119,14 +119,22 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             )}
           </Button>
           {!collapsed && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/")}
-              className="h-9 px-3"
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
+            <>
+              <ThemeToggle />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/")}
+                className="h-9 px-3"
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </>
+          )}
+          {collapsed && (
+            <div className="flex flex-col gap-2 mt-2">
+              <ThemeToggle />
+            </div>
           )}
         </div>
       </div>
