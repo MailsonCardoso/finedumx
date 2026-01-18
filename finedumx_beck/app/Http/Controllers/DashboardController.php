@@ -12,25 +12,40 @@ class DashboardController extends Controller
 {
     public function stats()
     {
-        $monthlyRevenue = Payment::whereMonth('payment_date', now()->month)
+        $today = now()->startOfDay();
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+
+        // 1. RECEBIDO MÊS (Apenas o que foi pago dentro deste mês)
+        $monthlyRevenue = Payment::whereBetween('payment_date', [$startOfMonth, $endOfMonth])
             ->where('status', 'confirmado')
             ->sum('amount');
 
-        $today = now()->startOfDay();
+        // 2. MENSALIDADES VENCENDO (Pendentes que vencem hoje ou até o fim do mês)
+        $pendingQuery = Tuition::where('status', 'pendente')
+            ->whereBetween('due_date', [$today, $endOfMonth]);
+
+        $pendingAmount = $pendingQuery->sum('amount');
+        $pendingCount = $pendingQuery->count();
+
+        // 3. INADIMPLÊNCIA TOTAL (Tudo o que venceu e não foi pago, de qualquer tempo)
         $overdueQuery = Tuition::whereIn('status', ['pendente', 'atrasado'])
             ->where('due_date', '<', $today);
 
         $overdueAmount = $overdueQuery->sum('amount');
         $overdueCount = $overdueQuery->count();
+
+        // 4. ALUNOS ATIVOS
         $activeStudents = Student::where('status', 'ativo')->count();
 
-        // Pendências Prioritárias (mesma lógica do KPI para consistência)
-        $priorityQuery = clone $overdueQuery;
+        // Tendências (Comparativo simples ou contagem)
+        // Simulando a meta de 85% para visual (podemos ajustar depois para ser real)
+        $goalAmount = $monthlyRevenue + $pendingAmount;
+        $revenuePercent = $goalAmount > 0 ? round(($monthlyRevenue / $goalAmount) * 100) : 0;
 
-        $priorityAmount = $priorityQuery->sum('amount');
-        $priorityCount = $priorityQuery->count();
-        $priorityDetails = $priorityQuery->with('student')
-            ->orderBy('due_date', 'asc') // Os mais antigos primeiro
+        // Pendências Prioritárias
+        $priorityDetails = $overdueQuery->with('student')
+            ->orderBy('due_date', 'asc')
             ->take(5)
             ->get()
             ->map(function ($t) use ($today) {
@@ -49,16 +64,18 @@ class DashboardController extends Controller
 
         return response()->json([
             'kpis' => [
-                'monthlyRevenue' => $monthlyRevenue,
-                'overdueAmount' => $overdueAmount,
+                'monthlyRevenue' => (float) $monthlyRevenue,
+                'revenueTrend' => $revenuePercent . '% da meta',
+                'pendingAmount' => (float) $pendingAmount,
+                'pendingTrend' => $pendingCount . ' alunos',
+                'overdueAmount' => (float) $overdueAmount,
+                'overdueTrend' => $overdueCount . ' matrículas',
                 'activeStudents' => $activeStudents,
-                'revenueTrend' => 'Mês Atual',
-                'overdueTrend' => $overdueCount . ' atrasadas',
                 'studentsTrend' => $activeStudents . ' ativos',
             ],
             'priority' => [
-                'totalAmount' => (float) $priorityAmount,
-                'count' => $priorityCount,
+                'totalAmount' => (float) $overdueAmount,
+                'count' => $overdueCount,
                 'details' => $priorityDetails,
             ],
             'recentPayments' => Payment::with('student')

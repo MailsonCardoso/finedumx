@@ -126,44 +126,7 @@ export default function Payments() {
           </p>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="shadow-card border-border/50">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-emerald-500/10">
-                <CheckCircle className="w-5 h-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Confirmados Hoje</p>
-                <p className="text-2xl font-bold text-foreground">{confirmedToday}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card border-border/50">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-warning/10">
-                <Clock className="w-5 h-5 text-warning" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Pendentes (Á vencer)</p>
-                <p className="text-2xl font-bold text-warning">{pendingCount}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card border-border/50 bg-destructive/5 border-destructive/20">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-destructive/10">
-                <AlertCircle className="w-5 h-5 text-destructive" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Avaliados como Atraso</p>
-                <p className="text-2xl font-bold text-destructive">{overdueCount}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Table */}
 
         {/* Table */}
         <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
