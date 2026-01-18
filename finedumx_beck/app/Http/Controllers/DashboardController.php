@@ -16,13 +16,16 @@ class DashboardController extends Controller
             ->where('status', 'confirmado')
             ->sum('amount');
 
-        $overdueAmount = Tuition::where('status', 'atrasado')->sum('amount');
+        $today = now()->startOfDay();
+        $overdueQuery = Tuition::whereIn('status', ['pendente', 'atrasado'])
+            ->where('due_date', '<', $today);
+
+        $overdueAmount = $overdueQuery->sum('amount');
+        $overdueCount = $overdueQuery->count();
         $activeStudents = Student::where('status', 'ativo')->count();
 
-        // Pendências Prioritárias (atrasadas: pendente e due_date < hoje)
-        $today = now()->startOfDay();
-        $priorityQuery = Tuition::where('status', 'pendente')
-            ->where('due_date', '<', $today);
+        // Pendências Prioritárias (mesma lógica do KPI para consistência)
+        $priorityQuery = clone $overdueQuery;
 
         $priorityAmount = $priorityQuery->sum('amount');
         $priorityCount = $priorityQuery->count();
@@ -50,7 +53,7 @@ class DashboardController extends Controller
                 'overdueAmount' => $overdueAmount,
                 'activeStudents' => $activeStudents,
                 'revenueTrend' => 'Mês Atual',
-                'overdueTrend' => Tuition::where('status', 'atrasado')->count() . ' atrasadas',
+                'overdueTrend' => $overdueCount . ' atrasadas',
                 'studentsTrend' => $activeStudents . ' ativos',
             ],
             'priority' => [
