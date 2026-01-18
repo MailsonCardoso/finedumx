@@ -104,8 +104,11 @@ export default function Dashboard() {
           <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-xl border border-border/50 shadow-sm self-start md:self-center">
             <Calendar className="w-4 h-4 text-primary" />
             <span className="text-sm font-semibold text-foreground">Período Atual:</span>
-            <span className="text-sm font-bold text-primary capitalize">
-              {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+            <span className="text-sm font-bold text-primary">
+              {(() => {
+                const dateStr = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+              })()}
             </span>
           </div>
         </motion.div>
