@@ -170,7 +170,7 @@ export default function Tuition() {
 
     if (isOverdue) {
       if (hasResp) {
-        message = `Olá ${respName}! Notamos que a mensalidade de *${tuition.reference}* do aluno *${studentName}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+        message = `Olá ${respName}! Notamos que a mensalidade de *${tuition.reference}* de *${studentName}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       } else {
         message = `Olá ${studentName}! Notamos que a mensalidade de *${tuition.reference}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       }
