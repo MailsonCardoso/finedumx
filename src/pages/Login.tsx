@@ -117,7 +117,7 @@ export default function Login() {
               className="space-y-2.5"
             >
               <Label htmlFor="cpf" className="text-sm font-semibold ml-1">
-                Acesse com seu CPF
+                Usuário
               </Label>
               <Input
                 id="cpf"
@@ -138,7 +138,7 @@ export default function Login() {
             >
               <div className="flex justify-between items-center ml-1">
                 <Label htmlFor="password" className="text-sm font-semibold">
-                  Sua senha
+                  Senha
                 </Label>
               </div>
               <Input
