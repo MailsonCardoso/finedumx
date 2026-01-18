@@ -26,6 +26,7 @@ class StudentController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string',
+            'active_responsible' => 'nullable|string',
             'email' => 'required|email|unique:students',
             'phone' => 'nullable|string',
             'course' => 'nullable|string',
@@ -46,6 +47,7 @@ class StudentController extends Controller
     {
         $validated = $request->validate([
             'name' => 'sometimes|required|string',
+            'active_responsible' => 'nullable|string',
             'email' => 'sometimes|required|email|unique:students,email,' . $student->id,
             'phone' => 'nullable|string',
             'course' => 'nullable|string',
