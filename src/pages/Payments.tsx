@@ -35,10 +35,17 @@ interface Payment {
 }
 
 export default function Payments() {
-  const { data: payments = [], isLoading } = useQuery<Payment[]>({
+  const { data: payments = [], isLoading: isLoadingPayments } = useQuery<Payment[]>({
     queryKey: ['payments'],
     queryFn: () => apiFetch('/payments'),
   });
+
+  const { data: tuitions = [], isLoading: isLoadingTuitions } = useQuery<any[]>({
+    queryKey: ['tuitions'],
+    queryFn: () => apiFetch('/tuitions'),
+  });
+
+  const isLoading = isLoadingPayments || isLoadingTuitions;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -89,7 +96,7 @@ export default function Payments() {
 
   const today = new Date().toISOString().split('T')[0];
   const confirmedToday = payments.filter(p => p.status === "confirmado" && p.payment_date === today).length;
-  const processing = payments.filter(p => p.status === "processando").length;
+  const pendingCount = tuitions.filter(t => t.status === "pendente" || t.status === "atrasado").length;
 
   return (
     <MainLayout>
@@ -121,8 +128,8 @@ export default function Payments() {
                 <Clock className="w-5 h-5 text-amber-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Processando</p>
-                <p className="text-2xl font-bold text-foreground">{processing}</p>
+                <p className="text-sm text-muted-foreground">Mensalidades Pendentes</p>
+                <p className="text-2xl font-bold text-foreground">{pendingCount}</p>
               </div>
             </CardContent>
           </Card>
