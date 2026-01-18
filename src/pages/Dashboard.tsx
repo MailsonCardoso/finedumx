@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { KPICard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -16,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
+import { StudentSheet } from "@/components/StudentSheet";
+import { Eye } from "lucide-react";
 
 interface DashboardData {
   kpis: {
@@ -33,6 +36,7 @@ interface DashboardData {
     count: number;
     details: Array<{
       id: number;
+      student_id: number;
       studentName: string;
       due_date: string;
       amount: number;
@@ -42,6 +46,7 @@ interface DashboardData {
   };
   recentPayments: Array<{
     id: string;
+    student_id: number;
     studentName: string;
     type: string;
     amount: number;
@@ -56,6 +61,9 @@ export default function Dashboard() {
     queryKey: ['dashboard-stats'],
     queryFn: () => apiFetch('/dashboard/stats'),
   });
+
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sheetStudentId, setSheetStudentId] = useState<number | null>(null);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -169,11 +177,18 @@ export default function Dashboard() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 + i * 0.1 }}
                       key={tuition.id}
-                      className="flex items-center justify-between py-4 group hover:bg-destructive/5 -mx-6 px-6 transition-colors"
+                      className="flex items-center justify-between py-4 group hover:bg-destructive/5 -mx-6 px-6 transition-colors cursor-pointer"
+                      onClick={() => {
+                        if (tuition.student_id) {
+                          setSheetStudentId(tuition.student_id);
+                          setIsSheetOpen(true);
+                        }
+                      }}
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground truncate group-hover:text-destructive transition-colors">
+                        <p className="font-semibold text-foreground truncate group-hover:text-destructive transition-colors flex items-center gap-2">
                           {tuition.studentName}
+                          <Eye className="w-3.5 h-3.5 opacity-0 group-hover:opacity-50" />
                         </p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <AlertCircle className="w-3 h-3 text-destructive" />
@@ -233,11 +248,18 @@ export default function Dashboard() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + i * 0.1 }}
                       key={payment.id}
-                      className="flex items-center justify-between py-4 group hover:bg-muted/50 -mx-6 px-6 transition-colors"
+                      className="flex items-center justify-between py-4 group hover:bg-muted/50 -mx-6 px-6 transition-colors cursor-pointer"
+                      onClick={() => {
+                        if (payment.student_id) {
+                          setSheetStudentId(payment.student_id);
+                          setIsSheetOpen(true);
+                        }
+                      }}
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                        <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors flex items-center gap-2">
                           {payment.studentName}
+                          <Eye className="w-3.5 h-3.5 opacity-0 group-hover:opacity-50" />
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {payment.type}
@@ -259,6 +281,12 @@ export default function Dashboard() {
           </motion.div>
         </div>
       </div>
+
+      <StudentSheet
+        studentId={sheetStudentId}
+        isOpen={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+      />
     </MainLayout>
   );
 }

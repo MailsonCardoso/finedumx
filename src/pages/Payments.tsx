@@ -96,24 +96,21 @@ export default function Payments() {
   };
 
   const todayStr = new Date().toISOString().split('T')[0];
-  const confirmedToday = payments.filter(p => p.status === "confirmado" && p.payment_date === todayStr).length;
-
-  // New logic for Pending vs Overdue
   const now = new Date();
-  const overdueTuitions = tuitions.filter(t => {
-    if (t.status === "pago") return false;
-    const dueDate = new Date(t.due_date + 'T23:59:59');
-    return t.status === "atrasado" || dueDate < now;
-  });
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth(), 30); // Requested 'até o dia 30'
 
-  const pendingOnlyTuitions = tuitions.filter(t => {
-    if (t.status !== "pendente") return false;
-    const dueDate = new Date(t.due_date + 'T23:59:59');
-    return dueDate >= now;
-  });
+  const amountReceivedToday = payments
+    .filter(p => p.status === "confirmado" && p.payment_date === todayStr)
+    .reduce((sum, p) => sum + Number(p.amount), 0);
 
-  const overdueCount = overdueTuitions.length;
-  const pendingCount = pendingOnlyTuitions.length;
+  const amountReceivedMonth = payments
+    .filter(p => {
+      if (p.status !== "confirmado") return false;
+      const pDate = new Date(p.payment_date + 'T12:00:00');
+      return pDate >= startOfMonth && pDate <= endOfMonth;
+    })
+    .reduce((sum, p) => sum + Number(p.amount), 0);
 
   return (
     <MainLayout>
@@ -126,9 +123,32 @@ export default function Payments() {
           </p>
         </div>
 
-        {/* Table */}
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card className="shadow-card border-border/50 bg-emerald-500/5">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-3 rounded-lg bg-emerald-500/10">
+                <CheckCircle className="w-5 h-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground font-medium">Recebido Hoje</p>
+                <p className="text-2xl font-bold text-emerald-600">{formatCurrency(amountReceivedToday)}</p>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Table */}
+          <Card className="shadow-card border-border/50 bg-primary/5">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-3 rounded-lg bg-primary/10">
+                <DollarSign className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground font-medium">Total do Mês (até dia 30)</p>
+                <p className="text-2xl font-bold text-primary">{formatCurrency(amountReceivedMonth)}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
           <div className="overflow-x-auto">
             <Table>

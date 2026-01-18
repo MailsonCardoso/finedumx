@@ -32,6 +32,8 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { motion, AnimatePresence } from "framer-motion";
+import { StudentSheet } from "@/components/StudentSheet";
+import { Eye } from "lucide-react";
 
 interface Student {
   id: number;
@@ -65,6 +67,8 @@ export default function Tuition() {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [tuitionToNotify, setTuitionToNotify] = useState<Tuition | null>(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sheetStudentId, setSheetStudentId] = useState<number | null>(null);
 
   const handlePrintReceipt = () => {
     window.print();
@@ -384,8 +388,19 @@ export default function Tuition() {
                         className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
                       >
                         <TableCell className="py-4 font-medium">{tuition.reference}</TableCell>
-                        <TableCell className="py-4 font-medium text-foreground group-hover:text-primary transition-colors">
-                          {tuition.student?.name}
+                        <TableCell
+                          className="py-4 font-medium text-foreground group-hover:text-primary transition-colors cursor-pointer"
+                          onClick={() => {
+                            if (tuition.student_id) {
+                              setSheetStudentId(tuition.student_id);
+                              setIsSheetOpen(true);
+                            }
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            {tuition.student?.name}
+                            <Eye className="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" />
+                          </div>
                         </TableCell>
                         <TableCell className="py-4 text-muted-foreground">
                           {formatDate(tuition.due_date)}
@@ -679,6 +694,11 @@ export default function Tuition() {
           </DialogContent>
         </Dialog>
 
+        <StudentSheet
+          studentId={sheetStudentId}
+          isOpen={isSheetOpen}
+          onOpenChange={setIsSheetOpen}
+        />
       </div>
     </MainLayout>
   );

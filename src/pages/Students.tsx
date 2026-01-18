@@ -38,10 +38,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Filter, UserX, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Filter, UserX, Loader2, Pencil, Trash2, Eye } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
+import { StudentSheet } from "@/components/StudentSheet";
 
 interface Student {
   id: number;
@@ -88,6 +89,8 @@ export default function Students() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sheetStudentId, setSheetStudentId] = useState<number | null>(null);
 
   // Form State
   const [formData, setFormData] = useState<StudentFormData>(initialFormData);
@@ -105,7 +108,7 @@ export default function Students() {
     return 0;
   });
 
-  const { data: coursesData = [] } = useQuery({
+  const { data: coursesData = [] } = useQuery<any[]>({
     queryKey: ['courses'],
     queryFn: () => apiFetch('/courses'),
   });
@@ -322,9 +325,12 @@ export default function Students() {
                         transition={{ delay: i * 0.05 }}
                         className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
                       >
-                        <TableCell className="py-4 font-semibold text-foreground group-hover:text-primary transition-colors">
+                        <TableCell className="py-4 font-semibold text-foreground group-hover:text-primary transition-colors cursor-pointer" onClick={() => { setSheetStudentId(student.id); setIsSheetOpen(true); }}>
                           <div className="flex flex-col">
-                            <span>{student.name}</span>
+                            <span className="flex items-center gap-2">
+                              {student.name}
+                              <Eye className="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" />
+                            </span>
                             {student.active_responsible && (
                               <span className="text-[10px] text-primary/70 font-medium uppercase tracking-wider mt-0.5">
                                 Resp: {student.active_responsible}
@@ -535,6 +541,11 @@ export default function Students() {
           </AlertDialogContent>
         </AlertDialog>
 
+        <StudentSheet
+          studentId={sheetStudentId}
+          isOpen={isSheetOpen}
+          onOpenChange={setIsSheetOpen}
+        />
       </div>
     </MainLayout>
   );

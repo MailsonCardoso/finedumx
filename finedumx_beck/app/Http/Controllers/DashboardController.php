@@ -57,6 +57,7 @@ class DashboardController extends Controller
 
                 return [
                     'id' => $t->id,
+                    'student_id' => $t->student_id,
                     'studentName' => $t->student->name ?? 'N/A',
                     'due_date' => $t->due_date,
                     'amount' => (float) $t->amount,
@@ -90,6 +91,7 @@ class DashboardController extends Controller
                 ->map(function ($p) {
                     return [
                         'id' => $p->id,
+                        'student_id' => $p->student_id,
                         'studentName' => $p->student->name ?? 'N/A',
                         'type' => $p->type,
                         'amount' => (float) $p->amount,
