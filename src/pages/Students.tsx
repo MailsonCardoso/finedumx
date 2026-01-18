@@ -62,7 +62,7 @@ interface StudentFormData {
   phone: string;
   course: string;
   due_day: number;
-  monthly_fee: number;
+  monthly_fee: number | string;
   status: string;
 }
 
@@ -73,7 +73,7 @@ const initialFormData: StudentFormData = {
   phone: "",
   course: "",
   due_day: 10,
-  monthly_fee: 0,
+  monthly_fee: "",
   status: "ativo",
 };
 
@@ -185,9 +185,18 @@ export default function Students() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditOpen && selectedStudent) {
-      updateMutation.mutate({ id: selectedStudent.id, data: formData });
+      updateMutation.mutate({
+        id: selectedStudent.id,
+        data: {
+          ...formData,
+          monthly_fee: formData.monthly_fee === "" ? 0 : parseFloat(formData.monthly_fee.toString())
+        }
+      });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate({
+        ...formData,
+        monthly_fee: formData.monthly_fee === "" ? 0 : parseFloat(formData.monthly_fee.toString())
+      });
     }
   };
 
@@ -470,7 +479,7 @@ export default function Students() {
                       type="number"
                       step="0.01"
                       value={formData.monthly_fee}
-                      onChange={(e) => setFormData({ ...formData, monthly_fee: parseFloat(e.target.value) })}
+                      onChange={(e) => setFormData({ ...formData, monthly_fee: e.target.value })}
                       placeholder="0.00"
                       required
                     />
