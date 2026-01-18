@@ -412,7 +412,7 @@ Conversar com *+55 ${schoolData?.phone?.replace(/\D/g, '') || "98988221217"}* no
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent side="bottom" align="start">
+                    <SelectContent side="bottom" align="start" sideOffset={5} className="max-h-[250px]">
                       <SelectItem value="pix">Pix</SelectItem>
                       <SelectItem value="dinheiro">Dinheiro</SelectItem>
                       <SelectItem value="cartao_credito">Cartão de Crédito</SelectItem>
@@ -452,7 +452,7 @@ Conversar com *+55 ${schoolData?.phone?.replace(/\D/g, '') || "98988221217"}* no
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent side="bottom" align="start">
+                  <SelectContent side="bottom" align="start" sideOffset={5} className="max-h-[250px]">
                     <SelectItem value="1">Janeiro</SelectItem>
                     <SelectItem value="2">Fevereiro</SelectItem>
                     <SelectItem value="3">Março</SelectItem>
