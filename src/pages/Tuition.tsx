@@ -170,16 +170,16 @@ export default function Tuition() {
 
     if (isOverdue) {
       if (hasResp) {
-        message = `Olá ${respName}! Notamos que a mensalidade de *${tuition.reference}* de *${studentName}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+        message = `Olá *${respName}*! Notamos que a mensalidade de *${tuition.reference}* de *${studentName}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       } else {
-        message = `Olá ${studentName}! Notamos que a mensalidade de *${tuition.reference}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+        message = `Olá *${studentName}*! Notamos que a mensalidade de *${tuition.reference}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       }
     } else {
       // Mensagem padrão para cobrança normal (pendente a vencer)
       if (hasResp) {
-        message = `Olá ${respName}! de *${studentName}*\na mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
+        message = `Olá *${respName}*! de *${studentName}*\na mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
       } else {
-        message = `Olá ${studentName}!\nsua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
+        message = `Olá *${studentName}*!\nsua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
       }
 
       message += `\n\nPara facilitar o pagamento, utilize nossa chave PIX:\n*${pix}*\n\nQualquer dúvida, estamos à disposição!\nConversar com *+55 ${schoolPhone}* no WhatsApp\n\n*${schoolName}*`;
