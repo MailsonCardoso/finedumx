@@ -163,20 +163,23 @@ export default function Tuition() {
     const schoolPhone = schoolData?.phone?.replace(/\D/g, '') || "98988221217";
     const schoolName = schoolData?.name || "ESCOLA DE MUSICA VEM CANTAR";
 
+    // Detect if overdue (either by status or by date)
+    const isOverdue = tuition.status === 'atrasado' || new Date(tuition.due_date) < new Date(new Date().setHours(0, 0, 0, 0));
+
     let message = "";
 
-    if (tuition.status === 'atrasado') {
+    if (isOverdue) {
       if (hasResp) {
         message = `Olá ${respName}! Notamos que a mensalidade de *${tuition.reference}* do aluno *${studentName}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       } else {
         message = `Olá ${studentName}! Notamos que a mensalidade de *${tuition.reference}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       }
     } else {
-      // Mensagem padrão para cobrança normal (pendente)
+      // Mensagem padrão para cobrança normal (pendente a vencer)
       if (hasResp) {
-        message = `Olá ${respName}! Referente ao aluno *${studentName}*, a mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
+        message = `Olá ${respName}! de *${studentName}*\na mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
       } else {
-        message = `Olá ${studentName}! Sua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
+        message = `Olá ${studentName}!\nsua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
       }
 
       message += `\n\nPara facilitar o pagamento, utilize nossa chave PIX:\n*${pix}*\n\nQualquer dúvida, estamos à disposição!\nConversar com *+55 ${schoolPhone}* no WhatsApp\n\n*${schoolName}*`;
