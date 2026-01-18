@@ -452,7 +452,14 @@ export default function Students() {
                     <Label htmlFor="course">Curso</Label>
                     <Select
                       value={formData.course}
-                      onValueChange={(value) => setFormData({ ...formData, course: value })}
+                      onValueChange={(value) => {
+                        const course = coursesData?.find((c: any) => c.name === value);
+                        setFormData({
+                          ...formData,
+                          course: value,
+                          monthly_fee: course ? course.price : formData.monthly_fee
+                        });
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione..." />

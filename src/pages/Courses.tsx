@@ -38,6 +38,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface Course {
     id: number;
     name: string;
+    price: number;
     description?: string;
 }
 
@@ -47,7 +48,7 @@ export default function Courses() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-    const [formData, setFormData] = useState({ name: "", description: "" });
+    const [formData, setFormData] = useState({ name: "", price: "", description: "" });
 
     const queryClient = useQueryClient();
 
@@ -65,7 +66,7 @@ export default function Courses() {
             queryClient.invalidateQueries({ queryKey: ['courses'] });
             toast.success("Curso criado com sucesso!");
             setIsAddOpen(false);
-            setFormData({ name: "", description: "" });
+            setFormData({ name: "", price: "", description: "" });
         },
         onError: () => toast.error("Erro ao criar curso")
     });
@@ -101,16 +102,25 @@ export default function Courses() {
 
     const handleSubmit = (e: React.FormEvent, isEdit: boolean) => {
         e.preventDefault();
+        const data = {
+            ...formData,
+            price: formData.price === "" ? 0 : parseFloat(formData.price)
+        };
+
         if (isEdit) {
-            updateMutation.mutate(formData);
+            updateMutation.mutate(data);
         } else {
-            createMutation.mutate(formData);
+            createMutation.mutate(data);
         }
     };
 
     const openEdit = (course: Course) => {
         setSelectedCourse(course);
-        setFormData({ name: course.name, description: course.description || "" });
+        setFormData({
+            name: course.name,
+            price: course.price.toString(),
+            description: course.description || ""
+        });
         setIsEditOpen(true);
     };
 
@@ -167,6 +177,7 @@ export default function Courses() {
                             <TableHeader>
                                 <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
                                     <TableHead className="font-bold h-14 text-foreground">Nome do Curso</TableHead>
+                                    <TableHead className="font-bold h-14 text-foreground text-right">Valor Padrão</TableHead>
                                     <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -196,6 +207,12 @@ export default function Courses() {
                                                         <BookOpen className="w-4 h-4 text-primary/70" />
                                                         {course.name}
                                                     </div>
+                                                </TableCell>
+                                                <TableCell className="py-4 text-right">
+                                                    {new Intl.NumberFormat("pt-BR", {
+                                                        style: "currency",
+                                                        currency: "BRL",
+                                                    }).format(course.price)}
                                                 </TableCell>
                                                 <TableCell className="py-4 text-right pr-6">
                                                     <div className="flex items-center justify-end gap-2">
@@ -242,6 +259,18 @@ export default function Courses() {
                                     />
                                 </div>
                                 <div className="space-y-2">
+                                    <Label htmlFor="price">Valor Padrão</Label>
+                                    <Input
+                                        id="price"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0,00"
+                                        value={formData.price}
+                                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
                                     <Label htmlFor="desc">Descrição (Opcional)</Label>
                                     <Input
                                         id="desc"
@@ -275,6 +304,17 @@ export default function Courses() {
                                         id="edit-name"
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="edit-price">Valor Padrão</Label>
+                                    <Input
+                                        id="edit-price"
+                                        type="number"
+                                        step="0.01"
+                                        value={formData.price}
+                                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                                         required
                                     />
                                 </div>

@@ -17,6 +17,7 @@ class CourseController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
         ]);
 
@@ -33,6 +34,7 @@ class CourseController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
         ]);
 
