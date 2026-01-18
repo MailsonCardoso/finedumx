@@ -105,7 +105,7 @@ export default function Login() {
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-foreground tracking-tight">FinEdu</h1>
             <p className="text-muted-foreground mt-2 font-medium">
-              Gestão Financeira Escolar Inteligente
+              Gestão Financeira
             </p>
           </div>
 
@@ -140,9 +140,6 @@ export default function Login() {
                 <Label htmlFor="password" className="text-sm font-semibold">
                   Sua senha
                 </Label>
-                <a href="#" className="text-xs text-primary hover:underline font-medium">
-                  Esqueceu?
-                </a>
               </div>
               <Input
                 id="password"
@@ -177,14 +174,6 @@ export default function Login() {
             </motion.div>
           </form>
 
-          <div className="mt-8 pt-8 border-t border-border/50 text-center">
-            <p className="text-sm text-muted-foreground">
-              Ainda não tem acesso?{" "}
-              <a href="#" className="text-primary font-bold hover:underline">
-                Solicite agora
-              </a>
-            </p>
-          </div>
         </motion.div>
 
         <motion.p
