@@ -260,7 +260,10 @@ export default function Tuition() {
   };
 
   const filteredTuitions = tuitions.filter(t => {
-    const matchesSearch = t.student?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    // Exclude orphans (tuitions without students)
+    if (!t.student) return false;
+
+    const matchesSearch = t.student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       t.reference.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'todos' || t.status === statusFilter;
     return matchesSearch && matchesStatus;

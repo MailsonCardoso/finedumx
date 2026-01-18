@@ -11,7 +11,7 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        return response()->json(Payment::with('student', 'tuition')->latest()->get());
+        return response()->json(Payment::with('student', 'tuition')->whereHas('student')->latest()->get());
     }
 
     public function store(Request $request)

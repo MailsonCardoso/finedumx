@@ -36,8 +36,8 @@ export function NotificationBell() {
 
     // Filter tuitions: Overdue AND (never notified OR notified more than 3 days ago)
     const pendingNotifications = tuitions.filter(t => {
-        // Se já estiver pago, nunca deve aparecer na notificação
-        if (t.status === 'pago') return false;
+        // Se já estiver pago ou o aluno não existir mais, ignora
+        if (t.status === 'pago' || !t.student) return false;
 
         if (t.status !== 'atrasado' && new Date(t.due_date) >= new Date()) return false;
 

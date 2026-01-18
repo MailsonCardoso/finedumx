@@ -62,7 +62,13 @@ class StudentController extends Controller
 
     public function destroy(Student $student)
     {
-        $student->delete();
+        \DB::transaction(function () use ($student) {
+            // Manualmente limpando para garantir que não fiquem órfãos se a constraint falhar
+            $student->payments()->delete();
+            $student->tuitions()->delete();
+            $student->delete();
+        });
+
         return response()->json(null, 204);
     }
 }

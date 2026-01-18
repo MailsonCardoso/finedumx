@@ -9,7 +9,7 @@ class TuitionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Tuition::with('student');
+        $query = Tuition::with('student')->whereHas('student');
 
         if ($request->has('status') && $request->status !== 'todos') {
             $query->where('status', $request->status);

@@ -17,19 +17,22 @@ class DashboardController extends Controller
         $endOfMonth = now()->endOfMonth();
 
         // 1. RECEBIDO MÊS (Apenas o que foi pago dentro deste mês)
-        $monthlyRevenue = Payment::whereBetween('payment_date', [$startOfMonth, $endOfMonth])
+        $monthlyRevenue = Payment::whereHas('student')
+            ->whereBetween('payment_date', [$startOfMonth, $endOfMonth])
             ->where('status', 'confirmado')
             ->sum('amount');
 
         // 2. MENSALIDADES VENCENDO (Pendentes que vencem hoje ou até o fim do mês)
-        $pendingQuery = Tuition::where('status', 'pendente')
+        $pendingQuery = Tuition::whereHas('student')
+            ->where('status', 'pendente')
             ->whereBetween('due_date', [$today, $endOfMonth]);
 
         $pendingAmount = $pendingQuery->sum('amount');
         $pendingCount = $pendingQuery->count();
 
         // 3. INADIMPLÊNCIA TOTAL (Tudo o que venceu e não foi pago, de qualquer tempo)
-        $overdueQuery = Tuition::whereIn('status', ['pendente', 'atrasado'])
+        $overdueQuery = Tuition::whereHas('student')
+            ->whereIn('status', ['pendente', 'atrasado'])
             ->where('due_date', '<', $today);
 
         $overdueAmount = $overdueQuery->sum('amount');
@@ -79,6 +82,7 @@ class DashboardController extends Controller
                 'details' => $priorityDetails,
             ],
             'recentPayments' => Payment::with('student')
+                ->whereHas('student')
                 ->where('status', 'confirmado')
                 ->latest('payment_date')
                 ->take(5)
