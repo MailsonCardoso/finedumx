@@ -138,14 +138,6 @@ export default function Dashboard() {
                   <div className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
                   Pendências Prioritárias
                 </CardTitle>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-destructive">
-                    {formatCurrency(data?.priority.totalAmount || 0)}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
-                    Total em atraso
-                  </p>
-                </div>
               </CardHeader>
               <CardContent className="pt-2">
                 <div className="divide-y divide-border/50">
