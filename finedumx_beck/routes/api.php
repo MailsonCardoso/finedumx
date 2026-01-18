@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Tuitions (Mensalidades)
     Route::post('/tuitions/generate-batch', [TuitionController::class, 'generateBatch']);
+    Route::post('/tuitions/{tuition}/notify', [TuitionController::class, 'notify']);
     Route::apiResource('tuitions', TuitionController::class);
 
     // Courses

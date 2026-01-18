@@ -89,4 +89,10 @@ class TuitionController extends Controller
 
         return response()->json(['message' => "Geradas {$count} mensalidades com sucesso!"]);
     }
+
+    public function notify(Tuition $tuition)
+    {
+        $tuition->update(['last_notification_at' => now()]);
+        return response()->json($tuition);
+    }
 }

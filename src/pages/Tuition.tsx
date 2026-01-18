@@ -48,6 +48,7 @@ interface Tuition {
   amount: number;
   status: 'pago' | 'pendente' | 'atrasado';
   student: Student;
+  last_notification_at?: string;
 }
 
 export default function Tuition() {
@@ -116,6 +117,13 @@ export default function Tuition() {
     }
   });
 
+  const notifyMutation = useMutation({
+    mutationFn: (id: number) => apiFetch(`/tuitions/${id}/notify`, { method: 'POST' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tuitions'] });
+    }
+  });
+
   // Handlers
   const handlePayClick = (tuition: Tuition) => {
     setSelectedTuition(tuition);
@@ -150,6 +158,18 @@ export default function Tuition() {
     if (!tuition.student?.phone) {
       toast.error("Aluno sem telefone cadastrado");
       return;
+    }
+
+    // Check if notified recently (today)
+    if (tuition.last_notification_at) {
+      const lastNotify = new Date(tuition.last_notification_at);
+      const isToday = lastNotify.toDateString() === new Date().toDateString();
+
+      if (isToday) {
+        if (!window.confirm("Uma cobrança já foi enviada HOJE para este aluno. Deseja enviar novamente?")) {
+          return;
+        }
+      }
     }
 
     // Remove formatting from phone (keep only numbers)
@@ -196,6 +216,9 @@ export default function Tuition() {
 
     // Encode message for URL
     const encodedMessage = encodeURIComponent(message);
+
+    // Mark as notified in backend
+    notifyMutation.mutate(tuition.id);
 
     // Open WhatsApp Web
     window.open(`https://wa.me/55${phone}?text=${encodedMessage}`, '_blank');
@@ -356,11 +379,25 @@ export default function Tuition() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                  className={`h-8 transition-colors ${tuition.last_notification_at
+                                      ? (new Date(tuition.last_notification_at).toDateString() === new Date().toDateString()
+                                        ? "text-emerald-500 bg-emerald-50"
+                                        : "text-emerald-600/60")
+                                      : "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                    }`}
                                   onClick={() => handleWhatsAppClick(tuition)}
-                                  title="Enviar Lembrete WhatsApp"
+                                  title={tuition.last_notification_at
+                                    ? `Último envio: ${new Date(tuition.last_notification_at).toLocaleString('pt-BR')}`
+                                    : "Enviar Lembrete WhatsApp"
+                                  }
                                 >
                                   <MessageCircle className="w-4 h-4" />
+                                  {tuition.last_notification_at && (
+                                    <CheckCircle2 className={`w-3 h-3 absolute -top-1 -right-1 ${new Date(tuition.last_notification_at).toDateString() === new Date().toDateString()
+                                        ? "text-emerald-500"
+                                        : "text-muted-foreground/40"
+                                      }`} />
+                                  )}
                                 </Button>
                                 <Button
                                   size="sm"
