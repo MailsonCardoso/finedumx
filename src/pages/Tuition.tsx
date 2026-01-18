@@ -37,6 +37,7 @@ interface Student {
   id: number;
   name: string;
   phone: string;
+  active_responsible?: string;
 }
 
 interface Tuition {
@@ -154,18 +155,32 @@ export default function Tuition() {
     // Remove formatting from phone (keep only numbers)
     const phone = tuition.student.phone.replace(/\D/g, '');
 
-    // Format message
-    const message = `Olá ${tuition.student.name}!
+    // Build Message based on status and responsible
+    const hasResp = tuition.student.active_responsible && tuition.student.active_responsible.trim() !== "";
+    const respName = tuition.student.active_responsible;
+    const studentName = tuition.student.name;
+    const pix = schoolData?.pix_key || "98988221217";
+    const schoolPhone = schoolData?.phone?.replace(/\D/g, '') || "98988221217";
+    const schoolName = schoolData?.name || "ESCOLA DE MUSICA VEM CANTAR";
 
-Sua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.
+    let message = "";
 
-Para facilitar o pagamento, utilize nossa chave PIX:
-*${schoolData?.pix_key || "98988221217"}*
+    if (tuition.status === 'atrasado') {
+      if (hasResp) {
+        message = `Olá ${respName}! Notamos que a mensalidade de *${tuition.reference}* do aluno *${studentName}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+      } else {
+        message = `Olá ${studentName}! Notamos que a mensalidade de *${tuition.reference}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+      }
+    } else {
+      // Mensagem padrão para cobrança normal (pendente)
+      if (hasResp) {
+        message = `Olá ${respName}! Referente ao aluno *${studentName}*, a mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
+      } else {
+        message = `Olá ${studentName}! Sua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
+      }
 
-Qualquer dúvida, estamos à disposição!
-Conversar com *+55 ${schoolData?.phone?.replace(/\D/g, '') || "98988221217"}* no WhatsApp
-
-*${schoolData?.name || "ESCOLA DE MUSICA VEM CANTAR"}*`;
+      message += `\n\nPara facilitar o pagamento, utilize nossa chave PIX:\n*${pix}*\n\nQualquer dúvida, estamos à disposição!\nConversar com *+55 ${schoolPhone}* no WhatsApp\n\n*${schoolName}*`;
+    }
 
     // Encode message for URL
     const encodedMessage = encodeURIComponent(message);
