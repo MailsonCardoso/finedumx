@@ -46,6 +46,7 @@ import { toast } from "sonner";
 interface Student {
   id: number;
   name: string;
+  active_responsible?: string;
   email: string;
   phone: string;
   course: string;
@@ -56,6 +57,7 @@ interface Student {
 
 interface StudentFormData {
   name: string;
+  active_responsible: string;
   email: string;
   phone: string;
   course: string;
@@ -66,6 +68,7 @@ interface StudentFormData {
 
 const initialFormData: StudentFormData = {
   name: "",
+  active_responsible: "",
   email: "",
   phone: "",
   course: "",
@@ -163,6 +166,7 @@ export default function Students() {
     setSelectedStudent(student);
     setFormData({
       name: student.name,
+      active_responsible: student.active_responsible || "",
       email: student.email,
       phone: student.phone,
       course: student.course,
@@ -312,6 +316,11 @@ export default function Students() {
                         <TableCell className="py-4 font-semibold text-foreground group-hover:text-primary transition-colors">
                           <div className="flex flex-col">
                             <span>{student.name}</span>
+                            {student.active_responsible && (
+                              <span className="text-[10px] text-primary/70 font-medium uppercase tracking-wider mt-0.5">
+                                Resp: {student.active_responsible}
+                              </span>
+                            )}
                             <span className="text-xs text-muted-foreground font-normal">{student.email}</span>
                           </div>
                         </TableCell>
@@ -380,15 +389,26 @@ export default function Students() {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nome Completo</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Ex: João da Silva"
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Nome do Aluno</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Ex: João da Silva"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="responsible">Responsável</Label>
+                    <Input
+                      id="responsible"
+                      value={formData.active_responsible}
+                      onChange={(e) => setFormData({ ...formData, active_responsible: e.target.value })}
+                      placeholder="Nome do pai/mãe"
+                    />
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
