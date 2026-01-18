@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
                 'phone' => '(11) 3456-7890',
                 'email' => 'contato@finedu.edu.br',
                 'address' => 'Rua da Educação, 123 - São Paulo, SP',
+                'pix_key' => '98988221217',
             ]
         );
 

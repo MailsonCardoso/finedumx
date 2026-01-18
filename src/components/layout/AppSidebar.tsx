@@ -56,6 +56,11 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     }
   };
 
+  const { data: user } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => apiFetch<any>('/me'),
+  });
+
   return (
     <aside
       className={cn(
@@ -109,13 +114,13 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         )}>
           <Avatar className="w-9 h-9">
             <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-              AD
+              {user?.name?.substring(0, 2).toUpperCase() || "AD"}
             </AvatarFallback>
           </Avatar>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">Admin</p>
-              <p className="text-xs text-muted-foreground truncate">admin@finedu.com</p>
+              <p className="text-sm font-medium text-foreground truncate">{user?.name || "Admin"}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email || "admin@finedu.com"}</p>
             </div>
           )}
         </div>

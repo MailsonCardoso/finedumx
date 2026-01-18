@@ -15,5 +15,6 @@ class SchoolSetting extends Model
         'phone',
         'email',
         'address',
+        'pix_key',
     ];
 }

@@ -93,6 +93,11 @@ export default function Tuition() {
     queryFn: () => apiFetch('/tuitions'),
   });
 
+  const { data: schoolData } = useQuery({
+    queryKey: ['school-settings'],
+    queryFn: () => apiFetch<any>('/settings'),
+  });
+
   // Mutations
   const payMutation = useMutation({
     mutationFn: (data: any) => apiFetch('/payments', {
@@ -155,12 +160,12 @@ export default function Tuition() {
 Sua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.
 
 Para facilitar o pagamento, utilize nossa chave PIX:
-*98988221217*
+*${schoolData?.pix_key || "98988221217"}*
 
 Qualquer dúvida, estamos à disposição!
-Conversar com *+55 98988221217* no WhatsApp
+Conversar com *+55 ${schoolData?.phone?.replace(/\D/g, '') || "98988221217"}* no WhatsApp
 
-*ESCOLA DE MUSICA VEM CANTAR*`;
+*${schoolData?.name || "ESCOLA DE MUSICA VEM CANTAR"}*`;
 
     // Encode message for URL
     const encodedMessage = encodeURIComponent(message);
@@ -511,9 +516,9 @@ Conversar com *+55 98988221217* no WhatsApp
               </style>
 
               <div className="text-center border-b-2 border-black pb-6 mb-6">
-                <h1 className="text-3xl font-bold uppercase tracking-wider">ESCOLA DE MUSICA VEM CANTAR</h1>
-                <p className="text-sm text-gray-600 mt-2">Rua da Música, 123 - Centro, São Paulo - SP</p>
-                <p className="text-sm text-gray-600">CNPJ: 12.345.678/0001-90 | Tel: (11) 99999-9999</p>
+                <h1 className="text-3xl font-bold uppercase tracking-wider">{schoolData?.name || "ESCOLA DE MUSICA VEM CANTAR"}</h1>
+                <p className="text-sm text-gray-600 mt-2">{schoolData?.address || "Rua da Música, 123 - Centro, São Paulo - SP"}</p>
+                <p className="text-sm text-gray-600">CNPJ: {schoolData?.cnpj || "12.345.678/0001-90"} | Tel: {schoolData?.phone || "(11) 99999-9999"}</p>
               </div>
 
               <div className="flex justify-between items-center mb-8">
@@ -542,7 +547,7 @@ Conversar com *+55 98988221217* no WhatsApp
 
               <div className="mt-16 text-center flex flex-col items-center justify-center">
                 <div className="w-64 border-b border-black mb-2"></div>
-                <p className="font-bold">ESCOLA DE MUSICA VEM CANTAR</p>
+                <p className="font-bold">{schoolData?.name || "ESCOLA DE MUSICA VEM CANTAR"}</p>
                 <p className="text-sm text-gray-500">{new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
               </div>
             </div>

@@ -20,6 +20,7 @@ interface SchoolData {
   phone: string;
   email: string;
   address: string;
+  pix_key: string;
 }
 
 export default function Settings() {
@@ -44,6 +45,7 @@ export default function Settings() {
     phone: "",
     email: "",
     address: "",
+    pix_key: "",
   });
 
   useEffect(() => {
@@ -317,6 +319,17 @@ export default function Settings() {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="pix">Chave PIX</Label>
+                  <Input
+                    id="pix"
+                    value={formData.pix_key}
+                    onChange={(e) =>
+                      setFormData({ ...formData, pix_key: e.target.value })
+                    }
+                    placeholder="E-mail, CPF, CNPJ ou Aleatória"
                   />
                 </div>
               </div>
