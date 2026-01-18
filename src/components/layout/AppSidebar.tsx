@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { removeAuthToken, apiFetch } from "@/lib/api-client";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface AppSidebarProps {
   collapsed: boolean;
