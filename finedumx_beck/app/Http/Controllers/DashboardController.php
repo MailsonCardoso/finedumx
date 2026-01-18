@@ -19,24 +19,28 @@ class DashboardController extends Controller
         $overdueAmount = Tuition::where('status', 'atrasado')->sum('amount');
         $activeStudents = Student::where('status', 'ativo')->count();
 
-        // Upcoming Tuitions (pendente e due_date >= hoje)
+        // Pendências Prioritárias (atrasadas: pendente e due_date < hoje)
         $today = now()->startOfDay();
-        $upcomingQuery = Tuition::where('status', 'pendente')
-            ->where('due_date', '>=', $today);
+        $priorityQuery = Tuition::where('status', 'pendente')
+            ->where('due_date', '<', $today);
 
-        $upcomingAmount = $upcomingQuery->sum('amount');
-        $upcomingCount = $upcomingQuery->count();
-        $upcomingDetails = $upcomingQuery->with('student')
-            ->orderBy('due_date', 'asc')
+        $priorityAmount = $priorityQuery->sum('amount');
+        $priorityCount = $priorityQuery->count();
+        $priorityDetails = $priorityQuery->with('student')
+            ->orderBy('due_date', 'asc') // Os mais antigos primeiro
             ->take(5)
             ->get()
-            ->map(function ($t) {
+            ->map(function ($t) use ($today) {
+                $dueDate = \Carbon\Carbon::parse($t->due_date);
+                $daysOverdue = (int) $dueDate->diffInDays($today);
+
                 return [
                     'id' => $t->id,
                     'studentName' => $t->student->name ?? 'N/A',
                     'due_date' => $t->due_date,
                     'amount' => (float) $t->amount,
                     'reference' => $t->reference,
+                    'daysOverdue' => $daysOverdue,
                 ];
             });
 
@@ -49,10 +53,10 @@ class DashboardController extends Controller
                 'overdueTrend' => Tuition::where('status', 'atrasado')->count() . ' atrasadas',
                 'studentsTrend' => $activeStudents . ' ativos',
             ],
-            'upcoming' => [
-                'totalAmount' => (float) $upcomingAmount,
-                'count' => $upcomingCount,
-                'details' => $upcomingDetails,
+            'priority' => [
+                'totalAmount' => (float) $priorityAmount,
+                'count' => $priorityCount,
+                'details' => $priorityDetails,
             ],
             'recentPayments' => Payment::with('student')
                 ->where('status', 'confirmado')
