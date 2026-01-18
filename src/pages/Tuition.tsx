@@ -164,15 +164,24 @@ export default function Tuition() {
     const schoolName = schoolData?.name || "ESCOLA DE MUSICA VEM CANTAR";
 
     // Detect if overdue (either by status or by date)
-    const isOverdue = tuition.status === 'atrasado' || new Date(tuition.due_date) < new Date(new Date().setHours(0, 0, 0, 0));
+    const dueDate = new Date(tuition.due_date + 'T23:59:59'); // use end of day for comparison
+    const today = new Date();
+    const isOverdue = tuition.status === 'atrasado' || dueDate < today;
+
+    // Calculate days overdue
+    const diffTime = today.getTime() - dueDate.getTime();
+    const daysOverdue = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const showDays = daysOverdue > 5;
 
     let message = "";
 
     if (isOverdue) {
+      const overduePhrase = showDays ? `está em aberto há *${daysOverdue} dias*` : `ainda está em aberto`;
+
       if (hasResp) {
-        message = `Olá *${respName}*! Notamos que a mensalidade de *${tuition.reference}* de *${studentName}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+        message = `Olá *${respName}*! Notamos que a mensalidade de *${tuition.reference}* de *${studentName}* ${overduePhrase}. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       } else {
-        message = `Olá *${studentName}*! Notamos que a mensalidade de *${tuition.reference}* ainda está em aberto. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+        message = `Olá *${studentName}*! Notamos que a mensalidade de *${tuition.reference}* ${overduePhrase}. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       }
     } else {
       // Mensagem padrão para cobrança normal (pendente a vencer)
