@@ -6,6 +6,8 @@ import {
   AlertTriangle,
   Users,
   ArrowRight,
+  Clock,
+  Calendar,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,16 +15,6 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
 
 interface DashboardData {
   kpis: {
@@ -33,7 +25,17 @@ interface DashboardData {
     overdueTrend: string;
     studentsTrend: string;
   };
-  cashFlow: Array<{ month: string; receita: number; despesas: number }>;
+  upcoming: {
+    totalAmount: number;
+    count: number;
+    details: Array<{
+      id: number;
+      studentName: string;
+      due_date: string;
+      amount: number;
+      reference: string;
+    }>;
+  };
   recentPayments: Array<{
     id: string;
     studentName: string;
@@ -123,63 +125,63 @@ export default function Dashboard() {
 
         {/* Charts and Recent Payments */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Cash Flow Chart */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <Card className="shadow-soft border-border/50 hover:shadow-card transition-shadow overflow-hidden bg-card/50 backdrop-blur-sm">
-              <CardHeader className="border-b border-border/50 bg-muted/20">
+            <Card className="shadow-soft border-border/50 hover:shadow-card transition-shadow overflow-hidden bg-card/50 backdrop-blur-sm h-full">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-muted/20">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-primary" />
-                  Fluxo de Caixa
+                  <div className="w-2 h-2 rounded-full bg-amber-500" />
+                  Mensalidades a Vencer
                 </CardTitle>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-amber-600">
+                    {formatCurrency(data?.upcoming.totalAmount || 0)}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                    Total previsto
+                  </p>
+                </div>
               </CardHeader>
-              <CardContent className="pt-6">
-                <div className="h-[280px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data?.cashFlow}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-border" />
-                      <XAxis
-                        dataKey="month"
-                        className="text-xs fill-muted-foreground"
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis
-                        className="text-xs fill-muted-foreground"
-                        tickLine={false}
-                        axisLine={false}
-                        tickFormatter={(value) => `R$ ${value / 1000}k`}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--card))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "12px",
-                          boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
-                        }}
-                        itemStyle={{ fontWeight: 600 }}
-                        formatter={(value: number) => formatCurrency(value)}
-                      />
-                      <Legend iconType="circle" />
-                      <Bar
-                        dataKey="receita"
-                        name="Receita"
-                        fill="hsl(var(--primary))"
-                        radius={[6, 6, 0, 0]}
-                        barSize={32}
-                      />
-                      <Bar
-                        dataKey="despesas"
-                        name="Despesas"
-                        fill="hsl(var(--chart-3))"
-                        radius={[6, 6, 0, 0]}
-                        barSize={32}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+              <CardContent className="pt-2">
+                <div className="divide-y divide-border/50">
+                  {data?.upcoming.details.map((tuition, i) => (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 + i * 0.1 }}
+                      key={tuition.id}
+                      className="flex items-center justify-between py-4 group hover:bg-muted/50 -mx-6 px-6 transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground truncate group-hover:text-amber-600 transition-colors">
+                          {tuition.studentName}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <Calendar className="w-3 h-3 text-muted-foreground" />
+                          <p className="text-xs text-muted-foreground">
+                            Vence em {new Date(tuition.due_date + 'T12:00:00').toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right ml-4">
+                        <p className="font-bold text-foreground">
+                          {formatCurrency(tuition.amount)}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          Ref: {tuition.reference}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
+                  {data?.upcoming.details.length === 0 && (
+                    <div className="py-12 text-center">
+                      <Clock className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
+                      <p className="text-muted-foreground font-medium">Nenhuma mensalidade a vencer em breve.</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

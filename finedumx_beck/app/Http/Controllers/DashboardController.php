@@ -19,26 +19,26 @@ class DashboardController extends Controller
         $overdueAmount = Tuition::where('status', 'atrasado')->sum('amount');
         $activeStudents = Student::where('status', 'ativo')->count();
 
-        // Cash flow data (last 6 months)
-        $cashFlow = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $monthName = $date->translatedFormat('M');
+        // Upcoming Tuitions (pendente e due_date >= hoje)
+        $today = now()->startOfDay();
+        $upcomingQuery = Tuition::where('status', 'pendente')
+            ->where('due_date', '>=', $today);
 
-            $receita = Payment::whereMonth('payment_date', $date->month)
-                ->whereYear('payment_date', $date->year)
-                ->where('status', 'confirmado')
-                ->sum('amount');
-
-            // Hypothetical expenses (for simulation)
-            $despesas = $receita * 0.6;
-
-            $cashFlow[] = [
-                'month' => $monthName,
-                'receita' => (float) $receita,
-                'despesas' => (float) $despesas,
-            ];
-        }
+        $upcomingAmount = $upcomingQuery->sum('amount');
+        $upcomingCount = $upcomingQuery->count();
+        $upcomingDetails = $upcomingQuery->with('student')
+            ->orderBy('due_date', 'asc')
+            ->take(5)
+            ->get()
+            ->map(function ($t) {
+                return [
+                    'id' => $t->id,
+                    'studentName' => $t->student->name ?? 'N/A',
+                    'due_date' => $t->due_date,
+                    'amount' => (float) $t->amount,
+                    'reference' => $t->reference,
+                ];
+            });
 
         return response()->json([
             'kpis' => [
@@ -49,7 +49,11 @@ class DashboardController extends Controller
                 'overdueTrend' => Tuition::where('status', 'atrasado')->count() . ' atrasadas',
                 'studentsTrend' => $activeStudents . ' ativos',
             ],
-            'cashFlow' => $cashFlow,
+            'upcoming' => [
+                'totalAmount' => (float) $upcomingAmount,
+                'count' => $upcomingCount,
+                'details' => $upcomingDetails,
+            ],
             'recentPayments' => Payment::with('student')
                 ->where('status', 'confirmado')
                 ->latest('payment_date')
