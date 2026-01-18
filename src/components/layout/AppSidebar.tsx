@@ -22,6 +22,7 @@ import { removeAuthToken, apiFetch } from "@/lib/api-client";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import { NotificationBell } from "@/components/NotificationBell";
 
 interface AppSidebarProps {
   collapsed: boolean;
@@ -79,6 +80,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             <span className="font-bold text-lg text-foreground">FinEdu</span>
           )}
         </div>
+        {!collapsed && <NotificationBell />}
       </div>
 
       {/* Menu */}

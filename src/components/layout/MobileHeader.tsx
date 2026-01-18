@@ -13,6 +13,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -37,6 +38,7 @@ export function MobileHeader() {
       </div>
 
       <div className="flex items-center gap-2">
+        <NotificationBell />
         <ThemeToggle />
         <Sheet>
           <SheetTrigger asChild>
