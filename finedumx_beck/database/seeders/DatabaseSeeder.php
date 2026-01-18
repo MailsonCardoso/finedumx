@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\Tuition;
 use App\Models\Payment;
 use App\Models\SchoolSetting;
+use App\Models\Course;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -39,63 +40,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Courses
-        $courses = [
-            'Canto Individual',
-            'Canto em Grupo',
-            'Teclado',
-            'Bateria',
-            'Violão'
-        ];
-
-        foreach ($courses as $courseName) {
-            \App\Models\Course::firstOrCreate(['name' => $courseName]);
-        }
-
-        // Students
-        $students = [
-            ['name' => 'Ana Silva', 'course' => 'Ensino Fundamental', 'due_day' => 10, 'monthly_fee' => 850, 'status' => 'ativo', 'email' => 'ana@email.com', 'phone' => '(11) 99999-0001'],
-            ['name' => 'Bruno Costa', 'course' => 'Ensino Médio', 'due_day' => 15, 'monthly_fee' => 1200, 'status' => 'ativo', 'email' => 'bruno@email.com', 'phone' => '(11) 99999-0002'],
-            ['name' => 'Carla Mendes', 'course' => 'Educação Infantil', 'due_day' => 5, 'monthly_fee' => 650, 'status' => 'inativo', 'email' => 'carla@email.com', 'phone' => '(11) 99999-0003'],
-            ['name' => 'Daniel Oliveira', 'course' => 'Ensino Fundamental', 'due_day' => 10, 'monthly_fee' => 850, 'status' => 'ativo', 'email' => 'daniel@email.com', 'phone' => '(11) 99999-0004'],
-            ['name' => 'Elena Ferreira', 'course' => 'Ensino Médio', 'due_day' => 20, 'monthly_fee' => 1200, 'status' => 'ativo', 'email' => 'elena@email.com', 'phone' => '(11) 99999-0005'],
-        ];
-
-        foreach ($students as $sData) {
-            $student = Student::firstOrCreate(
-                ['email' => $sData['email']],
-                $sData
-            );
-
-            // Create Tuitions for Jan and Feb
-            $t1 = Tuition::firstOrCreate(
-                [
-                    'student_id' => $student->id,
-                    'reference' => 'Jan/2025'
-                ],
-                [
-                    'due_date' => '2025-01-' . str_pad((string) $student->due_day, 2, '0', STR_PAD_LEFT),
-                    'amount' => $student->monthly_fee,
-                    'status' => $student->name === 'Carla Mendes' ? 'atrasado' : ($student->name === 'Bruno Costa' ? 'pendente' : 'pago'),
-                ]
-            );
-
-            // If paid, create a payment record
-            if ($t1->status === 'pago') {
-                Payment::firstOrCreate(
-                    [
-                        'tuition_id' => $t1->id
-                    ],
-                    [
-                        'student_id' => $student->id,
-                        'type' => 'Mensalidade Jan/2025',
-                        'method' => 'pix',
-                        'payment_date' => '2025-01-05',
-                        'amount' => $t1->amount,
-                        'status' => 'confirmado',
-                    ]
-                );
-            }
-        }
+        // System is now clean. 
+        // No students, courses, tuitions or payments will be seeded.
     }
 }
