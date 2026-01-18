@@ -64,6 +64,7 @@ export default function Tuition() {
   // Anti-spam Alert
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [tuitionToNotify, setTuitionToNotify] = useState<Tuition | null>(null);
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
 
   const handlePrintReceipt = () => {
     window.print();
