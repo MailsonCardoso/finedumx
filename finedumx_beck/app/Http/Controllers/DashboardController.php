@@ -98,6 +98,19 @@ class DashboardController extends Controller
                         'status' => $p->status,
                     ];
                 }),
+            'analysis' => collect(range(5, 0))->map(function ($i) {
+                $date = now()->subMonths($i);
+                return [
+                    'label' => ucfirst($date->translatedFormat('M')),
+                    'value' => (float) Payment::whereHas('student')
+                        ->whereBetween('payment_date', [$date->copy()->startOfMonth(), $date->copy()->endOfMonth()])
+                        ->where('status', 'confirmado')
+                        ->sum('amount'),
+                    'expected' => (float) Tuition::whereHas('student')
+                        ->whereBetween('due_date', [$date->copy()->startOfMonth(), $date->copy()->endOfMonth()])
+                        ->sum('amount')
+                ];
+            })->values(),
         ]);
     }
 }

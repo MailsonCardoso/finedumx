@@ -22,5 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+        \Carbon\Carbon::setLocale('pt_BR');
+        setlocale(LC_TIME, 'pt_BR', 'pt_BR.utf-8', 'portuguese');
     }
 }

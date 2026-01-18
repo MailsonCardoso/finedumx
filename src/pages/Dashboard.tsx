@@ -18,7 +18,21 @@ import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { StudentSheet } from "@/components/StudentSheet";
-import { Eye } from "lucide-react";
+import { Eye, TrendingUp, BarChart3 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  ReferenceLine,
+  Area,
+  AreaChart,
+} from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 interface DashboardData {
   kpis: {
@@ -51,6 +65,11 @@ interface DashboardData {
     type: string;
     amount: number;
     status: string;
+  }>;
+  analysis: Array<{
+    label: string;
+    value: number;
+    expected: number;
   }>;
 }
 
@@ -154,6 +173,93 @@ export default function Dashboard() {
             icon={<Users className="w-5 h-5" />}
           />
         </div>
+
+        {/* Analysis Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+        >
+          <Card className="shadow-soft border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 pb-4">
+              <div>
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                  Análise de Receita (Últimos 6 meses)
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">Comparativo entre valor recebido e valor previsto.</p>
+              </div>
+              <div className="flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-1.5 font-medium">
+                  <div className="w-3 h-3 rounded-sm bg-primary" />
+                  <span>Recebido</span>
+                </div>
+                <div className="flex items-center gap-1.5 font-medium border-l border-border/50 pl-4">
+                  <div className="w-3 h-3 rounded-sm bg-muted-foreground/30" />
+                  <span>Previsto</span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data?.analysis} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                    <XAxis
+                      dataKey="label"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      dy={10}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      tickFormatter={(value) => `R$ ${value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value}`}
+                    />
+                    <Tooltip
+                      cursor={{ fill: 'hsl(var(--primary))', opacity: 0.05 }}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-background border border-border/50 rounded-lg shadow-xl p-3 space-y-2">
+                              <p className="font-bold text-sm text-foreground">{payload[0].payload.label}</p>
+                              <div className="flex items-center justify-between gap-8">
+                                <span className="text-xs text-muted-foreground">Recebido:</span>
+                                <span className="text-sm font-bold text-primary">{formatCurrency(payload[0].value as number)}</span>
+                              </div>
+                              <div className="flex items-center justify-between gap-8 border-t border-border/50 pt-2">
+                                <span className="text-xs text-muted-foreground">Previsto:</span>
+                                <span className="text-sm font-bold text-muted-foreground">{formatCurrency(payload[1].value as number)}</span>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar
+                      dataKey="value"
+                      fill="hsl(var(--primary))"
+                      radius={[4, 4, 0, 0]}
+                      barSize={40}
+                      animationDuration={1500}
+                    />
+                    <Bar
+                      dataKey="expected"
+                      fill="hsl(var(--muted-foreground))"
+                      fillOpacity={0.2}
+                      radius={[4, 4, 0, 0]}
+                      barSize={40}
+                      animationDuration={2000}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Charts and Recent Payments */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
