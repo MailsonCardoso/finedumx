@@ -245,13 +245,18 @@ export default function Tuition() {
     }).format(value);
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pago": return <StatusBadge status="success">Pago</StatusBadge>;
-      case "pendente": return <StatusBadge status="warning">Pendente</StatusBadge>;
-      case "atrasado": return <StatusBadge status="danger">Atrasado</StatusBadge>;
-      default: return null;
+  const getStatusBadge = (tuition: Tuition) => {
+    if (tuition.status === "pago") return <StatusBadge status="success">Pago</StatusBadge>;
+
+    // Check if overdue by date
+    const dueDate = new Date(tuition.due_date + 'T23:59:59');
+    const isOverdue = tuition.status === 'atrasado' || dueDate < new Date();
+
+    if (isOverdue) {
+      return <StatusBadge status="danger">Atrasado</StatusBadge>;
     }
+
+    return <StatusBadge status="warning">Pendente</StatusBadge>;
   };
 
   const filteredTuitions = tuitions.filter(t => {
@@ -263,12 +268,20 @@ export default function Tuition() {
 
   // Sort by status priority: atrasado > pendente > pago
   const sortedTuitions = [...filteredTuitions].sort((a, b) => {
-    const statusOrder: Record<string, number> = {
-      'atrasado': 1,
-      'pendente': 2,
-      'pago': 3
+    const getPriority = (t: Tuition) => {
+      if (t.status === 'pago') return 3;
+      const dueDate = new Date(t.due_date + 'T23:59:59');
+      if (t.status === 'atrasado' || dueDate < new Date()) return 1;
+      return 2;
     };
-    return (statusOrder[a.status] || 999) - (statusOrder[b.status] || 999);
+
+    const prioA = getPriority(a);
+    const prioB = getPriority(b);
+
+    if (prioA !== prioB) return prioA - prioB;
+
+    // Within same priority, sort by due date (oldest first)
+    return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
   });
 
   return (
@@ -377,7 +390,7 @@ export default function Tuition() {
                         <TableCell className="py-4 font-bold text-foreground">
                           {formatCurrency(Number(tuition.amount))}
                         </TableCell>
-                        <TableCell className="py-4">{getStatusBadge(tuition.status)}</TableCell>
+                        <TableCell className="py-4">{getStatusBadge(tuition)}</TableCell>
                         <TableCell className="py-4 text-right pr-6">
                           <div className="flex items-center justify-end gap-2">
                             {tuition.status !== 'pago' && (
