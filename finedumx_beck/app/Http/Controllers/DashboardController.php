@@ -17,7 +17,7 @@ class DashboardController extends Controller
             ->sum('amount');
 
         $overdueAmount = Tuition::where('status', 'atrasado')->sum('amount');
-        $activeStudents = Student::count();
+        $activeStudents = Student::where('status', 'ativo')->count();
 
         // Cash flow data (last 6 months)
         $cashFlow = [];
@@ -45,20 +45,25 @@ class DashboardController extends Controller
                 'monthlyRevenue' => $monthlyRevenue,
                 'overdueAmount' => $overdueAmount,
                 'activeStudents' => $activeStudents,
-                'revenueTrend' => '+12% vs mês anterior', // Static for now
-                'overdueTrend' => '3 alunos atrasados',
-                'studentsTrend' => '+5 novos este mês',
+                'revenueTrend' => 'Mês Atual',
+                'overdueTrend' => Tuition::where('status', 'atrasado')->count() . ' atrasadas',
+                'studentsTrend' => $activeStudents . ' ativos',
             ],
             'cashFlow' => $cashFlow,
-            'recentPayments' => Payment::with('student')->latest()->take(5)->get()->map(function ($p) {
-                return [
-                    'id' => $p->id,
-                    'studentName' => $p->student->name,
-                    'type' => $p->type,
-                    'amount' => (float) $p->amount,
-                    'status' => $p->status,
-                ];
-            }),
+            'recentPayments' => Payment::with('student')
+                ->where('status', 'confirmado')
+                ->latest('payment_date')
+                ->take(5)
+                ->get()
+                ->map(function ($p) {
+                    return [
+                        'id' => $p->id,
+                        'studentName' => $p->student->name ?? 'N/A',
+                        'type' => $p->type,
+                        'amount' => (float) $p->amount,
+                        'status' => $p->status,
+                    ];
+                }),
         ]);
     }
 }
