@@ -27,7 +27,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle } from "lucide-react";
+import { AlertTriangle, Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
@@ -61,8 +61,9 @@ export default function Tuition() {
   const [generateYear, setGenerateYear] = useState(new Date().getFullYear().toString());
   const [generateMonth, setGenerateMonth] = useState((new Date().getMonth() + 1).toString());
 
-  // Receipt Modal
-  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+  // Anti-spam Alert
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [tuitionToNotify, setTuitionToNotify] = useState<Tuition | null>(null);
 
   const handlePrintReceipt = () => {
     window.print();
@@ -155,21 +156,25 @@ export default function Tuition() {
   };
 
   const handleWhatsAppClick = (tuition: Tuition) => {
-    if (!tuition.student?.phone) {
-      toast.error("Aluno sem telefone cadastrado");
-      return;
-    }
-
     // Check if notified recently (today)
     if (tuition.last_notification_at) {
       const lastNotify = new Date(tuition.last_notification_at);
       const isToday = lastNotify.toDateString() === new Date().toDateString();
 
       if (isToday) {
-        if (!window.confirm("Uma cobrança já foi enviada HOJE para este aluno. Deseja enviar novamente?")) {
-          return;
-        }
+        setTuitionToNotify(tuition);
+        setIsAlertOpen(true);
+        return;
       }
+    }
+
+    sendWhatsAppMessage(tuition);
+  };
+
+  const sendWhatsAppMessage = (tuition: Tuition) => {
+    if (!tuition.student?.phone) {
+      toast.error("Aluno sem telefone cadastrado");
+      return;
     }
 
     // Remove formatting from phone (keep only numbers)
@@ -380,8 +385,8 @@ export default function Tuition() {
                                   variant="ghost"
                                   size="icon"
                                   className={`h-8 w-8 transition-colors relative ${tuition.last_notification_at && new Date(tuition.last_notification_at).toDateString() === new Date().toDateString()
-                                      ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
-                                      : "text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10"
+                                    ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
+                                    : "text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10"
                                     }`}
                                   onClick={() => handleWhatsAppClick(tuition)}
                                   title={tuition.last_notification_at
@@ -542,6 +547,43 @@ export default function Tuition() {
               <Button onClick={handleGenerateClick} disabled={generateMutation.isPending}>
                 {generateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Gerar Agora
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Notification Alert Modal */}
+        <Dialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-warning">
+                <AlertTriangle className="w-5 h-5" />
+                Aviso de Reenvio
+              </DialogTitle>
+              <DialogDescription className="text-base pt-2">
+                Uma cobrança já foi enviada <span className="font-bold text-foreground underline underline-offset-2">HOJE</span> para este aluno.
+                <br /><br />
+                Deseja prosseguir e enviar o lembrete novamente?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-4 gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsAlertOpen(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                onClick={() => {
+                  if (tuitionToNotify) {
+                    sendWhatsAppMessage(tuitionToNotify);
+                    setIsAlertOpen(false);
+                  }
+                }}
+              >
+                Sim, enviar novamente
               </Button>
             </DialogFooter>
           </DialogContent>
