@@ -77,7 +77,7 @@ export default function Receipts() {
             {receipts.map((receipt) => (
               <Card
                 key={receipt.id}
-                className="shadow-card border-border/50 hover:shadow-lg transition-shadow"
+                className="shadow-soft border-border/50 hover:shadow-card transition-shadow bg-card"
               >
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between mb-4">

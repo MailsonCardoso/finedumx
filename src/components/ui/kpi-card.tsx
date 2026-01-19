@@ -23,7 +23,7 @@ export function KPICard({ title, value, trend, subText, icon, className, index =
       transition={{ duration: 0.4, delay: index * 0.1 }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
       className={cn(
-        "relative overflow-hidden bg-card/60 backdrop-blur-md rounded-2xl p-6 shadow-soft border border-border/50 group transition-all",
+        "relative overflow-hidden bg-card rounded-2xl p-6 shadow-soft border border-border/50 group transition-all",
         "hover:shadow-card hover:border-primary/20",
         className
       )}

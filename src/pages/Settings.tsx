@@ -103,8 +103,8 @@ export default function Settings() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="shadow-soft border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-muted/30">
+          <Card className="shadow-soft border-border/50 bg-card overflow-hidden">
+            <CardHeader className="bg-muted/10 border-b border-border/50">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-sm">
                   <Palette className="w-5 h-5" />
@@ -168,8 +168,8 @@ export default function Settings() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="shadow-soft border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-muted/30">
+          <Card className="shadow-soft border-border/50 bg-card overflow-hidden">
+            <CardHeader className="bg-muted/10 border-b border-border/50">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-sm">
                   <Bell className="w-5 h-5" />
@@ -264,8 +264,8 @@ export default function Settings() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="shadow-soft border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-muted/30">
+          <Card className="shadow-soft border-border/50 bg-card overflow-hidden">
+            <CardHeader className="bg-muted/10 border-b border-border/50">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-sm">
                   <Building2 className="w-5 h-5" />

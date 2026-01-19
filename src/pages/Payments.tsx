@@ -134,7 +134,7 @@ export default function Payments() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Card className="shadow-card border-border/50 bg-emerald-500/5">
+          <Card className="shadow-soft border-border/50 bg-card">
             <CardContent className="p-4 flex items-center gap-4">
               <div className="p-3 rounded-lg bg-emerald-500/10">
                 <CheckCircle className="w-5 h-5 text-emerald-500" />
@@ -146,7 +146,7 @@ export default function Payments() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-card border-border/50 bg-primary/5">
+          <Card className="shadow-soft border-border/50 bg-card">
             <CardContent className="p-4 flex items-center gap-4">
               <div className="p-3 rounded-lg bg-primary/10">
                 <DollarSign className="w-5 h-5 text-primary" />
@@ -158,7 +158,7 @@ export default function Payments() {
             </CardContent>
           </Card>
         </div>
-        <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
+        <div className="bg-card rounded-xl shadow-soft border border-border/50 overflow-hidden">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>

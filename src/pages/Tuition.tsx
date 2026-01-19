@@ -50,6 +50,7 @@ interface Student {
   name: string;
   phone: string;
   active_responsible?: string;
+  status: string;
 }
 
 interface Tuition {
@@ -402,7 +403,7 @@ export default function Tuition() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="flex flex-col sm:flex-row gap-4 bg-muted/30 p-4 rounded-2xl border border-border/50 backdrop-blur-sm"
+          className="flex flex-col sm:flex-row gap-4 bg-card p-4 rounded-2xl border border-border/50 shadow-soft"
         >
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -410,11 +411,11 @@ export default function Tuition() {
               placeholder="Buscar por nome do aluno..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-11 bg-background/50 border-border/50 focus:border-primary"
+              className="pl-10 h-11 bg-background border-border/50 focus:border-primary"
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[200px] h-11 bg-background/50">
+            <SelectTrigger className="w-full sm:w-[200px] h-11 bg-background">
               <div className="flex items-center gap-2">
                 <Filter className="w-4 h-4 text-muted-foreground" />
                 <SelectValue placeholder="Status" />
@@ -434,7 +435,7 @@ export default function Tuition() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-card/50 backdrop-blur-md rounded-2xl shadow-soft border border-border/50 overflow-hidden"
+          className="bg-card rounded-2xl shadow-soft border border-border/50 overflow-hidden"
         >
           <div className="overflow-x-auto">
             <Table>
