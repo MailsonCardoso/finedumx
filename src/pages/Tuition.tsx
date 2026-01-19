@@ -27,7 +27,17 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { AlertTriangle, Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { AlertTriangle, Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
@@ -57,6 +67,10 @@ export default function Tuition() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const queryClient = useQueryClient();
+
+  // Deletion State
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [tuitionToDelete, setTuitionToDelete] = useState<Tuition | null>(null);
 
   // Batch Generation Modal
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
@@ -127,6 +141,19 @@ export default function Tuition() {
     mutationFn: (id: number) => apiFetch(`/tuitions/${id}/notify`, { method: 'POST' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tuitions'] });
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => apiFetch(`/tuitions/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tuitions'] });
+      toast.success("Mensalidade excluída com sucesso!");
+      setIsDeleteOpen(false);
+      setTuitionToDelete(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao excluir mensalidade");
     }
   });
 
@@ -440,6 +467,18 @@ export default function Tuition() {
                                   <DollarSign className="w-4 h-4 mr-1.5" />
                                   Receber
                                 </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                  onClick={() => {
+                                    setTuitionToDelete(tuition);
+                                    setIsDeleteOpen(true);
+                                  }}
+                                  title="Excluir Mensalidade"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
                               </>
                             )}
 
@@ -699,6 +738,30 @@ export default function Tuition() {
           isOpen={isSheetOpen}
           onOpenChange={setIsSheetOpen}
         />
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Tem certeza que deseja excluir?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação excluirá permanentemente a mensalidade de <b>{tuitionToDelete?.student?.name}</b> ref. <b>{tuitionToDelete?.reference}</b>.
+                As mensalidades pagas não podem ser excluídas.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setTuitionToDelete(null)}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={() => tuitionToDelete && deleteMutation.mutate(tuitionToDelete.id)}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                Excluir Permanentemente
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </MainLayout>
   );

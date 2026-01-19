@@ -95,4 +95,14 @@ class TuitionController extends Controller
         $tuition->update(['last_notification_at' => now()]);
         return response()->json($tuition);
     }
+
+    public function destroy(Tuition $tuition)
+    {
+        if ($tuition->status === 'pago') {
+            return response()->json(['message' => 'Não é possível excluir uma mensalidade já paga'], 422);
+        }
+
+        $tuition->delete();
+        return response()->json(['message' => 'Mensalidade excluída com sucesso']);
+    }
 }
