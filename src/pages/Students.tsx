@@ -469,7 +469,7 @@ export default function Students() {
 
                         setFormData({ ...formData, phone: masked });
                       }}
-                      placeholder="(98) 98822-1217"
+                      placeholder="(00) 00000-0000"
                       maxLength={15}
                     />
                   </div>
