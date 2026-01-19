@@ -36,6 +36,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 
 interface DashboardData {
   kpis: {
+    totalRevenue: number;
     monthlyRevenue: number;
     matriculaRevenue: number;
     revenueTrend: string;
@@ -144,23 +145,18 @@ export default function Dashboard() {
         </motion.div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           <KPICard
             index={0}
-            title="Mensalidades Vencendo"
-            value={formatCurrency(data?.kpis.pendingAmount || 0)}
-            trend={{ value: data?.kpis.pendingTrend || "", direction: "neutral" }}
-            icon={<Clock className="w-5 h-5" />}
+            title="Caixa Total Acumulado"
+            value={formatCurrency(data?.kpis.totalRevenue || 0)}
+            trend={{ value: "Desde o início", direction: "neutral" }}
+            icon={<DollarSign className="w-5 h-5" />}
+            className="border-primary/20 bg-primary/5"
           />
           <KPICard
             index={1}
-            title="Inadimplência Total"
-            value={formatCurrency(data?.kpis.overdueAmount || 0)}
-            trend={{ value: data?.kpis.overdueTrend || "", direction: "down" }}
-            icon={<AlertTriangle className="w-5 h-5" />}
-          />
-          <KPICard
-            index={2}
             title="Recebido (Mês)"
             value={formatCurrency(data?.kpis.monthlyRevenue || 0)}
             trend={{ value: data?.kpis.revenueTrend || "", direction: "up" }}
@@ -168,7 +164,21 @@ export default function Dashboard() {
             icon={<DollarSign className="w-5 h-5" />}
           />
           <KPICard
+            index={2}
+            title="Mensalidades Vencendo"
+            value={formatCurrency(data?.kpis.pendingAmount || 0)}
+            trend={{ value: data?.kpis.pendingTrend || "", direction: "neutral" }}
+            icon={<Clock className="w-5 h-5" />}
+          />
+          <KPICard
             index={3}
+            title="Inadimplência Total"
+            value={formatCurrency(data?.kpis.overdueAmount || 0)}
+            trend={{ value: data?.kpis.overdueTrend || "", direction: "down" }}
+            icon={<AlertTriangle className="w-5 h-5" />}
+          />
+          <KPICard
+            index={4}
             title="Alunos Ativos"
             value={String(data?.kpis.activeStudents || 0)}
             trend={{ value: data?.kpis.studentsTrend || "", direction: "up" }}

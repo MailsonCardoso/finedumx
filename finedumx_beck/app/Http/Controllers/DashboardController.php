@@ -16,6 +16,11 @@ class DashboardController extends Controller
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
 
+        // 0. RECEBIDO TOTAL (Histórico completo)
+        $totalRevenue = Payment::whereHas('student')
+            ->where('status', 'confirmado')
+            ->sum('amount');
+
         // 1. RECEBIDO MÊS (Apenas o que foi pago dentro deste mês)
         $monthlyRevenue = Payment::whereHas('student')
             ->whereBetween('payment_date', [$startOfMonth, $endOfMonth])
@@ -77,6 +82,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'kpis' => [
+                'totalRevenue' => (float) $totalRevenue,
                 'monthlyRevenue' => (float) $monthlyRevenue,
                 'matriculaRevenue' => (float) $matriculaRevenue,
                 'revenueTrend' => $revenuePercent . '% da meta',
