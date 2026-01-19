@@ -662,9 +662,9 @@ export default function Tuition() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Forma de Pagamento</Label>
+                  <Label htmlFor="pay_method">Forma de Pagamento</Label>
                   <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger>
+                    <SelectTrigger id="pay_method">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent side="bottom" align="start" sideOffset={5} className="max-h-[250px]">
@@ -701,9 +701,9 @@ export default function Tuition() {
 
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Aluno</Label>
+                <Label htmlFor="charge_student">Aluno</Label>
                 <Select value={chargeStudentId?.toString() || ''} onValueChange={(val) => setChargeStudentId(parseInt(val))}>
-                  <SelectTrigger>
+                  <SelectTrigger id="charge_student">
                     <SelectValue placeholder="Selecione um aluno..." />
                   </SelectTrigger>
                   <SelectContent side="bottom" align="start" sideOffset={5} className="max-h-[250px]">
@@ -717,9 +717,9 @@ export default function Tuition() {
               </div>
 
               <div className="space-y-2">
-                <Label>Tipo de Cobrança</Label>
+                <Label htmlFor="charge_type">Tipo de Cobrança</Label>
                 <Select value={chargeType} onValueChange={(val: any) => setChargeType(val)}>
-                  <SelectTrigger>
+                  <SelectTrigger id="charge_type">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -732,16 +732,18 @@ export default function Tuition() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Referência</Label>
+                  <Label htmlFor="charge_ref">Referência</Label>
                   <Input
+                    id="charge_ref"
                     value={chargeReference}
                     onChange={(e) => setChargeReference(e.target.value)}
                     placeholder="Ex: Jan/2026"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Vencimento</Label>
+                  <Label htmlFor="charge_due">Vencimento</Label>
                   <Input
+                    id="charge_due"
                     type="date"
                     value={chargeDueDate}
                     onChange={(e) => setChargeDueDate(e.target.value)}
@@ -750,8 +752,9 @@ export default function Tuition() {
               </div>
 
               <div className="space-y-2">
-                <Label>Valor (R$)</Label>
+                <Label htmlFor="charge_amount">Valor (R$)</Label>
                 <Input
+                  id="charge_amount"
                   type="number"
                   step="0.01"
                   value={chargeAmount}
