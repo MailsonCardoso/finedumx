@@ -39,6 +39,7 @@ interface Tuition {
     due_date: string;
     amount: number;
     status: string;
+    type?: 'mensalidade' | 'matricula' | 'rematricula';
 }
 
 export function StudentSheet({ studentId, isOpen, onOpenChange }: StudentSheetProps) {
@@ -201,7 +202,19 @@ export function StudentSheet({ studentId, isOpen, onOpenChange }: StudentSheetPr
                                     {tuitions.map((t) => (
                                         <div key={t.id} className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-card hover:bg-muted/30 transition-colors">
                                             <div className="flex flex-col">
-                                                <span className="font-semibold text-foreground">{t.reference}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-semibold text-foreground">{t.reference}</span>
+                                                    {t.type === 'matricula' && (
+                                                        <span className="inline-flex items-center rounded-sm bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700">
+                                                            MATRÍCULA
+                                                        </span>
+                                                    )}
+                                                    {t.type === 'rematricula' && (
+                                                        <span className="inline-flex items-center rounded-sm bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-700">
+                                                            REMATRÍCULA
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <span className="text-xs text-muted-foreground">Vence {format(new Date(t.due_date + 'T12:00:00'), "dd/MM/yyyy")}</span>
                                             </div>
                                             <div className="flex flex-col items-end gap-1.5">

@@ -59,7 +59,7 @@ interface Tuition {
   due_date: string;
   amount: number;
   status: 'pago' | 'pendente' | 'atrasado';
-  type?: 'mensalidade' | 'matricula';
+  type?: 'mensalidade' | 'matricula' | 'rematricula';
   student: Student;
   last_notification_at?: string;
 }
@@ -421,6 +421,11 @@ export default function Tuition() {
                             {tuition.type === 'matricula' && (
                               <span className="inline-flex items-center rounded-sm bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 w-fit mt-0.5">
                                 MATRÍCULA
+                              </span>
+                            )}
+                            {tuition.type === 'rematricula' && (
+                              <span className="inline-flex items-center rounded-sm bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 w-fit mt-0.5">
+                                REMATRÍCULA
                               </span>
                             )}
                           </div>
