@@ -165,14 +165,16 @@ export default function Tuition() {
     const dueDate = new Date(t.due_date + 'T23:59:59');
     const isOverdue = t.status !== 'pago' && (t.status === 'atrasado' || dueDate < new Date());
 
-    // Check if notified today
-    let notifiedToday = false;
+    // Check if notified recently (within last 5 days)
+    let notifiedRecently = false;
     if (t.last_notification_at) {
       const lastNotify = new Date(t.last_notification_at);
-      notifiedToday = lastNotify.toDateString() === new Date().toDateString();
+      const diffTime = new Date().getTime() - lastNotify.getTime();
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      notifiedRecently = diffDays < 5;
     }
 
-    return isOverdue && !notifiedToday;
+    return isOverdue && !notifiedRecently;
   });
 
   const { data: schoolData } = useQuery({
@@ -253,12 +255,13 @@ export default function Tuition() {
   };
 
   const handleWhatsAppClick = (tuition: Tuition) => {
-    // Check if notified recently (today)
+    // Check if notified recently (within last 5 days)
     if (tuition.last_notification_at) {
       const lastNotify = new Date(tuition.last_notification_at);
-      const isToday = lastNotify.toDateString() === new Date().toDateString();
+      const diffTime = new Date().getTime() - lastNotify.getTime();
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
-      if (isToday) {
+      if (diffDays < 5) {
         setTuitionToNotify(tuition);
         setIsAlertOpen(true);
         return;
@@ -550,7 +553,12 @@ export default function Tuition() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className={`h-8 w-8 transition-colors relative ${tuition.last_notification_at && new Date(tuition.last_notification_at).toDateString() === new Date().toDateString()
+                                  className={`h-8 w-8 transition-colors relative ${(() => {
+                                    if (!tuition.last_notification_at) return false;
+                                    const lastNotify = new Date(tuition.last_notification_at);
+                                    const diffDays = (new Date().getTime() - lastNotify.getTime()) / (1000 * 60 * 60 * 24);
+                                    return diffDays < 5;
+                                  })()
                                     ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
                                     : "text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10"
                                     }`}
@@ -561,9 +569,14 @@ export default function Tuition() {
                                   }
                                 >
                                   <MessageCircle className="w-5 h-5" />
-                                  {tuition.last_notification_at && new Date(tuition.last_notification_at).toDateString() === new Date().toDateString() && (
-                                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-background" />
-                                  )}
+                                  {(() => {
+                                    if (!tuition.last_notification_at) return false;
+                                    const lastNotify = new Date(tuition.last_notification_at);
+                                    const diffDays = (new Date().getTime() - lastNotify.getTime()) / (1000 * 60 * 60 * 24);
+                                    return diffDays < 5;
+                                  })() && (
+                                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-background" />
+                                    )}
                                 </Button>
                                 <Button
                                   size="sm"
