@@ -39,6 +39,7 @@ interface DashboardData {
     totalRevenue: number;
     monthlyRevenue: number;
     matriculaRevenue: number;
+    rematriculaRevenue: number;
     revenueTrend: string;
     overdueAmount: number;
     overdueTrend: string;
@@ -160,7 +161,19 @@ export default function Dashboard() {
             title="Recebido (Mês)"
             value={formatCurrency(data?.kpis.monthlyRevenue || 0)}
             trend={{ value: data?.kpis.revenueTrend || "", direction: "up" }}
-            subText={data?.kpis.matriculaRevenue ? `(Inclui ${formatCurrency(data.kpis.matriculaRevenue)} em matrículas)` : undefined}
+            subText={(() => {
+              const matricula = data?.kpis.matriculaRevenue || 0;
+              const rematricula = data?.kpis.rematriculaRevenue || 0;
+
+              if (matricula > 0 && rematricula > 0) {
+                return `(Inclui ${formatCurrency(matricula)} em matrículas e ${formatCurrency(rematricula)} em rematrículas)`;
+              } else if (matricula > 0) {
+                return `(Inclui ${formatCurrency(matricula)} em matrículas)`;
+              } else if (rematricula > 0) {
+                return `(Inclui ${formatCurrency(rematricula)} em rematrículas)`;
+              }
+              return undefined;
+            })()}
             icon={<DollarSign className="w-5 h-5" />}
           />
           <KPICard
