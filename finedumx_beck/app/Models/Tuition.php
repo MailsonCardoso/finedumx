@@ -15,6 +15,7 @@ class Tuition extends Model
         'due_date',
         'amount',
         'status',
+        'type',
         'last_notification_at',
     ];
 

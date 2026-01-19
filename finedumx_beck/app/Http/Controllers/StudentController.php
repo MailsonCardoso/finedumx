@@ -32,9 +32,52 @@ class StudentController extends Controller
             'course' => 'nullable|string',
             'due_day' => 'required|integer|min:1|max:31',
             'monthly_fee' => 'required|numeric|min:0',
+            // Optional flags
+            'generate_matricula' => 'boolean',
+            'matricula_value' => 'nullable|numeric',
+            'generate_tuition' => 'boolean',
         ]);
 
         $student = Student::create($validated);
+
+        // Gerar Matrícula (Se solicitado)
+        if ($request->input('generate_matricula')) {
+            $val = $request->input('matricula_value', 100);
+            \App\Models\Tuition::create([
+                'student_id' => $student->id,
+                'reference' => 'Matrícula',
+                'due_date' => now()->toDateString(), // Vence hoje
+                'amount' => $val,
+                'status' => 'pendente',
+                'type' => 'matricula'
+            ]);
+        }
+
+        // Gerar 1ª Mensalidade (Se solicitado - para o próximo mês)
+        if ($request->input('generate_tuition')) {
+            $nextMonth = now()->addMonth();
+            $day = str_pad((string) $student->due_day, 2, '0', STR_PAD_LEFT);
+            $month = $nextMonth->format('m');
+            $year = $nextMonth->format('Y');
+
+            // Ref: Mês/Ano (ex: Fev/2025)
+            $months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+            // Laravel format 'm' 01-12, array index 0-11
+            $ref = $months[(int) $month - 1] . '/' . $year;
+
+            $dueDate = "{$year}-{$month}-{$day}";
+
+            \App\Models\Tuition::create([
+                'student_id' => $student->id,
+                'reference' => $ref,
+                'due_date' => $dueDate,
+                'amount' => $student->monthly_fee,
+                'status' => 'pendente',
+                'type' => 'mensalidade'
+            ]);
+        }
+
         return response()->json($student, 201);
     }
 

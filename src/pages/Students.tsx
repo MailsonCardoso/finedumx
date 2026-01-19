@@ -3,6 +3,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -38,7 +39,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Filter, UserX, Loader2, Pencil, Trash2, Eye } from "lucide-react";
+import { Plus, Search, Filter, UserX, Loader2, Pencil, Trash2, Eye, DollarSign } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -65,6 +66,9 @@ interface StudentFormData {
   due_day: number;
   monthly_fee: number | string;
   status: string;
+  generate_matricula?: boolean;
+  matricula_value?: number;
+  generate_tuition?: boolean;
 }
 
 const initialFormData: StudentFormData = {
@@ -76,6 +80,9 @@ const initialFormData: StudentFormData = {
   due_day: 10,
   monthly_fee: "",
   status: "ativo",
+  generate_matricula: false,
+  matricula_value: 100,
+  generate_tuition: true,
 };
 
 
@@ -514,46 +521,101 @@ export default function Students() {
                   </div>
                 </div>
               </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}>Cancelar</Button>
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                  {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Salvar
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
 
-        {/* Delete Alert */}
-        <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Esta ação não pode ser desfeita. Isso excluirá permanentemente o aluno
-                <span className="font-bold text-foreground"> {selectedStudent?.name} </span>
-                e todos os seus dados associados.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => selectedStudent && deleteMutation.mutate(selectedStudent.id)}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              {!isEditOpen && (
+                <div className="bg-muted/30 p-4 rounded-lg border border-border/50 space-y-4">
+                  <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-primary" />
+                    Financeiro Inicial
+                  </h3>
 
-        <StudentSheet
-          studentId={sheetStudentId}
-          isOpen={isSheetOpen}
-          onOpenChange={setIsSheetOpen}
-        />
-      </div>
-    </MainLayout>
+                  <div className="flex items-start space-x-3">
+                    <Checkbox
+                      id="gen_mat"
+                      checked={formData.generate_matricula}
+                      onCheckedChange={(checked) => setFormData({ ...formData, generate_matricula: checked as boolean })}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="gen_mat" className="font-medium cursor-pointer">
+                        Gerar Taxa de Matrícula
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Cria uma cobrança avulsa de matrícula para hoje.
+                      </p>
+                    </div>
+                  </div>
+
+                  {formData.generate_matricula && (
+                    <div className="pl-7 w-1/2">
+                      <Label htmlFor="mat_val" className="text-xs">Valor da Matrícula</Label>
+                      <Input
+                        id="mat_val"
+                        type="number"
+                        value={formData.matricula_value}
+                        onChange={(e) => setFormData({ ...formData, matricula_value: parseFloat(e.target.value) })}
+                        className="h-8 mt-1"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-start space-x-3 pt-2">
+                    <Checkbox
+                      id="gen_tui"
+                      checked={formData.generate_tuition}
+                      onCheckedChange={(checked) => setFormData({ ...formData, generate_tuition: checked as boolean })}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="gen_tui" className="font-medium cursor-pointer">
+                        Gerar 1ª Mensalidade (Mês Seguinte)
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Já lança a mensalidade para vencer no mês que vem.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}>Cancelar</Button>
+              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Salvar
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Alert */}
+      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o aluno
+              <span className="font-bold text-foreground"> {selectedStudent?.name} </span>
+              e todos os seus dados associados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => selectedStudent && deleteMutation.mutate(selectedStudent.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <StudentSheet
+        studentId={sheetStudentId}
+        isOpen={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+      />
+    </div>
+    </MainLayout >
   );
 }

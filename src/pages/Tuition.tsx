@@ -59,6 +59,7 @@ interface Tuition {
   due_date: string;
   amount: number;
   status: 'pago' | 'pendente' | 'atrasado';
+  type?: 'mensalidade' | 'matricula';
   student: Student;
   last_notification_at?: string;
 }
@@ -414,7 +415,16 @@ export default function Tuition() {
                         transition={{ delay: i * 0.05 }}
                         className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
                       >
-                        <TableCell className="py-4 font-medium">{tuition.reference}</TableCell>
+                        <TableCell className="py-4 font-medium">
+                          <div className="flex flex-col">
+                            <span>{tuition.reference}</span>
+                            {tuition.type === 'matricula' && (
+                              <span className="inline-flex items-center rounded-sm bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 w-fit mt-0.5">
+                                MATRÍCULA
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
                         <TableCell
                           className="py-4 font-medium text-foreground group-hover:text-primary transition-colors cursor-pointer"
                           onClick={() => {
