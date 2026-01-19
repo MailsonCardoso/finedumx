@@ -94,6 +94,21 @@ export default function Tuition() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [sheetStudentId, setSheetStudentId] = useState<number | null>(null);
 
+  // Bulk Notification State
+  const [isBulkNotifyOpen, setIsBulkNotifyOpen] = useState(false);
+  const [bulkNotifyIndex, setBulkNotifyIndex] = useState(0);
+  const [bulkQueue, setBulkQueue] = useState<Tuition[]>([]);
+
+  const handleStartBulk = () => {
+    if (overdueTuitions.length === 0) {
+      toast.info("Não há mensalidades atrasadas para notificar.");
+      return;
+    }
+    setBulkQueue(overdueTuitions);
+    setBulkNotifyIndex(0);
+    setIsBulkNotifyOpen(true);
+  };
+
   const handlePrintReceipt = () => {
     window.print();
   };
@@ -142,8 +157,22 @@ export default function Tuition() {
 
   // Queries
   const { data: tuitions = [], isLoading } = useQuery<Tuition[]>({
-    queryKey: ['tuitions'],
-    queryFn: () => apiFetch('/tuitions'),
+    queryKey: ['tuitions', searchTerm, statusFilter],
+    queryFn: () => apiFetch(`/tuitions?search=${searchTerm}&status=${statusFilter}`),
+  });
+
+  const overdueTuitions = tuitions.filter(t => {
+    const dueDate = new Date(t.due_date + 'T23:59:59');
+    const isOverdue = t.status !== 'pago' && (t.status === 'atrasado' || dueDate < new Date());
+
+    // Check if notified today
+    let notifiedToday = false;
+    if (t.last_notification_at) {
+      const lastNotify = new Date(t.last_notification_at);
+      notifiedToday = lastNotify.toDateString() === new Date().toDateString();
+    }
+
+    return isOverdue && !notifiedToday;
   });
 
   const { data: schoolData } = useQuery({
@@ -379,7 +408,15 @@ export default function Tuition() {
               Gerencie e dê baixa nas mensalidades dos alunos.
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={handleStartBulk}
+              variant="outline"
+              className="gap-2 h-11 px-6 border-emerald-500/50 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-500/10"
+            >
+              <Bell className="w-5 h-5 text-emerald-500" />
+              Mutirão de Cobrança
+            </Button>
             <Button
               onClick={() => setIsChargeOpen(true)}
               variant="outline"
@@ -932,6 +969,95 @@ export default function Tuition() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        {/* Bulk Notification Modal */}
+        <Dialog open={isBulkNotifyOpen} onOpenChange={(open) => {
+          if (!open) {
+            setIsBulkNotifyOpen(false);
+            setBulkNotifyIndex(0);
+          }
+        }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Bell className="w-5 h-5 text-emerald-500" />
+                Mutirão de Cobrança
+              </DialogTitle>
+              <DialogDescription>
+                Enviando lembretes para alunos com mensalidades atrasadas que ainda não foram notificados hoje.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="py-6">
+              {bulkQueue.length === 0 ? (
+                <div className="text-center space-y-3">
+                  <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                  </div>
+                  <p className="font-medium">Tudo em dia!</p>
+                  <p className="text-sm text-muted-foreground">Não há novos alunos pendentes de cobrança hoje.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="bg-muted/50 p-4 rounded-xl border border-border/50">
+                    <div className="flex justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                      <span>Progresso</span>
+                      <span>{bulkNotifyIndex + 1} de {bulkQueue.length}</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-emerald-500 h-full transition-all duration-300"
+                        style={{ width: `${((bulkNotifyIndex + 1) / bulkQueue.length) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4 p-4 bg-card border border-border/50 rounded-xl shadow-sm">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+                        {bulkQueue[bulkNotifyIndex]?.student?.name?.[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-foreground">{bulkQueue[bulkNotifyIndex]?.student?.name}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {bulkQueue[bulkNotifyIndex]?.reference} • {formatCurrency(bulkQueue[bulkNotifyIndex]?.amount)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-500/10 p-3 rounded-lg border border-amber-200 dark:border-amber-500/20 flex gap-2">
+                      <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                      <p>Ao clicar em enviar, o WhatsApp abrirá em uma nova aba. Volte aqui para passar para o próximo aluno.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="ghost" onClick={() => setIsBulkNotifyOpen(false)}>
+                {bulkQueue.length === 0 ? "Fechar" : "Cancelar"}
+              </Button>
+              {bulkQueue.length > 0 && (
+                <Button
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                  onClick={() => {
+                    sendWhatsAppMessage(bulkQueue[bulkNotifyIndex]);
+                    if (bulkNotifyIndex < bulkQueue.length - 1) {
+                      setBulkNotifyIndex(prev => prev + 1);
+                    } else {
+                      toast.success("Mutirão concluído com sucesso!");
+                      setIsBulkNotifyOpen(false);
+                      setBulkNotifyIndex(0);
+                    }
+                  }}
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Enviar e Próximo
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );
