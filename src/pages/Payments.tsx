@@ -33,6 +33,7 @@ interface Payment {
   payment_date: string;
   amount: number;
   status: string;
+  created_at: string;
 }
 
 export default function Payments() {
@@ -58,6 +59,14 @@ export default function Payments() {
   const formatDate = (dateString: string) => {
     if (!dateString) return "-";
     return new Date(dateString + 'T12:00:00').toLocaleDateString("pt-BR");
+  };
+
+  const formatTime = (dateTimeString: string) => {
+    if (!dateTimeString) return "-";
+    return new Date(dateTimeString).toLocaleTimeString("pt-BR", {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const getMethodIcon = (method: string) => {
@@ -158,6 +167,7 @@ export default function Payments() {
                   <TableHead className="font-semibold">Tipo</TableHead>
                   <TableHead className="font-semibold">Método</TableHead>
                   <TableHead className="font-semibold">Data</TableHead>
+                  <TableHead className="font-semibold">Hora</TableHead>
                   <TableHead className="font-semibold">Valor</TableHead>
                   <TableHead className="font-semibold">Status</TableHead>
                 </TableRow>
@@ -165,7 +175,7 @@ export default function Payments() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-48 text-center">
+                    <TableCell colSpan={7} className="h-48 text-center">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         <p className="text-muted-foreground">Carregando pagamentos...</p>
@@ -192,6 +202,9 @@ export default function Payments() {
                         <TableCell className="text-muted-foreground">
                           {formatDate(payment.payment_date)}
                         </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatTime(payment.created_at)}
+                        </TableCell>
                         <TableCell className="font-medium">
                           {formatCurrency(Number(payment.amount))}
                         </TableCell>
@@ -200,7 +213,7 @@ export default function Payments() {
                     ))}
                     {payments.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                        <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                           Nenhum pagamento encontrado.
                         </TableCell>
                       </TableRow>
