@@ -453,8 +453,24 @@ export default function Students() {
                     <Input
                       id="phone"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="(11) 99999-9999"
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                        let masked = value;
+
+                        if (value.length > 0) {
+                          masked = '(' + value.substring(0, 2);
+                        }
+                        if (value.length >= 3) {
+                          masked += ') ' + value.substring(2, 7);
+                        }
+                        if (value.length >= 8) {
+                          masked += '-' + value.substring(7, 11);
+                        }
+
+                        setFormData({ ...formData, phone: masked });
+                      }}
+                      placeholder="(98) 98822-1217"
+                      maxLength={15}
                     />
                   </div>
                 </div>
