@@ -33,6 +33,7 @@ class TuitionController extends Controller
             'reference' => 'required|string', // e.g., 'Jan/2025'
             'due_date' => 'required|date',
             'amount' => 'required|numeric',
+            'type' => 'nullable|string|in:mensalidade,matricula,rematricula',
         ]);
 
         $student = \App\Models\Student::findOrFail($validated['student_id']);

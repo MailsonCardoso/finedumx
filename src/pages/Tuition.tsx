@@ -78,6 +78,14 @@ export default function Tuition() {
   const [generateYear, setGenerateYear] = useState(new Date().getFullYear().toString());
   const [generateMonth, setGenerateMonth] = useState((new Date().getMonth() + 1).toString());
 
+  // One-off Charge Modal
+  const [isChargeOpen, setIsChargeOpen] = useState(false);
+  const [chargeStudentId, setChargeStudentId] = useState<number | null>(null);
+  const [chargeReference, setChargeReference] = useState('');
+  const [chargeDueDate, setChargeDueDate] = useState(new Date().toISOString().split('T')[0]);
+  const [chargeAmount, setChargeAmount] = useState('');
+  const [chargeType, setChargeType] = useState<'mensalidade' | 'matricula' | 'rematricula'>('mensalidade');
+
   // Anti-spam Alert
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [tuitionToNotify, setTuitionToNotify] = useState<Tuition | null>(null);
@@ -105,6 +113,27 @@ export default function Tuition() {
     }
   });
 
+  const chargeMutation = useMutation({
+    mutationFn: (data: { student_id: number, reference: string, due_date: string, amount: number, type: string }) =>
+      apiFetch('/tuitions', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tuitions'] });
+      toast.success("Cobrança criada com sucesso!");
+      setIsChargeOpen(false);
+      setChargeStudentId(null);
+      setChargeReference('');
+      setChargeDueDate(new Date().toISOString().split('T')[0]);
+      setChargeAmount('');
+      setChargeType('mensalidade');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao criar cobrança");
+    }
+  });
+
   // Payment Modal
   const [isPayOpen, setIsPayOpen] = useState(false);
   const [selectedTuition, setSelectedTuition] = useState<Tuition | null>(null);
@@ -119,6 +148,11 @@ export default function Tuition() {
   const { data: schoolData } = useQuery({
     queryKey: ['school-settings'],
     queryFn: () => apiFetch<any>('/settings'),
+  });
+
+  const { data: students = [] } = useQuery<Student[]>({
+    queryKey: ['students'],
+    queryFn: () => apiFetch('/students'),
   });
 
   // Mutations
@@ -334,13 +368,23 @@ export default function Tuition() {
               Gerencie e dê baixa nas mensalidades dos alunos.
             </p>
           </div>
-          <Button
-            onClick={() => setIsGenerateOpen(true)}
-            className="gap-2 shadow-lg shadow-primary/20 h-11 px-6"
-          >
-            <Plus className="w-5 h-5" />
-            Gerar Mensalidades
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setIsChargeOpen(true)}
+              variant="outline"
+              className="gap-2 h-11 px-6"
+            >
+              <Plus className="w-5 h-5" />
+              Nova Cobrança Avulsa
+            </Button>
+            <Button
+              onClick={() => setIsGenerateOpen(true)}
+              className="gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+            >
+              <Plus className="w-5 h-5" />
+              Gerar Mensalidades
+            </Button>
+          </div>
         </motion.div>
 
         {/* Filters */}
@@ -579,6 +623,103 @@ export default function Tuition() {
               <Button onClick={confirmPayment} className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={payMutation.isPending}>
                 {payMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
                 Confirmar Baixa
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* One-off Charge Modal */}
+        <Dialog open={isChargeOpen} onOpenChange={setIsChargeOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Nova Cobrança Avulsa</DialogTitle>
+              <DialogDescription>
+                Crie uma cobrança individual para um aluno específico.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Aluno</Label>
+                <Select value={chargeStudentId?.toString() || ''} onValueChange={(val) => setChargeStudentId(parseInt(val))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um aluno..." />
+                  </SelectTrigger>
+                  <SelectContent side="bottom" align="start" sideOffset={5} className="max-h-[250px]">
+                    {students.filter(s => s.status === 'ativo').map((student) => (
+                      <SelectItem key={student.id} value={student.id.toString()}>
+                        {student.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Tipo de Cobrança</Label>
+                <Select value={chargeType} onValueChange={(val: any) => setChargeType(val)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mensalidade">Mensalidade</SelectItem>
+                    <SelectItem value="matricula">Matrícula</SelectItem>
+                    <SelectItem value="rematricula">Rematrícula</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Referência</Label>
+                  <Input
+                    value={chargeReference}
+                    onChange={(e) => setChargeReference(e.target.value)}
+                    placeholder="Ex: Jan/2026"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Vencimento</Label>
+                  <Input
+                    type="date"
+                    value={chargeDueDate}
+                    onChange={(e) => setChargeDueDate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Valor (R$)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={chargeAmount}
+                  onChange={(e) => setChargeAmount(e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsChargeOpen(false)}>Cancelar</Button>
+              <Button
+                onClick={() => {
+                  if (!chargeStudentId || !chargeReference || !chargeDueDate || !chargeAmount) {
+                    toast.error('Preencha todos os campos');
+                    return;
+                  }
+                  chargeMutation.mutate({
+                    student_id: chargeStudentId,
+                    reference: chargeReference,
+                    due_date: chargeDueDate,
+                    amount: parseFloat(chargeAmount),
+                    type: chargeType
+                  });
+                }}
+                disabled={chargeMutation.isPending}
+              >
+                {chargeMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Criar Cobrança
               </Button>
             </DialogFooter>
           </DialogContent>
