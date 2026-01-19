@@ -9,12 +9,13 @@ interface KPICardProps {
     value: string;
     direction: "up" | "down" | "neutral";
   };
+  subText?: string;
   icon: React.ReactNode;
   className?: string;
   index?: number;
 }
 
-export function KPICard({ title, value, trend, icon, className, index = 0 }: KPICardProps) {
+export function KPICard({ title, value, trend, subText, icon, className, index = 0 }: KPICardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -34,19 +35,27 @@ export function KPICard({ title, value, trend, icon, className, index = 0 }: KPI
         <div className="space-y-3">
           <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{title}</p>
           <p className="text-3xl font-bold text-foreground tracking-tight">{value}</p>
-          {trend && (
-            <div className={cn(
-              "flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full w-fit",
-              trend.direction === "up" && "bg-success/10 text-success",
-              trend.direction === "down" && "bg-danger/10 text-danger",
-              trend.direction === "neutral" && "bg-muted/10 text-muted-foreground"
-            )}>
-              {trend.direction === "up" && <TrendingUp className="w-3 h-3" />}
-              {trend.direction === "down" && <TrendingDown className="w-3 h-3" />}
-              {trend.direction === "neutral" && <Minus className="w-3 h-3" />}
-              <span>{trend.value}</span>
-            </div>
-          )}
+
+          <div className="flex flex-col gap-1">
+            {trend && (
+              <div className={cn(
+                "flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full w-fit",
+                trend.direction === "up" && "bg-success/10 text-success",
+                trend.direction === "down" && "bg-danger/10 text-danger",
+                trend.direction === "neutral" && "bg-muted/10 text-muted-foreground"
+              )}>
+                {trend.direction === "up" && <TrendingUp className="w-3 h-3" />}
+                {trend.direction === "down" && <TrendingDown className="w-3 h-3" />}
+                {trend.direction === "neutral" && <Minus className="w-3 h-3" />}
+                <span>{trend.value}</span>
+              </div>
+            )}
+            {subText && (
+              <p className="text-xs text-muted-foreground/80 font-medium ml-1">
+                {subText}
+              </p>
+            )}
+          </div>
         </div>
         <div className="p-3.5 rounded-xl bg-primary/10 text-primary shadow-sm group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
           {icon}

@@ -22,6 +22,15 @@ class DashboardController extends Controller
             ->where('status', 'confirmado')
             ->sum('amount');
 
+        // Receita apenas de matrículas
+        $matriculaRevenue = Payment::whereHas('student')
+            ->whereBetween('payment_date', [$startOfMonth, $endOfMonth])
+            ->where('status', 'confirmado')
+            ->whereHas('tuition', function ($q) {
+                $q->where('type', 'matricula');
+            })
+            ->sum('amount');
+
         // 2. MENSALIDADES VENCENDO (Pendentes que vencem hoje ou até o fim do mês)
         $pendingQuery = Tuition::whereHas('student')
             ->where('status', 'pendente')
@@ -69,6 +78,7 @@ class DashboardController extends Controller
         return response()->json([
             'kpis' => [
                 'monthlyRevenue' => (float) $monthlyRevenue,
+                'matriculaRevenue' => (float) $matriculaRevenue,
                 'revenueTrend' => $revenuePercent . '% da meta',
                 'pendingAmount' => (float) $pendingAmount,
                 'pendingTrend' => $pendingCount . ' alunos',

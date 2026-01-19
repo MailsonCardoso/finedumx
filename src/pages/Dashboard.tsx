@@ -37,6 +37,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 interface DashboardData {
   kpis: {
     monthlyRevenue: number;
+    matriculaRevenue: number;
     revenueTrend: string;
     overdueAmount: number;
     overdueTrend: string;
@@ -163,6 +164,7 @@ export default function Dashboard() {
             title="Recebido (Mês)"
             value={formatCurrency(data?.kpis.monthlyRevenue || 0)}
             trend={{ value: data?.kpis.revenueTrend || "", direction: "up" }}
+            subText={data?.kpis.matriculaRevenue ? `(Inclui ${formatCurrency(data.kpis.matriculaRevenue)} em matrículas)` : undefined}
             icon={<DollarSign className="w-5 h-5" />}
           />
           <KPICard
