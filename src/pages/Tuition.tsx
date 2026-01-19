@@ -265,22 +265,32 @@ export default function Tuition() {
     const daysOverdue = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const showDays = daysOverdue > 5;
 
+    // Determine charge type label
+    const getChargeLabel = () => {
+      if (tuition.type === 'matricula') return 'taxa de matrícula';
+      if (tuition.type === 'rematricula') return 'rematrícula';
+      return 'mensalidade';
+    };
+
     let message = "";
 
     if (isOverdue) {
       const overduePhrase = showDays ? `está em aberto há *${daysOverdue} dias*` : `ainda está em aberto`;
+      const chargeLabel = getChargeLabel();
 
       if (hasResp) {
-        message = `Olá *${respName}*! Notamos que a mensalidade de *${tuition.reference}* de *${studentName}* ${overduePhrase}. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+        message = `Olá *${respName}*! responsável de *${studentName}*. Notamos que a ${chargeLabel} de *${tuition.reference}* ${overduePhrase}. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       } else {
-        message = `Olá *${studentName}*! Notamos que a mensalidade de *${tuition.reference}* ${overduePhrase}. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+        message = `Olá *${studentName}*! Notamos que a ${chargeLabel} de *${tuition.reference}* ${overduePhrase}. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
       }
     } else {
       // Mensagem padrão para cobrança normal (pendente a vencer)
+      const chargeLabel = getChargeLabel();
+
       if (hasResp) {
-        message = `Olá *${respName}*! de *${studentName}*\na mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
+        message = `Olá *${respName}*! responsável de *${studentName}*\na ${chargeLabel} de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
       } else {
-        message = `Olá *${studentName}*!\nsua mensalidade de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
+        message = `Olá *${studentName}*!\nsua ${chargeLabel} de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
       }
 
       message += `\n\nPara facilitar o pagamento, utilize nossa chave PIX:\n*${pix}*\n\nQualquer dúvida, estamos à disposição!\nConversar com *+55 ${schoolPhone}* no WhatsApp\n\n*${schoolName}*`;

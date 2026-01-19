@@ -19,6 +19,10 @@ class Tuition extends Model
         'last_notification_at',
     ];
 
+    protected $casts = [
+        'last_notification_at' => 'datetime',
+    ];
+
     public function student()
     {
         return $this->belongsTo(Student::class);
