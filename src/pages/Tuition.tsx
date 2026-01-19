@@ -882,6 +882,9 @@ export default function Tuition() {
           <DialogContent className="max-w-3xl">
             <DialogHeader className="no-print">
               <DialogTitle>Visualização do Recibo</DialogTitle>
+              <DialogDescription>
+                Confirmação de recebimento para a mensalidade selecionada.
+              </DialogDescription>
             </DialogHeader>
             <div id="receipt-area" className="p-8 bg-white text-black border-2 border-dashed border-gray-300 rounded-lg">
               <style>

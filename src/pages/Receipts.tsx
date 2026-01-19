@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Receipt as ReceiptIcon, Loader2, Printer } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface Payment {
   id: number;
@@ -135,6 +135,12 @@ export default function Receipts() {
         {/* Receipt Modal */}
         <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
           <DialogContent className="max-w-3xl">
+            <DialogHeader className="no-print">
+              <DialogTitle>Recibo de Pagamento</DialogTitle>
+              <DialogDescription>
+                Visualize ou imprima o recibo detalhado do pagamento confirmado.
+              </DialogDescription>
+            </DialogHeader>
             <div id="receipt-area" className="p-8 bg-white text-black border-2 border-dashed border-gray-300 rounded-lg">
               <style>
                 {`

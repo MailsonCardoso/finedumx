@@ -94,13 +94,17 @@ export function StudentSheet({ studentId, isOpen, onOpenChange }: StudentSheetPr
     return (
         <Sheet open={isOpen} onOpenChange={onOpenChange}>
             <SheetContent className="sm:max-w-md overflow-y-auto w-full">
+                <SheetHeader className="sr-only">
+                    <SheetTitle>Ficha do Aluno</SheetTitle>
+                    <SheetDescription>Detalhes e histórico do aluno selecionado.</SheetDescription>
+                </SheetHeader>
                 {isLoadingStudent ? (
                     <div className="flex items-center justify-center h-full">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                 ) : student ? (
                     <div className="space-y-6 pb-8">
-                        <SheetHeader className="text-left">
+                        <SheetHeader className="text-left sr-not-only">
                             <div className="flex items-center gap-4 mb-2">
                                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-2xl font-bold shadow-inner">
                                     {student.name.substring(0, 2).toUpperCase()}
