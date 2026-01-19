@@ -250,7 +250,11 @@ export default function Students() {
             </p>
           </div>
           <Button
-            onClick={() => { setFormData(initialFormData); setIsAddOpen(true); }}
+            onClick={() => {
+              setFormData(initialFormData);
+              setIsEditOpen(false);
+              setIsAddOpen(true);
+            }}
             className="gap-2 shadow-lg shadow-primary/20 h-11 px-6"
           >
             <Plus className="w-5 h-5" />
@@ -522,8 +526,8 @@ export default function Students() {
                 </div>
               </div>
 
-              {!isEditOpen && (
-                <div className="bg-muted/30 p-4 rounded-lg border border-border/50 space-y-4">
+              {isAddOpen && (
+                <div className="bg-emerald-500/5 border-emerald-500/20 p-4 rounded-lg border space-y-4">
                   <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-primary" />
                     Financeiro Inicial
@@ -575,47 +579,46 @@ export default function Students() {
                   </div>
                 </div>
               )}
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}>Cancelar</Button>
-              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Salvar
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}>Cancelar</Button>
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                  {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Salvar
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
 
-      {/* Delete Alert */}
-      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta ação não pode ser desfeita. Isso excluirá permanentemente o aluno
-              <span className="font-bold text-foreground"> {selectedStudent?.name} </span>
-              e todos os seus dados associados.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => selectedStudent && deleteMutation.mutate(selectedStudent.id)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        {/* Delete Alert */}
+        <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. Isso excluirá permanentemente o aluno
+                <span className="font-bold text-foreground"> {selectedStudent?.name} </span>
+                e todos os seus dados associados.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => selectedStudent && deleteMutation.mutate(selectedStudent.id)}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-      <StudentSheet
-        studentId={sheetStudentId}
-        isOpen={isSheetOpen}
-        onOpenChange={setIsSheetOpen}
-      />
-    </div>
+        <StudentSheet
+          studentId={sheetStudentId}
+          isOpen={isSheetOpen}
+          onOpenChange={setIsSheetOpen}
+        />
+      </div >
     </MainLayout >
   );
 }
