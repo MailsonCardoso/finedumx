@@ -36,6 +36,18 @@ class StudentController extends Controller
             'generate_matricula' => 'boolean',
             'matricula_value' => 'nullable|numeric',
             'generate_tuition' => 'boolean',
+        ], [
+            'email.unique' => 'Este e-mail já está sendo utilizado por outro aluno.',
+            'email.required' => 'O campo e-mail é obrigatório.',
+            'email.email' => 'Insira um e-mail válido.',
+            'name.required' => 'O nome do aluno é obrigatório.',
+            'due_day.required' => 'O dia do vencimento é obrigatório.',
+            'due_day.integer' => 'O dia do vencimento deve ser um número inteiro.',
+            'due_day.min' => 'O dia do vencimento deve ser entre 1 e 31.',
+            'due_day.max' => 'O dia do vencimento deve ser entre 1 e 31.',
+            'monthly_fee.required' => 'O valor da mensalidade é obrigatório.',
+            'monthly_fee.numeric' => 'O valor da mensalidade deve ser um número.',
+            'monthly_fee.min' => 'O valor da mensalidade não pode ser negativo.',
         ]);
 
         $student = Student::create($validated);
@@ -97,6 +109,12 @@ class StudentController extends Controller
             'due_day' => 'integer',
             'monthly_fee' => 'sometimes|required|numeric',
             'status' => 'sometimes|required|string',
+        ], [
+            'email.unique' => 'Este e-mail já está sendo utilizado por outro aluno.',
+            'email.required' => 'O campo e-mail é obrigatório.',
+            'email.email' => 'Insira um e-mail válido.',
+            'name.required' => 'O nome do aluno é obrigatório.',
+            'monthly_fee.required' => 'O valor da mensalidade é obrigatório.',
         ]);
 
         $student->update($validated);
