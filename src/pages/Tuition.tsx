@@ -363,7 +363,7 @@ export default function Tuition() {
         message = `Olá *${respName}*! responsável de *${studentName}*.\n\nNotamos que a ${chargeLabel} de *${tuition.reference}* ${overduePhrase}.`;
 
         if (paymentLink) {
-          message += `\n\nPara regularizar, utilize o link seguro abaixo (Aceita Pix, Cartão e Boleto):\n🔗 *${paymentLink}*`;
+          message += `\n\nPara regularizar, utilize o link seguro abaixo:\n\n🔗 *Link de Pagamento Seguro*\n${paymentLink}\n\n_Aceita Pix, Cartão e Boleto_`;
         } else {
           message += `\nSegue o PIX para regularização: *${pix}*`;
         }
@@ -373,7 +373,7 @@ export default function Tuition() {
         message = `Olá *${studentName}*!\n\nNotamos que a ${chargeLabel} de *${tuition.reference}* ${overduePhrase}.`;
 
         if (paymentLink) {
-          message += `\n\nPara regularizar, utilize o link seguro abaixo (Aceita Pix, Cartão e Boleto):\n🔗 *${paymentLink}*`;
+          message += `\n\nPara regularizar, utilize o link seguro abaixo:\n\n🔗 *Link de Pagamento Seguro*\n${paymentLink}\n\n_Aceita Pix, Cartão e Boleto_`;
         } else {
           message += `\nSegue o PIX para regularização: *${pix}*`;
         }
@@ -391,7 +391,7 @@ export default function Tuition() {
       }
 
       if (paymentLink) {
-        message += `\n\nPara sua comodidade, pague via Pix, Cartão ou Boleto pelo link:\n🔗 *${paymentLink}*`;
+        message += `\n\nPara sua comodidade, pague pelo link seguro:\n\n🔗 *Link de Pagamento*\n${paymentLink}\n\n_Aceita Pix, Cartão e Boleto_`;
       } else {
         message += `\n\nPara facilitar o pagamento, utilize nossa chave PIX:\n*${pix}*`;
       }

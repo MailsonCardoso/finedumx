@@ -411,24 +411,36 @@ For more information, see https://radix-ui.com/primitives/docs/components/alert-
 
 Notamos que a ${Ty} de *${T.reference}* ${ea}.`,J?Mt+=`
 
-Para regularizar, utilize o link seguro abaixo (Aceita Pix, Cartão e Boleto):
-🔗 *${J}*`:Mt+=`
+Para regularizar, utilize o link seguro abaixo:
+
+🔗 *Link de Pagamento Seguro*
+${J}
+
+_Aceita Pix, Cartão e Boleto_`:Mt+=`
 Segue o PIX para regularização: *${at}*`,Mt+=`
 
 Qualquer dúvida, estamos à disposição!`):(Mt=`Olá *${Ge}*!
 
 Notamos que a ${Ty} de *${T.reference}* ${ea}.`,J?Mt+=`
 
-Para regularizar, utilize o link seguro abaixo (Aceita Pix, Cartão e Boleto):
-🔗 *${J}*`:Mt+=`
+Para regularizar, utilize o link seguro abaixo:
+
+🔗 *Link de Pagamento Seguro*
+${J}
+
+_Aceita Pix, Cartão e Boleto_`:Mt+=`
 Segue o PIX para regularização: *${at}*`,Mt+=`
 
 Qualquer dúvida, estamos à disposição!`)}else{const ea=Ny();Se?Mt=`Olá *${Fe}*! responsável de *${Ge}*
 a ${ea} de *${T.reference}* no valor de *${Fn(Number(T.amount))}* vence em *${Qi(T.due_date)}*.`:Mt=`Olá *${Ge}*!
 sua ${ea} de *${T.reference}* no valor de *${Fn(Number(T.amount))}* vence em *${Qi(T.due_date)}*.`,J?Mt+=`
 
-Para sua comodidade, pague via Pix, Cartão ou Boleto pelo link:
-🔗 *${J}*`:Mt+=`
+Para sua comodidade, pague pelo link seguro:
+
+🔗 *Link de Pagamento*
+${J}
+
+_Aceita Pix, Cartão e Boleto_`:Mt+=`
 
 Para facilitar o pagamento, utilize nossa chave PIX:
 *${at}*`,Mt+=`
