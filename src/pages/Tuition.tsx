@@ -224,6 +224,23 @@ export default function Tuition() {
     }
   });
 
+  const paymentLinkMutation = useMutation({
+    mutationFn: (id: number) => apiFetch<{ url: string }>(`/tuitions/${id}/payment-link`, { method: 'POST' }),
+    onSuccess: (data, tuitionId) => {
+      // Find the tuition object to pass to sendWhatsAppMessage
+      const tuition = tuitions.find(t => t.id === tuitionId);
+      if (tuition) {
+        sendWhatsAppMessage(tuition, data.url);
+      }
+    },
+    onError: (error: any) => {
+      toast.error("Erro ao gerar link de pagamento. Enviando mensagem padrão.");
+      // Fallback to sending without link if generation fails
+      // We need to find the tuition somehow if we want to fallback, 
+      // but simpler to just let the user retry or we handle it in the click handler
+    }
+  });
+
   // Handlers
   const handlePayClick = (tuition: Tuition) => {
     setSelectedTuition(tuition);
@@ -268,10 +285,23 @@ export default function Tuition() {
       }
     }
 
-    sendWhatsAppMessage(tuition);
+
+
+    // Generate Payment Link first
+    const toastId = toast.loading("Gerando link de pagamento...");
+    paymentLinkMutation.mutate(tuition.id, {
+      onSuccess: () => {
+        toast.dismiss(toastId);
+      },
+      onError: () => {
+        toast.dismiss(toastId);
+        // Fallback: send without link
+        sendWhatsAppMessage(tuition);
+      }
+    });
   };
 
-  const sendWhatsAppMessage = (tuition: Tuition) => {
+  const sendWhatsAppMessage = (tuition: Tuition, paymentLink?: string) => {
     if (!tuition.student?.phone) {
       toast.error("Aluno sem telefone cadastrado");
       return;
@@ -312,9 +342,25 @@ export default function Tuition() {
       const chargeLabel = getChargeLabel();
 
       if (hasResp) {
-        message = `Olá *${respName}*! responsável de *${studentName}*. Notamos que a ${chargeLabel} de *${tuition.reference}* ${overduePhrase}. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+        message = `Olá *${respName}*! responsável de *${studentName}*.\n\nNotamos que a ${chargeLabel} de *${tuition.reference}* ${overduePhrase}.`;
+
+        if (paymentLink) {
+          message += `\n\nPara regularizar, utilize o link seguro abaixo (Aceita Pix, Cartão e Boleto):\n🔗 *${paymentLink}*`;
+        } else {
+          message += `\nSegue o PIX para regularização: *${pix}*`;
+        }
+
+        message += `\n\nQualquer dúvida, estamos à disposição!`;
       } else {
-        message = `Olá *${studentName}*! Notamos que a ${chargeLabel} de *${tuition.reference}* ${overduePhrase}. Segue o PIX para regularização: *${pix}* . Qualquer dúvida, estamos à disposição!`;
+        message = `Olá *${studentName}*!\n\nNotamos que a ${chargeLabel} de *${tuition.reference}* ${overduePhrase}.`;
+
+        if (paymentLink) {
+          message += `\n\nPara regularizar, utilize o link seguro abaixo (Aceita Pix, Cartão e Boleto):\n🔗 *${paymentLink}*`;
+        } else {
+          message += `\nSegue o PIX para regularização: *${pix}*`;
+        }
+
+        message += `\n\nQualquer dúvida, estamos à disposição!`;
       }
     } else {
       // Mensagem padrão para cobrança normal (pendente a vencer)
@@ -326,7 +372,13 @@ export default function Tuition() {
         message = `Olá *${studentName}*!\nsua ${chargeLabel} de *${tuition.reference}* no valor de *${formatCurrency(Number(tuition.amount))}* vence em *${formatDate(tuition.due_date)}*.`;
       }
 
-      message += `\n\nPara facilitar o pagamento, utilize nossa chave PIX:\n*${pix}*\n\nQualquer dúvida, estamos à disposição!\nConversar com *+55 ${schoolPhone}* no WhatsApp\n\n*${schoolName}*`;
+      if (paymentLink) {
+        message += `\n\nPara sua comodidade, pague via Pix, Cartão ou Boleto pelo link:\n🔗 *${paymentLink}*`;
+      } else {
+        message += `\n\nPara facilitar o pagamento, utilize nossa chave PIX:\n*${pix}*`;
+      }
+
+      message += `\n\nQualquer dúvida, estamos à disposição!\nConversar com *+55 ${schoolPhone}* no WhatsApp\n\n*${schoolName}*`;
     }
 
     // Encode message for URL

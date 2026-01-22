@@ -12,6 +12,7 @@ use App\Http\Controllers\TuitionController;
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/webhooks/mercadopago', [\App\Http\Controllers\MercadoPagoController::class, 'handleWebhook']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -28,6 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Tuitions (Mensalidades)
     Route::post('/tuitions/generate-batch', [TuitionController::class, 'generateBatch']);
     Route::post('/tuitions/{tuition}/notify', [TuitionController::class, 'notify']);
+
+    // Mercado Pago
+    Route::post('/tuitions/{tuition}/payment-link', [\App\Http\Controllers\MercadoPagoController::class, 'createPaymentLink']);
+
     Route::apiResource('tuitions', TuitionController::class);
 
     // Courses
