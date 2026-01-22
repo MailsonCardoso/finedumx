@@ -411,17 +411,17 @@ export default function Employees() {
 
                 {/* Add/Edit Modal */}
                 <Dialog open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
-                    <DialogContent className="max-w-[700px] p-0 overflow-hidden rounded-[32px] border-none shadow-2xl bg-white">
+                    <DialogContent className="max-w-[700px] p-0 overflow-hidden rounded-[24px] border-none shadow-2xl bg-card">
                         <div className="p-8 relative">
                             <div className="flex justify-between items-start mb-1">
                                 <div>
-                                    <h2 className="text-4xl font-extrabold text-slate-800 tracking-tight">
+                                    <h2 className="text-4xl font-extrabold text-foreground tracking-tight">
                                         {isEditOpen ? "EDITAR MEMBRO" : "NOVO MEMBRO"}
                                     </h2>
-                                    <p className="text-slate-400 text-lg">Dados profissionais e contato</p>
+                                    <p className="text-muted-foreground text-lg">Dados profissionais e contato</p>
                                 </div>
-                                <div className="bg-slate-900 p-4 rounded-2xl">
-                                    <UserPlus className="w-8 h-8 text-white" />
+                                <div className="bg-primary p-4 rounded-2xl">
+                                    <UserPlus className="w-8 h-8 text-primary-foreground" />
                                 </div>
                             </div>
 
@@ -429,27 +429,27 @@ export default function Employees() {
                                 <div className="grid grid-cols-2 gap-x-6 gap-y-6">
                                     {/* Nome e Status */}
                                     <div className="space-y-2 col-span-1">
-                                        <Label htmlFor="name" className="text-slate-600 font-medium ml-1">Nome Completo</Label>
+                                        <Label htmlFor="name" className="font-medium ml-1">Nome Completo</Label>
                                         <div className="relative">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                                             <Input
                                                 id="name"
                                                 value={formData.name}
                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                                 placeholder="Nome do funcionário"
-                                                className="h-14 pl-12 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:border-purple-500 focus:bg-white transition-all text-slate-700"
+                                                className="h-14 pl-12 rounded-2xl border-2 border-border/50 bg-muted/30 focus:border-primary focus:bg-background transition-all"
                                                 required
                                             />
                                         </div>
                                     </div>
 
                                     <div className="space-y-2 col-span-1">
-                                        <Label htmlFor="status" className="text-slate-600 font-medium ml-1">Status</Label>
+                                        <Label htmlFor="status" className="font-medium ml-1">Status</Label>
                                         <Select
                                             value={formData.status || "ativo"}
                                             onValueChange={(value) => setFormData({ ...formData, status: value })}
                                         >
-                                            <SelectTrigger className="h-14 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:border-purple-500 transition-all text-slate-700">
+                                            <SelectTrigger className="h-14 rounded-2xl border-2 border-border/50 bg-muted/30 focus:border-primary transition-all">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -464,7 +464,7 @@ export default function Employees() {
                                     {/* CPF, Contato, Salário e Dia Pagto */}
                                     <div className="col-span-2 grid grid-cols-4 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="cpf" className="text-slate-600 font-medium ml-1">CPF</Label>
+                                            <Label htmlFor="cpf" className="font-medium ml-1">CPF</Label>
                                             <Input
                                                 id="cpf"
                                                 value={formData.cpf}
@@ -478,14 +478,14 @@ export default function Employees() {
                                                     setFormData({ ...formData, cpf: masked });
                                                 }}
                                                 placeholder="000.000.000-00"
-                                                className="h-14 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:border-purple-500 transition-all"
+                                                className="h-14 rounded-2xl border-2 border-border/50 bg-muted/30 focus:border-primary transition-all"
                                                 maxLength={14}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="phone" className="text-slate-600 font-medium ml-1">Contato</Label>
+                                            <Label htmlFor="phone" className="font-medium ml-1">Contato</Label>
                                             <div className="relative">
-                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                                 <Input
                                                     id="phone"
                                                     value={formData.phone}
@@ -498,29 +498,29 @@ export default function Employees() {
                                                         setFormData({ ...formData, phone: masked });
                                                     }}
                                                     placeholder="(00) 00000-0000"
-                                                    className="h-14 pl-9 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:border-purple-500 transition-all"
+                                                    className="h-14 pl-9 rounded-2xl border-2 border-border/50 bg-muted/30 focus:border-primary transition-all"
                                                     maxLength={15}
                                                 />
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="salary" className="text-slate-600 font-medium ml-1">Salário (R$)</Label>
+                                            <Label htmlFor="salary" className="font-medium ml-1">Salário (R$)</Label>
                                             <div className="relative">
-                                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                                 <Input
                                                     id="salary"
                                                     type="number"
                                                     value={formData.salary}
                                                     onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
                                                     placeholder="R$ 0"
-                                                    className="h-14 pl-9 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:border-purple-500 transition-all text-slate-700"
+                                                    className="h-14 pl-9 rounded-2xl border-2 border-border/50 bg-muted/30 focus:border-primary transition-all"
                                                 />
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="payment_day" className="text-slate-600 font-medium ml-1">Dia Pagto.</Label>
+                                            <Label htmlFor="payment_day" className="font-medium ml-1">Dia Pagto.</Label>
                                             <div className="relative">
-                                                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                                 <Input
                                                     id="payment_day"
                                                     type="number"
@@ -529,7 +529,7 @@ export default function Employees() {
                                                     value={formData.payment_day}
                                                     onChange={(e) => setFormData({ ...formData, payment_day: e.target.value })}
                                                     placeholder="5"
-                                                    className="h-14 pl-9 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:border-purple-500 transition-all text-slate-700"
+                                                    className="h-14 pl-9 rounded-2xl border-2 border-border/50 bg-muted/30 focus:border-primary transition-all"
                                                 />
                                             </div>
                                         </div>
@@ -537,44 +537,44 @@ export default function Employees() {
 
                                     {/* Email e Disponibilidade */}
                                     <div className="col-span-1 space-y-2">
-                                        <Label htmlFor="email" className="text-slate-600 font-medium ml-1">Email Acadêmico / Acesso</Label>
+                                        <Label htmlFor="email" className="font-medium ml-1">Email Acadêmico / Acesso</Label>
                                         <div className="relative">
-                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                                             <Input
                                                 id="email"
                                                 type="email"
                                                 value={formData.email}
                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                                 placeholder="email@escola.com"
-                                                className="h-14 pl-12 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:border-purple-500 transition-all text-slate-700"
+                                                className="h-14 pl-12 rounded-2xl border-2 border-border/50 bg-muted/30 focus:border-primary transition-all"
                                                 required
                                             />
                                         </div>
                                     </div>
 
                                     <div className="col-span-1">
-                                        <div className="bg-slate-50/50 border-2 border-slate-100 rounded-[28px] p-4 flex items-center justify-between h-[104px] mt-[10px]">
-                                            <div className="flex-1">
-                                                <p className="text-slate-700 font-bold">Disponível para dar aulas</p>
-                                                <p className="text-slate-400 text-xs leading-tight mt-1">Habilita aparecimento na lista de professores.</p>
+                                        <div className="bg-muted/30 border-2 border-border/50 rounded-[28px] p-4 flex items-center justify-between h-[104px] mt-[10px]">
+                                            <div className="flex-1 text-card-foreground">
+                                                <p className="font-bold">Disponível para dar aulas</p>
+                                                <p className="text-muted-foreground text-xs leading-tight mt-1">Habilita aparecimento na lista de professores.</p>
                                             </div>
                                             <Checkbox
                                                 id="is_teacher"
                                                 checked={formData.is_teacher}
                                                 onCheckedChange={(checked) => setFormData({ ...formData, is_teacher: !!checked })}
-                                                className="w-8 h-8 rounded-full border-2 border-slate-200"
+                                                className="w-8 h-8 rounded-full border-2 border-primary/50 data-[state=checked]:bg-primary"
                                             />
                                         </div>
                                     </div>
 
                                     {/* Cargo */}
                                     <div className="col-span-1 space-y-2 -mt-4">
-                                        <Label htmlFor="role" className="text-slate-600 font-medium ml-1">Cargo</Label>
+                                        <Label htmlFor="role" className="font-medium ml-1">Cargo</Label>
                                         <Select
                                             value={formData.role}
                                             onValueChange={(value) => setFormData({ ...formData, role: value })}
                                         >
-                                            <SelectTrigger className="h-14 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:border-purple-500 transition-all text-slate-700">
+                                            <SelectTrigger className="h-14 rounded-2xl border-2 border-border/50 bg-muted/30 focus:border-primary transition-all">
                                                 <SelectValue placeholder="Selecione o cargo" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -592,14 +592,14 @@ export default function Employees() {
                                         type="button"
                                         variant="ghost"
                                         onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}
-                                        className="h-16 rounded-[24px] text-slate-600 font-bold text-lg hover:bg-slate-100"
+                                        className="h-16 rounded-[24px] font-bold text-lg"
                                     >
                                         Cancelar
                                     </Button>
                                     <Button
                                         type="submit"
                                         disabled={createMutation.isPending || updateMutation.isPending}
-                                        className="h-16 rounded-[24px] bg-[#8B2FF0] hover:bg-[#7a28d6] text-white font-bold text-lg shadow-[0_8px_20px_-4px_rgba(139,47,240,0.4)] transition-all"
+                                        className="h-16 rounded-[24px] bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg shadow-lg shadow-primary/20 transition-all font-sans"
                                     >
                                         {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
                                         {isEditOpen ? "Salvar Alterações" : "Cadastrar Membro"}
