@@ -50,6 +50,7 @@ interface Student {
   name: string;
   active_responsible?: string;
   email: string;
+  cpf?: string;
   phone: string;
   course: string;
   due_day: number;
@@ -61,6 +62,7 @@ interface StudentFormData {
   name: string;
   active_responsible: string;
   email: string;
+  cpf?: string;
   phone: string;
   course: string;
   due_day: number;
@@ -75,6 +77,7 @@ const initialFormData: StudentFormData = {
   name: "",
   active_responsible: "",
   email: "",
+  cpf: "",
   phone: "",
   course: "",
   due_day: 10,
@@ -178,6 +181,7 @@ export default function Students() {
       name: student.name,
       active_responsible: student.active_responsible || "",
       email: student.email,
+      cpf: student.cpf || "",
       phone: student.phone,
       course: student.course,
       due_day: student.due_day,
@@ -448,6 +452,35 @@ export default function Students() {
                       required
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cpf">CPF</Label>
+                    <Input
+                      id="cpf"
+                      value={formData.cpf || ""}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                        let masked = value;
+
+                        if (value.length > 0) {
+                          masked = value.substring(0, 3);
+                        }
+                        if (value.length >= 4) {
+                          masked += '.' + value.substring(3, 6);
+                        }
+                        if (value.length >= 7) {
+                          masked += '.' + value.substring(6, 9);
+                        }
+                        if (value.length >= 10) {
+                          masked += '-' + value.substring(9, 11);
+                        }
+
+                        setFormData({ ...formData, cpf: masked });
+                      }}
+                      placeholder="000.000.000-00"
+                      maxLength={14}
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="phone">Telefone</Label>
                     <Input

@@ -44,7 +44,11 @@ class MercadoPagoController extends Controller
                     ],
                     'payer' => [
                         'name' => $tuition->student->name,
-                        'email' => 'student@email.com', // Idealmente ter o email do aluno
+                        'email' => $tuition->student->email ?? 'aluno@email.com',
+                        'identification' => $tuition->student->cpf ? [
+                            'type' => 'CPF',
+                            'number' => preg_replace('/\D/', '', $tuition->student->cpf) // Remove formatação
+                        ] : null,
                     ],
                     'external_reference' => (string) $tuition->id,
                     'back_urls' => [
