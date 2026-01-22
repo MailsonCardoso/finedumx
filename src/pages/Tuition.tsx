@@ -285,7 +285,11 @@ export default function Tuition() {
       .catch((error) => {
         toast.dismiss(toastId);
         console.error("Erro ao gerar link MP:", error);
-        toast.error("Erro ao gerar link. Usando método padrão.");
+
+        // Extrair mensagem de erro amigável se possível
+        const errorMessage = error.message || "Erro desconhecido";
+        toast.error(`Erro: ${errorMessage}. Usando método padrão.`);
+
         sendWhatsAppMessage(tuition);
       });
   };
