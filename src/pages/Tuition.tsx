@@ -37,7 +37,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { AlertTriangle, Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle, Trash2, Zap } from "lucide-react";
+import { AlertTriangle, Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
