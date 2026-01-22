@@ -274,30 +274,55 @@ export default function Tuition() {
 
 
 
-    // Generate Payment Link first
+    // Abra a janela IMEDIATAMENTE antes de qualquer async para evitar bloqueio de popup
+    // Se não tiver pagamentoLink (ou seja, backend demorar), ela fica carregando.
+    const loadingMessage = encodeURIComponent("Aguarde, gerando link de pagamento seguro...");
+    const tempWindow = window.open('', '_blank');
+
+    if (tempWindow) {
+      tempWindow.document.write(`
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
+            <div style="width:50px;height:50px;border:5px solid #f3f3f3;border-top:5px solid #10b981;border-radius:50%;animation:spin 1s linear infinite;"></div>
+            <p style="margin-top:20px;color:#333;">Gerando link de pagamento seguro...</p>
+            <style>@keyframes spin {0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);}}</style>
+          </div>
+        `);
+    }
+
     const toastId = toast.loading("Gerando link de pagamento...");
 
     paymentLinkMutation.mutateAsync(tuition.id)
       .then((data) => {
         toast.dismiss(toastId);
-        sendWhatsAppMessage(tuition, data.url);
+        // Sucesso: Redireciona a janela que já está aberta
+        const whatsappUrl = buildWhatsAppUrl(tuition, data.url);
+        if (tempWindow) {
+          tempWindow.location.href = whatsappUrl;
+        } else {
+          // Fallback se bloqueador foi muito agressivo, tenta abrir de novo
+          window.open(whatsappUrl, '_blank');
+        }
       })
       .catch((error) => {
         toast.dismiss(toastId);
         console.error("Erro ao gerar link MP:", error);
 
-        // Extrair mensagem de erro amigável se possível
         const errorMessage = error.message || "Erro desconhecido";
         toast.error(`Erro: ${errorMessage}. Usando método padrão.`);
 
-        sendWhatsAppMessage(tuition);
+        // Falha: Redireciona para WhatsApp com mensagem padrão (sem link)
+        const standardUrl = buildWhatsAppUrl(tuition);
+        if (tempWindow) {
+          tempWindow.location.href = standardUrl;
+        }
       });
   };
 
-  const sendWhatsAppMessage = (tuition: Tuition, paymentLink?: string) => {
+  /* Separa a construção da URL da ação de abrir janela */
+  const buildWhatsAppUrl = (tuition: Tuition, paymentLink?: string) => {
     if (!tuition.student?.phone) {
       toast.error("Aluno sem telefone cadastrado");
-      return;
+      return "";
     }
 
     // Remove formatting from phone (keep only numbers)
@@ -377,11 +402,10 @@ export default function Tuition() {
     // Encode message for URL
     const encodedMessage = encodeURIComponent(message);
 
-    // Mark as notified in backend
+    // Mark as notified in backend (fire and forget)
     notifyMutation.mutate(tuition.id);
 
-    // Open WhatsApp Web
-    window.open(`https://wa.me/55${phone}?text=${encodedMessage}`, '_blank');
+    return `https://wa.me/55${phone}?text=${encodedMessage}`;
   };
 
   // Helpers
