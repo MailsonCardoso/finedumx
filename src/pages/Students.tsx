@@ -22,6 +22,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -418,67 +424,76 @@ export default function Students() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nome do Aluno</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Ex: João da Silva"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="responsible">Responsável</Label>
-                    <Input
-                      id="responsible"
-                      value={formData.active_responsible}
-                      onChange={(e) => setFormData({ ...formData, active_responsible: e.target.value })}
-                      placeholder="Nome do pai/mãe"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">E-mail</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="joao@email.com"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cpf">CPF</Label>
-                    <Input
-                      id="cpf"
-                      value={formData.cpf || ""}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-                        let masked = value;
+              <Tabs defaultValue="pessoal" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="pessoal">Dados do Aluno</TabsTrigger>
+                  <TabsTrigger value="financeiro">Informações Financeiras</TabsTrigger>
+                </TabsList>
 
-                        if (value.length > 0) {
-                          masked = value.substring(0, 3);
-                        }
-                        if (value.length >= 4) {
-                          masked += '.' + value.substring(3, 6);
-                        }
-                        if (value.length >= 7) {
-                          masked += '.' + value.substring(6, 9);
-                        }
-                        if (value.length >= 10) {
-                          masked += '-' + value.substring(9, 11);
-                        }
+                {/* Aba 1: Dados Pessoais */}
+                <TabsContent value="pessoal" className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nome do Aluno</Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Ex: João da Silva"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="responsible">Responsável</Label>
+                      <Input
+                        id="responsible"
+                        value={formData.active_responsible}
+                        onChange={(e) => setFormData({ ...formData, active_responsible: e.target.value })}
+                        placeholder="Nome do pai/mãe"
+                      />
+                    </div>
+                  </div>
 
-                        setFormData({ ...formData, cpf: masked });
-                      }}
-                      placeholder="000.000.000-00"
-                      maxLength={14}
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">E-mail</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="joao@email.com"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cpf">CPF</Label>
+                      <Input
+                        id="cpf"
+                        value={formData.cpf || ""}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          let masked = value;
+
+                          if (value.length > 0) {
+                            masked = value.substring(0, 3);
+                          }
+                          if (value.length >= 4) {
+                            masked += '.' + value.substring(3, 6);
+                          }
+                          if (value.length >= 7) {
+                            masked += '.' + value.substring(6, 9);
+                          }
+                          if (value.length >= 10) {
+                            masked += '-' + value.substring(9, 11);
+                          }
+
+                          setFormData({ ...formData, cpf: masked });
+                        }}
+                        placeholder="000.000.000-00"
+                        maxLength={14}
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -487,7 +502,7 @@ export default function Students() {
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                        const value = e.target.value.replace(/\D/g, '');
                         let masked = value;
 
                         if (value.length > 0) {
@@ -506,128 +521,134 @@ export default function Students() {
                       maxLength={15}
                     />
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="course">Curso</Label>
-                    <Select
-                      value={formData.course}
-                      onValueChange={(value) => {
-                        const course = coursesData?.find((c: any) => c.name === value);
-                        setFormData({
-                          ...formData,
-                          course: value,
-                          monthly_fee: course ? course.price : formData.monthly_fee
-                        });
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {coursesData?.map((course: any) => (
-                          <SelectItem key={course.id} value={course.name}>{course.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="due_day">Dia Vencimento</Label>
-                    <Input
-                      id="due_day"
-                      type="number"
-                      min="1"
-                      max="31"
-                      value={formData.due_day}
-                      onChange={(e) => setFormData({ ...formData, due_day: parseInt(e.target.value) })}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="monthly_fee">Valor da Mensalidade (R$)</Label>
-                    <Input
-                      id="monthly_fee"
-                      type="number"
-                      step="0.01"
-                      value={formData.monthly_fee}
-                      onChange={(e) => setFormData({ ...formData, monthly_fee: e.target.value })}
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Status</Label>
-                    <Select
-                      value={formData.status || "ativo"}
-                      onValueChange={(value) => setFormData({ ...formData, status: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ativo">Ativo</SelectItem>
-                        <SelectItem value="inativo">Inativo</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
+                </TabsContent>
 
-              {isAddOpen && (
-                <div className="bg-emerald-500/5 border-emerald-500/20 p-4 rounded-lg border space-y-4">
-                  <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-primary" />
-                    Financeiro Inicial
-                  </h3>
-
-                  <div className="flex items-start space-x-3">
-                    <Checkbox
-                      id="gen_mat"
-                      checked={formData.generate_matricula}
-                      onCheckedChange={(checked) => setFormData({ ...formData, generate_matricula: checked as boolean })}
-                    />
-                    <div className="grid gap-1.5 leading-none">
-                      <Label htmlFor="gen_mat" className="font-medium cursor-pointer">
-                        Gerar Taxa de Matrícula
-                      </Label>
-                      <p className="text-xs text-muted-foreground">
-                        Cria uma cobrança avulsa de matrícula para hoje.
-                      </p>
+                {/* Aba 2: Informações Financeiras */}
+                <TabsContent value="financeiro" className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="course">Curso</Label>
+                      <Select
+                        value={formData.course}
+                        onValueChange={(value) => {
+                          const course = coursesData?.find((c: any) => c.name === value);
+                          setFormData({
+                            ...formData,
+                            course: value,
+                            monthly_fee: course ? course.price : formData.monthly_fee
+                          });
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {coursesData?.map((course: any) => (
+                            <SelectItem key={course.id} value={course.name}>{course.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </div>
-
-                  {formData.generate_matricula && (
-                    <div className="pl-7 w-1/2">
-                      <Label htmlFor="mat_val" className="text-xs">Valor da Matrícula</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="due_day">Dia Vencimento</Label>
                       <Input
-                        id="mat_val"
+                        id="due_day"
                         type="number"
-                        value={formData.matricula_value}
-                        onChange={(e) => setFormData({ ...formData, matricula_value: parseFloat(e.target.value) })}
-                        className="h-8 mt-1"
+                        min="1"
+                        max="31"
+                        value={formData.due_day}
+                        onChange={(e) => setFormData({ ...formData, due_day: parseInt(e.target.value) })}
+                        required
                       />
                     </div>
-                  )}
+                  </div>
 
-                  <div className="flex items-start space-x-3 pt-2">
-                    <Checkbox
-                      id="gen_tui"
-                      checked={formData.generate_tuition}
-                      onCheckedChange={(checked) => setFormData({ ...formData, generate_tuition: checked as boolean })}
-                    />
-                    <div className="grid gap-1.5 leading-none">
-                      <Label htmlFor="gen_tui" className="font-medium cursor-pointer">
-                        Gerar 1ª Mensalidade (Mês Seguinte)
-                      </Label>
-                      <p className="text-xs text-muted-foreground">
-                        Já lança a mensalidade para vencer no mês que vem.
-                      </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="monthly_fee">Valor da Mensalidade (R$)</Label>
+                      <Input
+                        id="monthly_fee"
+                        type="number"
+                        step="0.01"
+                        value={formData.monthly_fee}
+                        onChange={(e) => setFormData({ ...formData, monthly_fee: e.target.value })}
+                        placeholder="0.00"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="status">Status</Label>
+                      <Select
+                        value={formData.status || "ativo"}
+                        onValueChange={(value) => setFormData({ ...formData, status: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ativo">Ativo</SelectItem>
+                          <SelectItem value="inativo">Inativo</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                </div>
-              )}
+
+                  {isAddOpen && (
+                    <div className="bg-emerald-500/5 border-emerald-500/20 p-4 rounded-lg border space-y-4 mt-4">
+                      <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-primary" />
+                        Financeiro Inicial
+                      </h3>
+
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id="gen_mat"
+                          checked={formData.generate_matricula}
+                          onCheckedChange={(checked) => setFormData({ ...formData, generate_matricula: checked as boolean })}
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                          <Label htmlFor="gen_mat" className="font-medium cursor-pointer">
+                            Gerar Taxa de Matrícula
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Cria uma cobrança avulsa de matrícula para hoje.
+                          </p>
+                        </div>
+                      </div>
+
+                      {formData.generate_matricula && (
+                        <div className="pl-7 w-1/2">
+                          <Label htmlFor="mat_val" className="text-xs">Valor da Matrícula</Label>
+                          <Input
+                            id="mat_val"
+                            type="number"
+                            value={formData.matricula_value}
+                            onChange={(e) => setFormData({ ...formData, matricula_value: parseFloat(e.target.value) })}
+                            className="h-8 mt-1"
+                          />
+                        </div>
+                      )}
+
+                      <div className="flex items-start space-x-3 pt-2">
+                        <Checkbox
+                          id="gen_tui"
+                          checked={formData.generate_tuition}
+                          onCheckedChange={(checked) => setFormData({ ...formData, generate_tuition: checked as boolean })}
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                          <Label htmlFor="gen_tui" className="font-medium cursor-pointer">
+                            Gerar 1ª Mensalidade (Mês Seguinte)
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Já lança a mensalidade para vencer no mês que vem.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}>Cancelar</Button>
                 <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
