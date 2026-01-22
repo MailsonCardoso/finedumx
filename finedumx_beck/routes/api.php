@@ -12,6 +12,13 @@ use App\Http\Controllers\TuitionController;
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/mp-test', function () {
+    return response()->json([
+        'token_configured' => !empty(env('MERCADO_PAGO_ACCESS_TOKEN')),
+        'token_start' => substr(env('MERCADO_PAGO_ACCESS_TOKEN') ?? '', 0, 10) . '...',
+        'api_url' => env('APP_URL')
+    ]);
+});
 Route::post('/webhooks/mercadopago', [\App\Http\Controllers\MercadoPagoController::class, 'handleWebhook']);
 
 // Protected routes
