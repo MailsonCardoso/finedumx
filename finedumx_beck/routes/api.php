@@ -7,7 +7,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\TuitionController;
 
 // Public routes
@@ -44,6 +44,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Courses
     Route::apiResource('courses', App\Http\Controllers\CourseController::class);
+
+    // Employees
+    Route::apiResource('employees', EmployeeController::class);
 
     Route::get('/settings', [SettingController::class, 'index']);
     Route::put('/settings', [SettingController::class, 'update']);
