@@ -29,7 +29,14 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, Edit2, Trash2, Loader2, BookOpen } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Loader2, BookOpen, User } from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
@@ -40,6 +47,15 @@ interface Course {
     name: string;
     price: number;
     description?: string;
+    teacher_id?: number | string;
+    teacher_name?: string;
+}
+
+interface Employee {
+    id: number;
+    name: string;
+    is_teacher?: boolean;
+    status: string;
 }
 
 export default function Courses() {
@@ -48,9 +64,16 @@ export default function Courses() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-    const [formData, setFormData] = useState({ name: "", price: "", description: "" });
+    const [formData, setFormData] = useState({ name: "", price: "", description: "", teacher_id: "" });
 
     const queryClient = useQueryClient();
+
+    const { data: employees = [] } = useQuery<Employee[]>({
+        queryKey: ['employees'],
+        queryFn: () => apiFetch('/employees'),
+    });
+
+    const teachers = employees.filter(emp => emp.is_teacher && emp.status === 'ativo');
 
     const { data: courses = [], isLoading } = useQuery<Course[]>({
         queryKey: ['courses'],
@@ -66,7 +89,7 @@ export default function Courses() {
             queryClient.invalidateQueries({ queryKey: ['courses'] });
             toast.success("Curso criado com sucesso!");
             setIsAddOpen(false);
-            setFormData({ name: "", price: "", description: "" });
+            setFormData({ name: "", price: "", description: "", teacher_id: "" });
         },
         onError: () => toast.error("Erro ao criar curso")
     });
@@ -119,7 +142,8 @@ export default function Courses() {
         setFormData({
             name: course.name,
             price: course.price.toString(),
-            description: course.description || ""
+            description: course.description || "",
+            teacher_id: course.teacher_id?.toString() || ""
         });
         setIsEditOpen(true);
     };
@@ -177,6 +201,7 @@ export default function Courses() {
                             <TableHeader>
                                 <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
                                     <TableHead className="font-bold h-14 text-foreground">Nome do Curso</TableHead>
+                                    <TableHead className="font-bold h-14 text-foreground">Professor Responsável</TableHead>
                                     <TableHead className="font-bold h-14 text-foreground text-right">Valor Padrão</TableHead>
                                     <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
                                 </TableRow>
@@ -207,6 +232,16 @@ export default function Courses() {
                                                         <BookOpen className="w-4 h-4 text-primary/70" />
                                                         {course.name}
                                                     </div>
+                                                </TableCell>
+                                                <TableCell className="py-4 text-muted-foreground">
+                                                    {course.teacher_name ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <User className="w-3.5 h-3.5" />
+                                                            {course.teacher_name}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground/50 italic">Não associado</span>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="py-4 text-right">
                                                     {new Intl.NumberFormat("pt-BR", {
@@ -278,9 +313,29 @@ export default function Courses() {
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     />
                                 </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="teacher">Professor Responsável</Label>
+                                    <Select
+                                        value={formData.teacher_id}
+                                        onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
+                                    >
+                                        <SelectTrigger id="teacher">
+                                            <SelectValue placeholder="Selecione um professor (opcional)" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">Nenhum</SelectItem>
+                                            {teachers.map((teacher) => (
+                                                <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                                    {teacher.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <p className="text-[10px] text-muted-foreground">Apenas funcionários habilitados para dar aula aparecem aqui.</p>
+                                </div>
                             </div>
                             <DialogFooter>
-                                <Button variant="outline" type="button" onClick={() => setIsAddOpen(false)}>Cancelar</Button>
+                                <Button variant="outline" type="button" onClick={() => { setIsAddOpen(false); setFormData({ name: "", price: "", description: "", teacher_id: "" }); }}>Cancelar</Button>
                                 <Button type="submit" disabled={createMutation.isPending}>
                                     {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                                     Salvar
@@ -325,6 +380,25 @@ export default function Courses() {
                                         value={formData.description}
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="edit-teacher">Professor Responsável</Label>
+                                    <Select
+                                        value={formData.teacher_id}
+                                        onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
+                                    >
+                                        <SelectTrigger id="edit-teacher">
+                                            <SelectValue placeholder="Selecione um professor (opcional)" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">Nenhum</SelectItem>
+                                            {teachers.map((teacher) => (
+                                                <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                                    {teacher.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
                             <DialogFooter>
