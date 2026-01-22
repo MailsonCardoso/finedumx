@@ -7,6 +7,37 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [0.4.0] - 2026-01-22
+
+### ✨ Adicionado
+- **🎓 Expansão Escolar**: Duas novas telas completas para gestão escolar
+  - **👔 Funcionários** (`/funcionarios`):
+    - CRUD completo de funcionários
+    - Formulário com abas (Dados Pessoais + Dados Profissionais)
+    - Campos: Nome, Email, CPF, Telefone, Cargo, Departamento, Admissão, Salário
+    - Status: Ativo, Inativo, Férias, Afastado
+    - Busca e filtros por status
+  - **🎓 Turmas** (`/turmas`):
+    - CRUD completo de turmas
+    - Formulário com abas (Informações Gerais + Horário e Capacidade)
+    - Campos: Nome, Curso, Professor, Turno, Horário, Dias, Sala, Capacidade
+    - Badges coloridos de turno (Manhã, Tarde, Noite, Integral)
+    - Barra de progresso de ocupação de alunos
+    - Status: Ativo, Inativo, Completo
+- **Menu Lateral Atualizado**: Adicionados ícones e links para as novas seções
+
+### 🔧 Melhorado
+- Sistema agora possui gestão completa: Financeira + Acadêmica
+- Padrão consistente de design em todas as telas
+- Navegação intuitiva expandida
+
+### 📚 Documentação
+- Criado `EXPANSAO_ESCOLAR_v0.4.0.md` com documentação completa
+- Incluídas estruturas de banco de dados sugeridas
+- Endpoints de API documentados
+
+---
+
 ## [0.3.0] - 2026-01-22
 
 ### ✨ Adicionado
