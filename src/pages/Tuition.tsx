@@ -226,19 +226,6 @@ export default function Tuition() {
 
   const paymentLinkMutation = useMutation({
     mutationFn: (id: number) => apiFetch<{ url: string }>(`/tuitions/${id}/payment-link`, { method: 'POST' }),
-    onSuccess: (data, tuitionId) => {
-      // Find the tuition object to pass to sendWhatsAppMessage
-      const tuition = tuitions.find(t => t.id === tuitionId);
-      if (tuition) {
-        sendWhatsAppMessage(tuition, data.url);
-      }
-    },
-    onError: (error: any) => {
-      toast.error("Erro ao gerar link de pagamento. Enviando mensagem padrão.");
-      // Fallback to sending without link if generation fails
-      // We need to find the tuition somehow if we want to fallback, 
-      // but simpler to just let the user retry or we handle it in the click handler
-    }
   });
 
   // Handlers
@@ -289,16 +276,18 @@ export default function Tuition() {
 
     // Generate Payment Link first
     const toastId = toast.loading("Gerando link de pagamento...");
-    paymentLinkMutation.mutate(tuition.id, {
-      onSuccess: () => {
+
+    paymentLinkMutation.mutateAsync(tuition.id)
+      .then((data) => {
         toast.dismiss(toastId);
-      },
-      onError: () => {
+        sendWhatsAppMessage(tuition, data.url);
+      })
+      .catch((error) => {
         toast.dismiss(toastId);
-        // Fallback: send without link
+        console.error("Erro ao gerar link MP:", error);
+        toast.error("Erro ao gerar link. Usando método padrão.");
         sendWhatsAppMessage(tuition);
-      }
-    });
+      });
   };
 
   const sendWhatsAppMessage = (tuition: Tuition, paymentLink?: string) => {
