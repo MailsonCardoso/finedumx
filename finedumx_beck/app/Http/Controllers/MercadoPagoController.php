@@ -48,9 +48,9 @@ class MercadoPagoController extends Controller
                     ],
                     'external_reference' => (string) $tuition->id,
                     'back_urls' => [
-                        'success' => env('APP_URL') . '/pagamento/sucesso',
-                        'failure' => env('APP_URL') . '/pagamento/falha',
-                        'pending' => env('APP_URL') . '/pagamento/pendente'
+                        'success' => 'https://app.platformx.com.br/pagamento/sucesso',
+                        'failure' => 'https://app.platformx.com.br/pagamento/falha',
+                        'pending' => 'https://app.platformx.com.br/pagamento/pendente'
                     ],
                     'auto_return' => 'approved',
                 ]);
