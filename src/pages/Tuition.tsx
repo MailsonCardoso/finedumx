@@ -605,15 +605,15 @@ export default function Tuition() {
                                     return diffDays < 5;
                                   })()
                                     ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
-                                    : "text-muted-foreground hover:text-purple-600 hover:bg-purple-500/10"
+                                    : "text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10"
                                     }`}
                                   onClick={() => handleWhatsAppClick(tuition)}
                                   title={tuition.last_notification_at
                                     ? `Último envio: ${new Date(tuition.last_notification_at).toLocaleString('pt-BR')}`
-                                    : "Enviar Cobrança com Link"
+                                    : "Enviar WhatsApp"
                                   }
                                 >
-                                  <Zap className="w-5 h-5 text-purple-600" />
+                                  <MessageCircle className="w-5 h-5" />
                                   {(() => {
                                     if (!tuition.last_notification_at) return false;
                                     const lastNotify = new Date(tuition.last_notification_at);
