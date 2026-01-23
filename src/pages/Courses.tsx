@@ -29,18 +29,16 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, Edit2, Trash2, Loader2, BookOpen, User } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Loader2, BookOpen, User, ArrowLeft, Users, Calendar, Settings2, GraduationCap, Clock } from "lucide-react";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { toast } from "sonner";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api-client";
-import { motion, AnimatePresence } from "framer-motion";
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs";
+import { ClassModal } from "@/components/ClassModal";
+import { AppointmentModal } from "@/components/AppointmentModal";
+import { Badge } from "@/components/ui/badge";
 
 interface Course {
     id: number;
@@ -63,8 +61,15 @@ export default function Courses() {
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [isManaging, setIsManaging] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const [formData, setFormData] = useState({ name: "", price: "", description: "", teacher_id: "" });
+
+    // Modals for management
+    const [isClassModalOpen, setIsClassModalOpen] = useState(false);
+    const [selectedClass, setSelectedClass] = useState<any>(null);
+    const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 
     const queryClient = useQueryClient();
 
@@ -78,6 +83,25 @@ export default function Courses() {
     const { data: courses = [], isLoading } = useQuery<Course[]>({
         queryKey: ['courses'],
         queryFn: () => apiFetch('/courses'),
+    });
+
+    // Queries for Management
+    const { data: allClasses = [] } = useQuery<any[]>({
+        queryKey: ['classes'],
+        queryFn: () => apiFetch('/classes'),
+        enabled: isManaging
+    });
+
+    const { data: allAppointments = [] } = useQuery<any[]>({
+        queryKey: ['appointments'],
+        queryFn: () => apiFetch('/appointments'),
+        enabled: isManaging
+    });
+
+    const { data: allStudents = [] } = useQuery<any[]>({
+        queryKey: ['students'],
+        queryFn: () => apiFetch('/students'),
+        enabled: isManaging
     });
 
     const createMutation = useMutation({
@@ -115,6 +139,7 @@ export default function Courses() {
             queryClient.invalidateQueries({ queryKey: ['courses'] });
             toast.success("Curso excluído com sucesso!");
             setIsDeleteOpen(false);
+            setIsManaging(false);
         },
         onError: () => toast.error("Erro ao excluir curso")
     });
@@ -152,6 +177,198 @@ export default function Courses() {
         setSelectedCourse(course);
         setIsDeleteOpen(true);
     };
+
+    const openManage = (course: Course) => {
+        setSelectedCourse(course);
+        setIsManaging(true);
+    };
+
+    if (isManaging && selectedCourse) {
+        const courseClasses = allClasses.filter(c => c.course_id === selectedCourse.id);
+        const courseStudents = allStudents.filter(s => s.course === selectedCourse.name);
+        const courseAppointments = allAppointments.filter(app =>
+            app.course_id === selectedCourse.id ||
+            (app.school_class && app.school_class.course_id === selectedCourse.id)
+        );
+
+        return (
+            <MainLayout>
+                <div className="space-y-6">
+                    {/* Management Header */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <Button variant="ghost" size="icon" onClick={() => setIsManaging(false)}>
+                                <ArrowLeft className="w-5 h-5" />
+                            </Button>
+                            <div>
+                                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                                    {selectedCourse.name}
+                                    <Badge variant="secondary" className="px-3 py-1 text-xs">Gestão</Badge>
+                                </h1>
+                                <p className="text-muted-foreground">Gerencie turmas e aulas individuais deste curso.</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button variant="outline" onClick={() => openEdit(selectedCourse)} className="gap-2">
+                                <Settings2 className="w-4 h-4" /> Configurações
+                            </Button>
+                        </div>
+                    </div>
+
+                    <Tabs defaultValue="turmas" className="w-full">
+                        <TabsList className="bg-muted/50 p-1 border border-border/50 rounded-xl mb-6">
+                            <TabsTrigger value="turmas" className="gap-2 rounded-lg py-2">
+                                <Users className="w-4 h-4" /> Turmas (Grupo)
+                            </TabsTrigger>
+                            <TabsTrigger value="individuais" className="gap-2 rounded-lg py-2">
+                                <User className="w-4 h-4" /> Alunos e Aulas Individuais
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="turmas" className="space-y-4">
+                            <div className="flex justify-between items-center bg-card p-4 rounded-xl border border-border/50 shadow-sm">
+                                <p className="text-sm font-medium text-muted-foreground">{courseClasses.length} turmas vinculadas.</p>
+                                <Button onClick={() => { setSelectedClass(null); setIsClassModalOpen(true); }} className="gap-2">
+                                    <Plus className="w-4 h-4" /> Nova Turma
+                                </Button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {courseClasses.map(cls => (
+                                    <motion.div
+                                        key={cls.id}
+                                        layoutId={`class-${cls.id}`}
+                                        className="bg-card p-5 rounded-2xl border border-border/50 shadow-soft hover:shadow-card transition-all group"
+                                    >
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h3 className="font-bold text-lg text-foreground">{cls.name}</h3>
+                                                <div className="flex items-center gap-1.5 text-xs text-primary font-bold uppercase mt-1">
+                                                    <User className="w-3.5 h-3.5" />
+                                                    {cls.teacher_name || "Sem professor"}
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setSelectedClass(cls); setIsClassModalOpen(true); }}>
+                                                    <Edit2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between text-sm text-muted-foreground">
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="w-4 h-4" />
+                                                    {cls.days_of_week}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="w-4 h-4" />
+                                                    {cls.start_time} - {cls.end_time}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                                                <span className="text-xs font-medium text-muted-foreground">Ocupação</span>
+                                                <span className="text-xs font-bold text-foreground">{cls.current_students}/{cls.max_students} Alunos</span>
+                                            </div>
+                                            <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
+                                                <div
+                                                    className="bg-primary h-full rounded-full transition-all"
+                                                    style={{ width: `${(cls.current_students / cls.max_students) * 100}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                                {courseClasses.length === 0 && (
+                                    <div className="col-span-full py-12 text-center bg-muted/20 border-2 border-dashed border-border/50 rounded-2xl">
+                                        <GraduationCap className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+                                        <p className="text-muted-foreground italic">Nenhuma turma criada para este curso.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="individuais" className="space-y-4">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Students List */}
+                                <div className="space-y-4">
+                                    <h3 className="font-bold text-lg flex items-center gap-2 border-b pb-2">
+                                        <Users className="w-5 h-5 text-primary" />
+                                        Alunos de {selectedCourse.name}
+                                    </h3>
+                                    <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+                                        {courseStudents.map(student => (
+                                            <div key={student.id} className="flex items-center justify-between bg-card p-4 rounded-xl border border-border/50 hover:bg-muted/10 transition-colors">
+                                                <div>
+                                                    <p className="font-bold text-foreground">{student.name}</p>
+                                                    <p className="text-xs text-muted-foreground">{student.phone}</p>
+                                                </div>
+                                                <Button size="sm" variant="outline" onClick={() => {
+                                                    setSelectedAppointment({ type: 'individual', student_id: student.id.toString(), course_id: selectedCourse.id.toString(), date: new Date().toISOString().split('T')[0] });
+                                                    setIsAppointmentModalOpen(true);
+                                                }} className="gap-2 h-8 text-xs">
+                                                    <Plus className="w-3.5 h-3.5" /> Agendar
+                                                </Button>
+                                            </div>
+                                        ))}
+                                        {courseStudents.length === 0 && (
+                                            <p className="py-8 text-center text-muted-foreground italic">Nenhum aluno matriculado neste curso.</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Shared View of Next Lessons */}
+                                <div className="space-y-4">
+                                    <h3 className="font-bold text-lg flex items-center gap-2 border-b pb-2">
+                                        <Calendar className="w-5 h-5 text-primary" />
+                                        Próximas Aulas (Individuais)
+                                    </h3>
+                                    <div className="space-y-3">
+                                        {courseAppointments.filter(app => app.type === 'individual').length > 0 ? (
+                                            courseAppointments.filter(app => app.type === 'individual').map(app => (
+                                                <div key={app.id} className="flex items-center gap-4 bg-muted/30 p-4 rounded-xl border border-border/50">
+                                                    <div className="flex flex-col items-center justify-center bg-background px-3 py-2 rounded-lg border shadow-sm min-w-[70px]">
+                                                        <span className="text-[10px] uppercase font-bold text-primary">
+                                                            {new Date(app.date + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}
+                                                        </span>
+                                                        <span className="text-xl font-black">
+                                                            {new Date(app.date + 'T12:00:00').getDate()}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="font-bold text-foreground">{app.student?.name}</p>
+                                                        <p className="text-xs text-muted-foreground">{app.start_time} - {app.duration} min</p>
+                                                    </div>
+                                                    <Button variant="ghost" size="icon" onClick={() => { setSelectedAppointment(app); setIsAppointmentModalOpen(true); }}>
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="py-12 text-center text-muted-foreground italic">Nenhum agendamento individual pendente.</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+
+                    <ClassModal
+                        isOpen={isClassModalOpen}
+                        onOpenChange={setIsClassModalOpen}
+                        classItem={selectedClass}
+                        defaultCourseId={selectedCourse.id.toString()}
+                    />
+
+                    <AppointmentModal
+                        isOpen={isAppointmentModalOpen}
+                        onOpenChange={setIsAppointmentModalOpen}
+                        appointment={selectedAppointment}
+                    />
+                </div>
+            </MainLayout>
+        );
+    }
 
     return (
         <MainLayout>
@@ -209,7 +426,7 @@ export default function Courses() {
                             <TableBody>
                                 {isLoading ? (
                                     <TableRow>
-                                        <TableCell colSpan={2} className="h-48 text-center">
+                                        <TableCell colSpan={4} className="h-48 text-center">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                                 <p className="text-muted-foreground">Carregando cursos...</p>
@@ -251,10 +468,13 @@ export default function Courses() {
                                                 </TableCell>
                                                 <TableCell className="py-4 text-right pr-6">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        <Button variant="ghost" size="icon" onClick={() => openEdit(course)}>
+                                                        <Button variant="outline" size="sm" onClick={() => openManage(course)} className="gap-2 h-8 px-3 text-xs border-primary/20 text-primary hover:bg-primary hover:text-white transition-all">
+                                                            Gerenciar
+                                                        </Button>
+                                                        <Button variant="ghost" size="icon" onClick={() => openEdit(course)} className="h-8 w-8">
                                                             <Edit2 className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
                                                         </Button>
-                                                        <Button variant="ghost" size="icon" onClick={() => openDelete(course)}>
+                                                        <Button variant="ghost" size="icon" onClick={() => openDelete(course)} className="h-8 w-8">
                                                             <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive transition-colors" />
                                                         </Button>
                                                     </div>
@@ -263,7 +483,7 @@ export default function Courses() {
                                         ))}
                                         {!isLoading && filteredCourses.length === 0 && (
                                             <TableRow>
-                                                <TableCell colSpan={2} className="h-32 text-center text-muted-foreground">
+                                                <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
                                                     Nenhum curso encontrado.
                                                 </TableCell>
                                             </TableRow>

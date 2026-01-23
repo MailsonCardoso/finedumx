@@ -3,7 +3,6 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Table,
@@ -21,20 +20,6 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-    DialogDescription,
-} from "@/components/ui/dialog";
-import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -44,11 +29,12 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Filter, Users, Loader2, Pencil, Trash2, GraduationCap, Clock, UserPlus } from "lucide-react";
+import { Plus, Search, Filter, Users, Loader2, Pencil, Trash2, GraduationCap, Clock } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { ClassModal } from "@/components/ClassModal";
 
 interface Class {
     id: number;
@@ -68,47 +54,15 @@ interface Class {
     student_ids: number[];
 }
 
-interface ClassFormData {
-    name: string;
-    course_id: string;
-    teacher_id: string;
-    shift: string;
-    start_time: string;
-    end_time: string;
-    days_of_week: string;
-    max_students: number | string;
-    room: string;
-    status: string;
-    student_ids: number[];
-}
-
-const initialFormData: ClassFormData = {
-    name: "",
-    course_id: "",
-    teacher_id: "",
-    shift: "manha",
-    start_time: "08:00",
-    end_time: "12:00",
-    days_of_week: "",
-    max_students: 30,
-    room: "",
-    status: "ativo",
-    student_ids: [],
-};
-
 export default function Classes() {
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("todos");
     const queryClient = useQueryClient();
 
     // Modal States
-    const [isAddOpen, setIsAddOpen] = useState(false);
-    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [selectedClass, setSelectedClass] = useState<Class | null>(null);
-
-    // Form State
-    const [formData, setFormData] = useState<ClassFormData>(initialFormData);
 
     // Queries
     const { data: classesData = [], isLoading } = useQuery<Class[]>({
@@ -116,63 +70,11 @@ export default function Classes() {
         queryFn: () => apiFetch(`/classes?search=${searchTerm}&status=${statusFilter}`),
     });
 
-    const { data: coursesData = [] } = useQuery<any[]>({
-        queryKey: ['courses'],
-        queryFn: () => apiFetch('/courses'),
-    });
-
-    const { data: employeesData = [] } = useQuery<any[]>({
-        queryKey: ['employees'],
-        queryFn: () => apiFetch('/employees'),
-    });
-
-    const { data: studentsData = [] } = useQuery<any[]>({
-        queryKey: ['students'],
-        queryFn: () => apiFetch('/students'),
-    });
-
-    const teachers = employeesData.filter(emp => emp.is_teacher && emp.status === 'ativo');
-
     // Sort: Active classes first
     const sortedClasses = [...classesData].sort((a, b) => {
         if (a.status === 'ativo' && b.status !== 'ativo') return -1;
         if (a.status !== 'ativo' && b.status === 'ativo') return 1;
         return 0;
-    });
-
-    // Mutations
-    const createMutation = useMutation({
-        mutationFn: (data: ClassFormData) =>
-            apiFetch('/classes', {
-                method: 'POST',
-                body: JSON.stringify(data)
-            }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['classes'] });
-            toast.success("Turma cadastrada com sucesso!");
-            setIsAddOpen(false);
-            setFormData(initialFormData);
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Erro ao cadastrar turma");
-        }
-    });
-
-    const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: number, data: ClassFormData }) =>
-            apiFetch(`/classes/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify(data)
-            }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['classes'] });
-            toast.success("Turma atualizada com sucesso!");
-            setIsEditOpen(false);
-            setSelectedClass(null);
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Erro ao atualizar turma");
-        }
     });
 
     const deleteMutation = useMutation({
@@ -194,43 +96,12 @@ export default function Classes() {
     // Handlers
     const handleEditClick = (classItem: Class) => {
         setSelectedClass(classItem);
-        setFormData({
-            name: classItem.name,
-            course_id: classItem.course_id.toString(),
-            teacher_id: classItem.teacher_id?.toString() || "",
-            shift: classItem.shift,
-            start_time: classItem.start_time,
-            end_time: classItem.end_time,
-            days_of_week: classItem.days_of_week,
-            max_students: classItem.max_students,
-            room: classItem.room,
-            status: classItem.status,
-            student_ids: classItem.student_ids || [],
-        });
-        setIsEditOpen(true);
+        setIsModalOpen(true);
     };
 
     const handleDeleteClick = (classItem: Class) => {
         setSelectedClass(classItem);
         setIsDeleteOpen(true);
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (isEditOpen && selectedClass) {
-            updateMutation.mutate({
-                id: selectedClass.id,
-                data: {
-                    ...formData,
-                    max_students: formData.max_students === "" ? 0 : parseInt(formData.max_students.toString())
-                }
-            });
-        } else {
-            createMutation.mutate({
-                ...formData,
-                max_students: formData.max_students === "" ? 0 : parseInt(formData.max_students.toString())
-            });
-        }
     };
 
     const getStatusBadge = (status: string) => {
@@ -281,9 +152,8 @@ export default function Classes() {
                     </div>
                     <Button
                         onClick={() => {
-                            setFormData(initialFormData);
-                            setIsEditOpen(false);
-                            setIsAddOpen(true);
+                            setSelectedClass(null);
+                            setIsModalOpen(true);
                         }}
                         className="gap-2 shadow-lg shadow-primary/20 h-11 px-6"
                     >
@@ -452,170 +322,11 @@ export default function Classes() {
                     )}
                 </motion.div>
 
-                {/* Add/Edit Modal */}
-                <Dialog open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
-                    <DialogContent className="max-w-2xl rounded-2xl border border-border bg-card p-0 overflow-hidden shadow-2xl">
-                        <DialogHeader className="p-6 pb-0">
-                            <DialogTitle className="text-2xl font-bold text-foreground">
-                                {isEditOpen ? "Editar Turma" : "Nova Turma"}
-                            </DialogTitle>
-                            <DialogDescription className="text-muted-foreground">
-                                Configure os detalhes da aula coletiva.
-                            </DialogDescription>
-                        </DialogHeader>
-
-                        <form onSubmit={handleSubmit} className="p-6 pt-4 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Left Column */}
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="name" className="text-sm font-semibold text-foreground ml-1">
-                                            Nome da Turma
-                                        </Label>
-                                        <Input
-                                            id="name"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            placeholder="Ex: Aula de Piano"
-                                            className="h-10 px-4 rounded-xl bg-background border-border focus-visible:ring-1 focus-visible:ring-primary font-medium"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="course_id" className="text-sm font-semibold text-foreground ml-1">
-                                            Instrumento / Matéria
-                                        </Label>
-                                        <Select
-                                            value={formData.course_id}
-                                            onValueChange={(value) => {
-                                                const course = coursesData.find(c => c.id.toString() === value);
-                                                const filteredStudents = studentsData.filter(s => s.course === course?.name);
-                                                setFormData({
-                                                    ...formData,
-                                                    course_id: value,
-                                                    student_ids: filteredStudents.map(s => s.id)
-                                                });
-                                            }}
-                                        >
-                                            <SelectTrigger className="h-10 px-4 rounded-xl bg-background border-border focus:ring-1 focus:ring-primary font-medium">
-                                                <SelectValue placeholder="Matéria" />
-                                            </SelectTrigger>
-                                            <SelectContent className="rounded-xl">
-                                                {coursesData.map((course) => (
-                                                    <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="teacher_id" className="text-sm font-semibold text-foreground ml-1">
-                                            Professor Responsável
-                                        </Label>
-                                        <Select
-                                            value={formData.teacher_id}
-                                            onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
-                                        >
-                                            <SelectTrigger className="h-10 px-4 rounded-xl bg-background border-border focus:ring-1 focus:ring-primary font-medium">
-                                                <SelectValue placeholder="Professor" />
-                                            </SelectTrigger>
-                                            <SelectContent className="rounded-xl">
-                                                {teachers.map((teacher) => (
-                                                    <SelectItem key={teacher.id} value={teacher.id.toString()}>{teacher.name}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="status" className="text-sm font-semibold text-foreground ml-1">
-                                            Status
-                                        </Label>
-                                        <Select
-                                            value={formData.status}
-                                            onValueChange={(value) => setFormData({ ...formData, status: value })}
-                                        >
-                                            <SelectTrigger className="h-10 px-4 rounded-xl bg-background border-border focus:ring-1 focus:ring-primary font-medium">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent className="rounded-xl">
-                                                <SelectItem value="ativo">Ativo</SelectItem>
-                                                <SelectItem value="inativo">Inativo</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-
-                                {/* Right Column */}
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-semibold text-foreground ml-1">
-                                        Alunos Integrantes
-                                    </Label>
-                                    <div className="h-[250px] p-3 rounded-xl bg-muted/10 border border-border flex flex-col gap-2 overflow-y-auto">
-                                        <div className="flex flex-wrap gap-1.5">
-                                            <AnimatePresence>
-                                                {formData.student_ids.map(id => {
-                                                    const student = studentsData.find(s => s.id === id);
-                                                    return (
-                                                        <motion.div
-                                                            key={id}
-                                                            initial={{ scale: 0.9, opacity: 0 }}
-                                                            animate={{ scale: 1, opacity: 1 }}
-                                                            exit={{ scale: 0.9, opacity: 0 }}
-                                                            className="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full flex items-center gap-1.5 text-[10px] font-bold"
-                                                        >
-                                                            {student?.name}
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => setFormData({
-                                                                    ...formData,
-                                                                    student_ids: formData.student_ids.filter(sid => sid !== id)
-                                                                })}
-                                                                className="hover:bg-primary/20 rounded-full p-0.5"
-                                                            >
-                                                                <Trash2 className="w-2.5 h-2.5" />
-                                                            </button>
-                                                        </motion.div>
-                                                    );
-                                                })}
-                                            </AnimatePresence>
-                                            {formData.student_ids.length === 0 && (
-                                                <p className="text-muted-foreground/50 text-xs italic ml-1 mt-1">Selecione uma matéria.</p>
-                                            )}
-                                        </div>
-                                        {formData.student_ids.length > 0 && (
-                                            <div className="mt-auto pt-2 border-t border-border/50">
-                                                <p className="text-[10px] font-medium text-muted-foreground italic">
-                                                    {formData.student_ids.length} alunos vinculados.
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-end gap-3 pt-2">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}
-                                    className="h-10 px-6 rounded-xl font-semibold hover:bg-muted"
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={createMutation.isPending || updateMutation.isPending}
-                                    className="h-10 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 transition-all"
-                                >
-                                    {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Salvar
-                                </Button>
-                            </div>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                <ClassModal
+                    isOpen={isModalOpen}
+                    onOpenChange={setIsModalOpen}
+                    classItem={selectedClass}
+                />
 
                 {/* Delete Alert */}
                 <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>

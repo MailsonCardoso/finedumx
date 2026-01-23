@@ -40,6 +40,7 @@ const appointmentSchema = z.object({
     type: z.enum(["individual", "grupo"]),
     student_id: z.string().optional(),
     school_class_id: z.string().optional(),
+    course_id: z.string().optional(),
     date: z.string().min(1, "Data é obrigatória"),
     start_time: z.string().min(1, "Horário de início é obrigatório"),
     duration: z.string().min(1, "Duração é obrigatória"),
@@ -92,6 +93,7 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                 type: appointment.type,
                 student_id: appointment.student_id?.toString(),
                 school_class_id: appointment.school_class_id?.toString(),
+                course_id: appointment.course_id?.toString(),
                 date: appointment.date,
                 start_time: appointment.start_time,
                 duration: appointment.duration,
@@ -193,26 +195,54 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                     </div>
 
                     {selectedType === "individual" ? (
-                        <div className="space-y-2">
-                            <Label>Aluno</Label>
-                            <Select
-                                value={watch("student_id")}
-                                onValueChange={(val) => setValue("student_id", val)}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Selecione o aluno" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {students.map((student) => (
-                                        <SelectItem key={student.id} value={student.id.toString()}>
-                                            {student.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {errors.student_id && (
-                                <p className="text-xs text-destructive">{errors.student_id.message}</p>
-                            )}
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label>Aluno</Label>
+                                <Select
+                                    value={watch("student_id")}
+                                    onValueChange={(val) => {
+                                        setValue("student_id", val);
+                                        const student = students.find(s => s.id.toString() === val);
+                                        if (student && student.course) {
+                                            const course = courses.find(c => c.name === student.course);
+                                            if (course) setValue("course_id", course.id.toString());
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecione o aluno" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {students.map((student) => (
+                                            <SelectItem key={student.id} value={student.id.toString()}>
+                                                {student.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.student_id && (
+                                    <p className="text-xs text-destructive">{errors.student_id.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Curso / Instrumento</Label>
+                                <Select
+                                    value={watch("course_id")}
+                                    onValueChange={(val) => setValue("course_id", val)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecione o curso" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {courses.map((course) => (
+                                            <SelectItem key={course.id} value={course.id.toString()}>
+                                                {course.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     ) : (
                         <div className="space-y-2">
