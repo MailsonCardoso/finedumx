@@ -36,7 +36,12 @@ class SchoolClassController extends Controller
                 'current_students' => $class->students->count(),
                 'room' => $class->room,
                 'status' => $class->status,
-                'student_ids' => $class->students->pluck('id'),
+                'students' => $class->students->map(function ($s) {
+                    return [
+                        'id' => $s->id,
+                        'name' => $s->name,
+                    ];
+                }),
             ];
         });
 
@@ -86,7 +91,12 @@ class SchoolClassController extends Controller
             'current_students' => $class->students->count(),
             'room' => $class->room,
             'status' => $class->status,
-            'student_ids' => $class->students->pluck('id'),
+            'students' => $class->students->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                ];
+            }),
         ]);
     }
 

@@ -190,7 +190,10 @@ export default function Courses() {
 
     if (isManaging && selectedCourse) {
         const courseClasses = allClasses.filter(c => c.course_id === selectedCourse.id);
-        const courseStudents = allStudents.filter(s => s.course === selectedCourse.name);
+        const courseStudents = allStudents.filter(s =>
+            s.course === selectedCourse.name &&
+            (!s.school_classes || s.school_classes.length === 0)
+        );
         const courseAppointments = allAppointments.filter(app =>
             app.course_id === selectedCourse.id ||
             (app.school_class && app.school_class.course_id === selectedCourse.id)
@@ -281,6 +284,19 @@ export default function Courses() {
                                                     style={{ width: `${(cls.current_students / cls.max_students) * 100}%` }}
                                                 />
                                             </div>
+
+                                            {cls.students && cls.students.length > 0 && (
+                                                <div className="mt-4 pt-3 border-t border-border/50">
+                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Alunos Matriculados:</p>
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {cls.students.map((s: any) => (
+                                                            <Badge key={s.id} variant="secondary" className="text-[10px] font-medium py-0 px-2 bg-primary/5 text-primary border-primary/10">
+                                                                {s.name.split(' ')[0]} {s.name.split(' ').length > 1 ? s.name.split(' ').pop()?.charAt(0) + '.' : ''}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </motion.div>
                                 ))}

@@ -30,4 +30,9 @@ class Student extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function schoolClasses()
+    {
+        return $this->belongsToMany(SchoolClass::class, 'class_student', 'student_id', 'school_class_id');
+    }
 }
