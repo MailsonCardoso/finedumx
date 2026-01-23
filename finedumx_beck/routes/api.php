@@ -48,6 +48,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Employees
     Route::apiResource('employees', EmployeeController::class);
 
+    // Classes
+    Route::apiResource('classes', App\Http\Controllers\SchoolClassController::class);
+
     Route::get('/settings', [SettingController::class, 'index']);
     Route::put('/settings', [SettingController::class, 'update']);
 });
