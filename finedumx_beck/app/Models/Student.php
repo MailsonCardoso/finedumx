@@ -13,6 +13,7 @@ class Student extends Model
         'name',
         'active_responsible',
         'email',
+        'cpf',
         'phone',
         'course',
         'due_day',
