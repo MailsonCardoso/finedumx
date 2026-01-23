@@ -30,7 +30,6 @@ const appointmentSchema = z.object({
     type: z.enum(["individual", "grupo"]),
     student_id: z.string().optional(),
     school_class_id: z.string().optional(),
-    course_id: z.string().min(1, "Selecione a matéria"),
     date: z.string().min(1, "Data é obrigatória"),
     start_time: z.string().min(1, "Horário de início é obrigatório"),
     duration: z.string().min(1, "Duração é obrigatória"),
@@ -82,7 +81,6 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                 type: appointment.type,
                 student_id: appointment.student_id?.toString(),
                 school_class_id: appointment.school_class_id?.toString(),
-                course_id: appointment.course_id?.toString(),
                 date: appointment.date,
                 start_time: appointment.start_time,
                 duration: appointment.duration,
@@ -152,7 +150,7 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-2">
                             <Label>Tipo</Label>
                             <Select
@@ -167,28 +165,6 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                                     <SelectItem value="grupo">Em Grupo</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>Matéria</Label>
-                            <Select
-                                value={watch("course_id")}
-                                onValueChange={(val) => setValue("course_id", val)}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Selecione a matéria" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {courses.map((course) => (
-                                        <SelectItem key={course.id} value={course.id.toString()}>
-                                            {course.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {errors.course_id && (
-                                <p className="text-xs text-destructive">{errors.course_id.message}</p>
-                            )}
                         </div>
                     </div>
 
