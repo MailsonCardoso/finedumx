@@ -412,6 +412,10 @@ export default function Employees() {
                 {/* Add/Edit Modal */}
                 <Dialog open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
                     <DialogContent className="max-w-[700px] gap-0 p-0 overflow-hidden rounded-xl border border-border shadow-2xl bg-card">
+                        <DialogHeader className="sr-only">
+                            <DialogTitle>{isEditOpen ? "Editar Membro" : "Novo Membro"}</DialogTitle>
+                            <DialogDescription>Preencha os dados profissionais e de contato abaixo.</DialogDescription>
+                        </DialogHeader>
                         <div className="p-6">
                             <div className="space-y-1 mb-6">
                                 <h1 className="text-2xl font-bold text-foreground tracking-tight">
