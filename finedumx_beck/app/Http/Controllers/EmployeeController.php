@@ -85,7 +85,12 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
-        $employee->delete();
+        \DB::transaction(function () use ($employee) {
+            // Remover usuário de acesso
+            \App\Models\User::where('employee_id', $employee->id)->delete();
+
+            $employee->delete();
+        });
 
         return response()->json(null, 204);
     }

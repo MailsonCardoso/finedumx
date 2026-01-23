@@ -37,6 +37,26 @@ class AuthController extends Controller
             ]);
         }
 
+        // Verificar status se for aluno
+        if ($user->role === 'student' && $user->student_id) {
+            $student = \App\Models\Student::find($user->student_id);
+            if (!$student || $student->status !== 'ativo') {
+                throw ValidationException::withMessages([
+                    'cpf' => ['Este acesso está desativado. Entre em contato com a secretaria.'],
+                ]);
+            }
+        }
+
+        // Verificar status se for funcionário/professor
+        if ($user->role !== 'admin' && $user->employee_id) {
+            $employee = \App\Models\Employee::find($user->employee_id);
+            if (!$employee || $employee->status !== 'ativo') {
+                throw ValidationException::withMessages([
+                    'cpf' => ['Acesso de funcionário inativo.'],
+                ]);
+            }
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

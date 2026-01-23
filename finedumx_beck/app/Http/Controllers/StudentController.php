@@ -148,7 +148,10 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         \DB::transaction(function () use ($student) {
-            // Manualmente limpando para garantir que não fiquem órfãos se a constraint falhar
+            // Remover usuário de acesso
+            \App\Models\User::where('student_id', $student->id)->delete();
+
+            // Manualmente limpando para garantir que não fiquem órfãos
             $student->payments()->delete();
             $student->tuitions()->delete();
             $student->delete();
