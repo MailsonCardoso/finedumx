@@ -30,14 +30,15 @@ class CreateStudentUsers extends Command
             $exists = User::where('email', $cpf)->orWhere('cpf', $cpf)->exists();
 
             if (!$exists) {
-                User::create([
-                    'name' => $student->name,
-                    'email' => $cpf, // Usando CPF no campo email para simplificar login
-                    'cpf' => $cpf,   // Preenchendo também o campo CPF que é obrigatório no banco
-                    'password' => Hash::make($cpf),
-                    'role' => 'student',
-                    'student_id' => $student->id
-                ]);
+                $user = new User();
+                $user->name = $student->name;
+                $user->email = $cpf;
+                $user->cpf = $cpf;
+                $user->password = Hash::make($cpf);
+                $user->role = 'student';
+                $user->student_id = $student->id;
+                $user->save();
+
                 $count++;
             }
         }
