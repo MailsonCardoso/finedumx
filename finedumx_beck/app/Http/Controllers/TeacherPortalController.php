@@ -18,20 +18,21 @@ class TeacherPortalController extends Controller
 
         $teacherId = $user->employee_id;
 
-        // Recuperar agendamentos vinculados aos cursos deste professor
-        $appointments = Appointment::with(['course', 'student', 'schoolClass.students'])
-            ->whereHas('course', function ($query) use ($teacherId) {
-                $query->where('teacher_id', $teacherId);
+        // Recuperar agendamentos vinculados ao professor via Curso OU Turma
+        $myAppointments = Appointment::with(['course', 'student', 'schoolClass.students'])
+            ->where(function ($query) use ($teacherId) {
+                // Filtra por professor no curso
+                $query->whereHas('course', function ($q) use ($teacherId) {
+                    $q->where('teacher_id', $teacherId);
+                })
+                    // OU filtra por professor na turma
+                    ->orWhereHas('schoolClass', function ($q) use ($teacherId) {
+                    $q->where('teacher_id', $teacherId);
+                });
             })
-            ->orWhere('student_id', null) // Se for uma aula de turma, o professor pode estar vinculado à turma/curso
             ->orderBy('date', 'desc')
             ->orderBy('start_time', 'asc')
             ->get();
-
-        // Filtrar apenas o que realmente pertence ao professor (caso o orWhere tenha sido muito amplo)
-        $myAppointments = $appointments->filter(function ($app) use ($teacherId) {
-            return $app->course && $app->course->teacher_id == $teacherId;
-        });
 
         // Estatísticas rápidas
         $stats = [
@@ -42,7 +43,7 @@ class TeacherPortalController extends Controller
 
         return response()->json([
             'teacher' => $user->load('employee'),
-            'appointments' => $myAppointments->values(),
+            'appointments' => $myAppointments,
             'stats' => $stats
         ]);
     }

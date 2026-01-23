@@ -77,7 +77,6 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         collapsed ? "w-[72px]" : "w-[260px]"
       )}
     >
-      {/* Logo */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
@@ -87,7 +86,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             <span className="font-bold text-lg text-foreground">FinEdu</span>
           )}
         </div>
-        {!collapsed && <NotificationBell />}
+        {!collapsed && user?.role !== 'teacher' && <NotificationBell />}
       </div>
 
       {/* Menu */}
