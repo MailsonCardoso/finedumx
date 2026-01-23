@@ -460,7 +460,7 @@ export default function Classes() {
                                 {isEditOpen ? "Editar Turma" : "Nova Turma"}
                             </DialogTitle>
                             <DialogDescription className="text-muted-foreground">
-                                Configure os detalhes da aula coletiva.
+                                Configure os detalhes da aula coletiva. (v2)
                             </DialogDescription>
                         </DialogHeader>
 
