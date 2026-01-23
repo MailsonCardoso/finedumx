@@ -35,10 +35,34 @@ class StudentPortalController extends Controller
             ->limit(10)
             ->get();
 
-        // Minhas Mensalidades
+        // Minhas Mensalidades com lógica de status e links
         $tuitions = Tuition::where('student_id', $studentId)
             ->orderBy('due_date', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($t) {
+                // Se não estiver pago, pode gerar link do MP
+                if ($t->status !== 'pago') {
+                    // Adicionamos um campo virtual para o frontend saber que pode cobrar
+                    $t->payment_url = route('tuitions.payment-link', $t->id);
+                }
+
+                // Determinar se está em atraso
+                if ($t->status !== 'pago' && $t->due_date < now()->toDateString()) {
+                    $t->is_overdue = true;
+                } else {
+                    $t->is_overdue = false;
+                }
+
+                return $t;
+            });
+
+        // Estatísticas para os KPI Cards
+        $stats = [
+            'next_due_date' => $tuitions->where('status', 'pendente')->where('due_date', '>=', now()->toDateString())->sortBy('due_date')->first()?->due_date,
+            'total_paid' => $tuitions->where('status', 'pago')->sum('amount'),
+            'overdue_count' => $tuitions->where('status', 'pendente')->where('due_date', '<', now()->toDateString())->count(),
+            'pending_amount' => $tuitions->where('status', 'pendente')->sum('amount'),
+        ];
 
         // Minhas Presenças (Aulas com status 'realizado')
         $presences = Appointment::where(function ($q) use ($studentId, $classIds) {
@@ -60,7 +84,8 @@ class StudentPortalController extends Controller
             'appointments' => $appointments,
             'tuitions' => $tuitions,
             'presences' => $presences,
-            'enrolled' => $enrolled
+            'enrolled' => $enrolled,
+            'stats' => $stats
         ]);
     }
 }

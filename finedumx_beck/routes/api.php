@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tuitions/{tuition}/notify', [TuitionController::class, 'notify']);
 
     // Mercado Pago
-    Route::post('/tuitions/{tuition}/payment-link', [\App\Http\Controllers\MercadoPagoController::class, 'createPaymentLink']);
+    Route::post('/tuitions/{tuition}/payment-link', [\App\Http\Controllers\MercadoPagoController::class, 'createPaymentLink'])->name('tuitions.payment-link');
 
     Route::apiResource('tuitions', TuitionController::class);
 
