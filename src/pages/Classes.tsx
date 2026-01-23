@@ -454,152 +454,160 @@ export default function Classes() {
 
                 {/* Add/Edit Modal */}
                 <Dialog open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
-                    <DialogContent className="max-w-[480px] w-[calc(100%-2rem)] rounded-2xl border border-border bg-card p-6 shadow-2xl">
-                        <DialogHeader className="mb-6">
+                    <DialogContent className="max-w-2xl rounded-2xl border border-border bg-card p-0 overflow-hidden shadow-2xl">
+                        <DialogHeader className="p-6 pb-0">
                             <DialogTitle className="text-2xl font-bold text-foreground">
                                 {isEditOpen ? "Editar Turma" : "Nova Turma"}
                             </DialogTitle>
                             <DialogDescription className="text-muted-foreground">
-                                Configure os detalhes da aula coletiva. (v2)
+                                Configure os detalhes da aula coletiva.
                             </DialogDescription>
                         </DialogHeader>
 
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            <div className="space-y-2">
-                                <Label htmlFor="name" className="text-sm font-semibold text-foreground ml-1">
-                                    Nome da Turma
-                                </Label>
-                                <Input
-                                    id="name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Ex: Aula em Grupo"
-                                    className="h-11 px-4 rounded-xl bg-background border-border focus-visible:ring-1 focus-visible:ring-primary font-medium"
-                                    required
-                                />
-                            </div>
+                        <form onSubmit={handleSubmit} className="p-6 pt-4 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Left Column */}
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name" className="text-sm font-semibold text-foreground ml-1">
+                                            Nome da Turma
+                                        </Label>
+                                        <Input
+                                            id="name"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            placeholder="Ex: Aula de Piano"
+                                            className="h-10 px-4 rounded-xl bg-background border-border focus-visible:ring-1 focus-visible:ring-primary font-medium"
+                                            required
+                                        />
+                                    </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="course_id" className="text-sm font-semibold text-foreground ml-1">
-                                    Instrumento / Matéria
-                                </Label>
-                                <Select
-                                    value={formData.course_id}
-                                    onValueChange={(value) => {
-                                        const course = coursesData.find(c => c.id.toString() === value);
-                                        const filteredStudents = studentsData.filter(s => s.course === course?.name);
-                                        setFormData({
-                                            ...formData,
-                                            course_id: value,
-                                            student_ids: filteredStudents.map(s => s.id)
-                                        });
-                                    }}
-                                >
-                                    <SelectTrigger className="h-11 px-4 rounded-xl bg-background border-border focus:ring-1 focus:ring-primary font-medium">
-                                        <SelectValue placeholder="Selecione a matéria" />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl">
-                                        {coursesData.map((course) => (
-                                            <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="course_id" className="text-sm font-semibold text-foreground ml-1">
+                                            Instrumento / Matéria
+                                        </Label>
+                                        <Select
+                                            value={formData.course_id}
+                                            onValueChange={(value) => {
+                                                const course = coursesData.find(c => c.id.toString() === value);
+                                                const filteredStudents = studentsData.filter(s => s.course === course?.name);
+                                                setFormData({
+                                                    ...formData,
+                                                    course_id: value,
+                                                    student_ids: filteredStudents.map(s => s.id)
+                                                });
+                                            }}
+                                        >
+                                            <SelectTrigger className="h-10 px-4 rounded-xl bg-background border-border focus:ring-1 focus:ring-primary font-medium">
+                                                <SelectValue placeholder="Matéria" />
+                                            </SelectTrigger>
+                                            <SelectContent className="rounded-xl">
+                                                {coursesData.map((course) => (
+                                                    <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="teacher_id" className="text-sm font-semibold text-foreground ml-1">
-                                    Professor Responsável
-                                </Label>
-                                <Select
-                                    value={formData.teacher_id}
-                                    onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
-                                >
-                                    <SelectTrigger className="h-11 px-4 rounded-xl bg-background border-border focus:ring-1 focus:ring-primary font-medium">
-                                        <SelectValue placeholder="Selecione o professor" />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl">
-                                        {teachers.map((teacher) => (
-                                            <SelectItem key={teacher.id} value={teacher.id.toString()}>{teacher.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="teacher_id" className="text-sm font-semibold text-foreground ml-1">
+                                            Professor Responsável
+                                        </Label>
+                                        <Select
+                                            value={formData.teacher_id}
+                                            onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
+                                        >
+                                            <SelectTrigger className="h-10 px-4 rounded-xl bg-background border-border focus:ring-1 focus:ring-primary font-medium">
+                                                <SelectValue placeholder="Professor" />
+                                            </SelectTrigger>
+                                            <SelectContent className="rounded-xl">
+                                                {teachers.map((teacher) => (
+                                                    <SelectItem key={teacher.id} value={teacher.id.toString()}>{teacher.name}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                            <div className="space-y-2">
-                                <Label className="text-sm font-semibold text-foreground ml-1">
-                                    Alunos Integrantes
-                                </Label>
-                                <div className="p-3 rounded-xl bg-muted/20 border border-border min-h-[100px] flex flex-col gap-2">
-                                    <div className="flex flex-wrap gap-1.5">
-                                        <AnimatePresence>
-                                            {formData.student_ids.map(id => {
-                                                const student = studentsData.find(s => s.id === id);
-                                                return (
-                                                    <motion.div
-                                                        key={id}
-                                                        initial={{ scale: 0.9, opacity: 0 }}
-                                                        animate={{ scale: 1, opacity: 1 }}
-                                                        exit={{ scale: 0.9, opacity: 0 }}
-                                                        className="bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-full flex items-center gap-1.5 text-xs font-bold"
-                                                    >
-                                                        {student?.name}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setFormData({
-                                                                ...formData,
-                                                                student_ids: formData.student_ids.filter(sid => sid !== id)
-                                                            })}
-                                                            className="hover:bg-primary/20 rounded-full p-0.5"
+                                    <div className="space-y-2">
+                                        <Label htmlFor="status" className="text-sm font-semibold text-foreground ml-1">
+                                            Status
+                                        </Label>
+                                        <Select
+                                            value={formData.status}
+                                            onValueChange={(value) => setFormData({ ...formData, status: value })}
+                                        >
+                                            <SelectTrigger className="h-10 px-4 rounded-xl bg-background border-border focus:ring-1 focus:ring-primary font-medium">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent className="rounded-xl">
+                                                <SelectItem value="ativo">Ativo</SelectItem>
+                                                <SelectItem value="inativo">Inativo</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                {/* Right Column */}
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-semibold text-foreground ml-1">
+                                        Alunos Integrantes
+                                    </Label>
+                                    <div className="h-[250px] p-3 rounded-xl bg-muted/10 border border-border flex flex-col gap-2 overflow-y-auto">
+                                        <div className="flex flex-wrap gap-1.5">
+                                            <AnimatePresence>
+                                                {formData.student_ids.map(id => {
+                                                    const student = studentsData.find(s => s.id === id);
+                                                    return (
+                                                        <motion.div
+                                                            key={id}
+                                                            initial={{ scale: 0.9, opacity: 0 }}
+                                                            animate={{ scale: 1, opacity: 1 }}
+                                                            exit={{ scale: 0.9, opacity: 0 }}
+                                                            className="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full flex items-center gap-1.5 text-[10px] font-bold"
                                                         >
-                                                            <Trash2 className="w-3 h-3" />
-                                                        </button>
-                                                    </motion.div>
-                                                );
-                                            })}
-                                        </AnimatePresence>
-                                        {formData.student_ids.length === 0 && (
-                                            <p className="text-muted-foreground/50 text-xs italic ml-1 mt-1">Selecione uma matéria para carregar alunos.</p>
+                                                            {student?.name}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setFormData({
+                                                                    ...formData,
+                                                                    student_ids: formData.student_ids.filter(sid => sid !== id)
+                                                                })}
+                                                                className="hover:bg-primary/20 rounded-full p-0.5"
+                                                            >
+                                                                <Trash2 className="w-2.5 h-2.5" />
+                                                            </button>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </AnimatePresence>
+                                            {formData.student_ids.length === 0 && (
+                                                <p className="text-muted-foreground/50 text-xs italic ml-1 mt-1">Selecione uma matéria.</p>
+                                            )}
+                                        </div>
+                                        {formData.student_ids.length > 0 && (
+                                            <div className="mt-auto pt-2 border-t border-border/50">
+                                                <p className="text-[10px] font-medium text-muted-foreground italic">
+                                                    {formData.student_ids.length} alunos vinculados.
+                                                </p>
+                                            </div>
                                         )}
                                     </div>
-                                    {formData.student_ids.length > 0 && (
-                                        <p className="text-[10px] font-medium text-muted-foreground mt-auto pt-2 border-t border-border/50 italic">
-                                            Mostrando {formData.student_ids.length} alunos matriculados nesta matéria.
-                                        </p>
-                                    )}
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="status" className="text-sm font-semibold text-foreground ml-1">
-                                    Status
-                                </Label>
-                                <Select
-                                    value={formData.status}
-                                    onValueChange={(value) => setFormData({ ...formData, status: value })}
-                                >
-                                    <SelectTrigger className="h-11 px-4 rounded-xl bg-background border-border focus:ring-1 focus:ring-primary font-medium">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl">
-                                        <SelectItem value="ativo">Ativo</SelectItem>
-                                        <SelectItem value="inativo">Inativo</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="flex items-center justify-end gap-3 pt-4">
+                            <div className="flex items-center justify-end gap-3 pt-2">
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}
-                                    className="h-11 px-6 rounded-xl font-semibold hover:bg-muted"
+                                    className="h-10 px-6 rounded-xl font-semibold hover:bg-muted"
                                 >
                                     Cancelar
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={createMutation.isPending || updateMutation.isPending}
-                                    className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 transition-all"
+                                    className="h-10 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 transition-all"
                                 >
                                     {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Salvar
