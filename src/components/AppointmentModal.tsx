@@ -24,7 +24,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const appointmentSchema = z.object({
     type: z.enum(["individual", "grupo"]),
@@ -54,7 +64,8 @@ interface AppointmentModalProps {
 
 export function AppointmentModal({ isOpen, onOpenChange, appointment }: AppointmentModalProps) {
     const queryClient = useQueryClient();
-    const isEditing = !!appointment;
+    const isEditing = !!appointment && appointment.id !== undefined;
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const {
         register,
@@ -132,6 +143,19 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
         },
         onError: (error: any) => {
             toast.error(error.message || "Erro ao salvar agendamento");
+        },
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: () => apiFetch(`/appointments/${appointment.id}`, { method: "DELETE" }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["appointments"] });
+            toast.success("Agendamento excluído com sucesso!");
+            setIsDeleteDialogOpen(false);
+            onOpenChange(false);
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Erro ao excluir agendamento");
         },
     });
 
@@ -260,21 +284,60 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                         />
                     </div>
 
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => onOpenChange(false)}
-                        >
-                            Cancelar
-                        </Button>
-                        <Button type="submit" disabled={mutation.isPending}>
-                            {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {isEditing ? "Salvar Alterações" : "Agendar"}
-                        </Button>
+                    <DialogFooter className="flex-row justify-between items-center sm:justify-between">
+                        {isEditing ? (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 px-2"
+                                onClick={() => setIsDeleteDialogOpen(true)}
+                                disabled={deleteMutation.isPending}
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                Excluir
+                            </Button>
+                        ) : (
+                            <div /> /* Spacer */
+                        )}
+                        <div className="flex gap-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => onOpenChange(false)}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button type="submit" disabled={mutation.isPending}>
+                                {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {isEditing ? "Salvar Alterações" : "Agendar"}
+                            </Button>
+                        </div>
                     </DialogFooter>
                 </form>
             </DialogContent>
+
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir Agendamento?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Esta ação não pode ser desfeita. O agendamento será removido permanentemente da agenda.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={(e) => {
+                                e.preventDefault();
+                                deleteMutation.mutate();
+                            }}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            {deleteMutation.isPending ? "Excluindo..." : "Confirmar Exclusão"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Dialog>
     );
 }
