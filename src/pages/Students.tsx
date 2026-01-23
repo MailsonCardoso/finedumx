@@ -205,6 +205,11 @@ export default function Students() {
 
   // Handlers
   const handleEditClick = (student: Student) => {
+    const studentData = student as any;
+    const classId = studentData.school_classes && studentData.school_classes.length > 0
+      ? studentData.school_classes[0].id.toString()
+      : "";
+
     setSelectedStudent(student);
     setFormData({
       name: student.name,
@@ -213,9 +218,9 @@ export default function Students() {
       cpf: student.cpf || "",
       phone: student.phone,
       course: student.course,
-      class_type: (student as any).class_type || "individual",
-      class_id: (student as any).class_id?.toString() || "",
-      teacher_id: (student as any).teacher_id?.toString() || "",
+      class_type: studentData.class_type || "individual",
+      class_id: classId,
+      teacher_id: studentData.teacher_id?.toString() || "",
       due_day: student.due_day,
       monthly_fee: student.monthly_fee,
       status: student.status,

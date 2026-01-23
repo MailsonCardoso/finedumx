@@ -19,6 +19,8 @@ class Student extends Model
         'due_day',
         'monthly_fee',
         'status',
+        'class_type',
+        'teacher_id',
     ];
 
     public function tuitions()

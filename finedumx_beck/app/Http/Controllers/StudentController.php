@@ -33,6 +33,9 @@ class StudentController extends Controller
             'course' => 'nullable|string',
             'due_day' => 'required|integer|min:1|max:31',
             'monthly_fee' => 'required|numeric|min:0',
+            'class_type' => 'nullable|string',
+            'teacher_id' => 'nullable|exists:employees,id',
+            'class_id' => 'nullable|exists:school_classes,id',
             // Optional flags
             'generate_matricula' => 'boolean',
             'matricula_value' => 'nullable|numeric',
@@ -139,6 +142,9 @@ class StudentController extends Controller
             'due_day' => 'integer',
             'monthly_fee' => 'sometimes|required|numeric',
             'status' => 'sometimes|required|string',
+            'class_type' => 'nullable|string',
+            'teacher_id' => 'nullable|exists:employees,id',
+            'class_id' => 'nullable|exists:school_classes,id',
         ], [
             'email.unique' => 'Este e-mail já está sendo utilizado por outro aluno.',
             'email.required' => 'O campo e-mail é obrigatório.',
