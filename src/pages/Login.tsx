@@ -48,6 +48,8 @@ export default function Login() {
 
       if (response.user?.role === 'student') {
         navigate("/portal");
+      } else if (response.user?.role === 'teacher') {
+        navigate("/professor");
       } else {
         navigate("/dashboard");
       }

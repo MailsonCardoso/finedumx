@@ -43,6 +43,7 @@ const menuItems = [
   { icon: Receipt, label: "Recibos", path: "/recibos", roles: ["admin"] },
   { icon: Settings, label: "Configurações", path: "/configuracoes", roles: ["admin"] },
   { icon: LayoutDashboard, label: "Meu Portal", path: "/portal", roles: ["student"] },
+  { icon: LayoutDashboard, label: "Meu Portal", path: "/professor", roles: ["teacher"] },
 ];
 
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {

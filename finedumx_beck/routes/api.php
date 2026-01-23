@@ -57,6 +57,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Student Portal
     Route::get('/student/portal', [\App\Http\Controllers\StudentPortalController::class, 'index']);
 
+    // Teacher Portal
+    Route::get('/teacher/portal', [\App\Http\Controllers\TeacherPortalController::class, 'index']);
+
     Route::get('/settings', [SettingController::class, 'index']);
     Route::put('/settings', [SettingController::class, 'update']);
 });

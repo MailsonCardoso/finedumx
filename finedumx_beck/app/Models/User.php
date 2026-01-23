@@ -24,12 +24,18 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'student_id'
+        'student_id',
+        'employee_id'
     ];
 
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
     }
 
     /**

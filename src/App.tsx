@@ -16,6 +16,7 @@ import Receipts from "./pages/Receipts";
 import Settings from "./pages/Settings";
 import Agenda from "./pages/Agenda";
 import StudentPortal from "./pages/StudentPortal";
+import TeacherPortal from "./pages/TeacherPortal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/configuracoes" element={<Settings />} />
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/portal" element={<StudentPortal />} />
+            <Route path="/professor" element={<TeacherPortal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
