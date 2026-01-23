@@ -13,7 +13,7 @@ class AppointmentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Appointment::with(['student', 'schoolClass', 'course']);
+        $query = Appointment::with(['student', 'schoolClass.teacher', 'course.teacher']);
 
         if ($request->has('student_id')) {
             $query->where('student_id', $request->student_id);

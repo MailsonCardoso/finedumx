@@ -35,7 +35,9 @@ export default function Agenda() {
             if (app.status === "falta") color = "#ef4444"; // vermelho
 
             const entityName = app.type === "individual" ? app.student?.name : app.school_class?.name;
-            const title = `${app.course?.name || "Aula"} - ${entityName || ""}`;
+            const teacher = app.school_class?.teacher || app.course?.teacher;
+            const teacherName = teacher ? ` (${teacher.name})` : "";
+            const title = `${app.course?.name || "Aula"} - ${entityName || ""}${teacherName}`;
 
             return {
                 id: app.id.toString(),

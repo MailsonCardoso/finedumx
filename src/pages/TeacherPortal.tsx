@@ -124,7 +124,7 @@ export default function TeacherPortal() {
                                 <thead className="bg-muted/30 text-muted-foreground font-medium border-b border-border/50 uppercase text-[10px] tracking-wider">
                                     <tr>
                                         <th className="px-6 py-4">Data/Hora</th>
-                                        <th className="px-6 py-4">Curso / Turma</th>
+                                        <th className="px-6 py-4">Aula</th>
                                         <th className="px-6 py-4">Aluno(s)</th>
                                         <th className="px-6 py-4">Duração</th>
                                         <th className="px-6 py-4">Status</th>
@@ -147,15 +147,10 @@ export default function TeacherPortal() {
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-2">
                                                         <BookOpen className="w-4 h-4 text-primary/60" />
-                                                        <span className="font-medium">
-                                                            {app.course?.name || app.school_class?.course?.name || "Aula Avulsa"}
+                                                        <span className="font-bold text-foreground uppercase tracking-tight">
+                                                            {app.school_class?.name || app.course?.name || "Aula"}
                                                         </span>
                                                     </div>
-                                                    {app.school_class && (
-                                                        <div className="text-[10px] text-primary font-bold mt-0.5 uppercase">
-                                                            Turma: {app.school_class.name}
-                                                        </div>
-                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {app.type === 'individual' ? (

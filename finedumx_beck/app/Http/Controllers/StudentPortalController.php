@@ -24,7 +24,7 @@ class StudentPortalController extends Controller
             $q->where('student_id', $studentId);
         })->pluck('id');
 
-        $appointments = Appointment::with(['course', 'schoolClass'])
+        $appointments = Appointment::with(['course.teacher', 'schoolClass.teacher'])
             ->where(function ($q) use ($studentId, $classIds) {
                 $q->where('student_id', $studentId)
                     ->orWhereIn('school_class_id', $classIds);

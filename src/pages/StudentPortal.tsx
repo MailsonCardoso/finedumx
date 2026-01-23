@@ -154,9 +154,12 @@ export default function StudentPortal() {
                                                     <Music className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-semibold text-foreground">{app.course?.name || "Aula"}</p>
-                                                    <p className="text-xs text-muted-foreground uppercase">
-                                                        {new Date(app.date).toLocaleDateString('pt-BR', { weekday: 'long' })} • {app.start_time.substring(0, 5)} - {app.duration}min
+                                                    <p className="font-semibold text-foreground">{app.course?.name || app.school_class?.name || "Aula"}</p>
+                                                    <p className="text-[10px] font-bold text-primary uppercase">
+                                                        Prof. {app.course?.teacher?.name || app.school_class?.teacher?.name || "A definir"}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground uppercase mt-0.5">
+                                                        {new Date(app.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long' })} • {app.start_time.substring(0, 5)}
                                                     </p>
                                                 </div>
                                             </div>
@@ -184,7 +187,7 @@ export default function StudentPortal() {
                                         <div key={idx} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
                                             <div className="flex items-center gap-4">
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tuition.status === 'pago' ? 'bg-emerald-500/10 text-emerald-500' :
-                                                        tuition.is_overdue ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'
+                                                    tuition.is_overdue ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'
                                                     }`}>
                                                     {tuition.status === 'pago' ? <CheckCircle2 className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
                                                 </div>
