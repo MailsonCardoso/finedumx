@@ -39,6 +39,7 @@ const App = () => (
             <Route path="/recibos" element={<Receipts />} />
             <Route path="/configuracoes" element={<Settings />} />
             <Route path="/agenda" element={<Agenda />} />
+            <Route path="/portal" element={<StudentPortal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
