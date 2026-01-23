@@ -69,28 +69,28 @@ class SchoolClassController extends Controller
         return response()->json($class->load(['course', 'teacher', 'students']), 201);
     }
 
-    public function show(SchoolClass $schoolClass)
+    public function show(SchoolClass $class)
     {
         return response()->json([
-            'id' => $schoolClass->id,
-            'name' => $schoolClass->name,
-            'course_id' => $schoolClass->course_id,
-            'course_name' => $schoolClass->course ? $schoolClass->course->name : null,
-            'teacher_id' => $schoolClass->teacher_id,
-            'teacher_name' => $schoolClass->teacher ? $schoolClass->teacher->name : null,
-            'shift' => $schoolClass->shift,
-            'start_time' => $schoolClass->start_time,
-            'end_time' => $schoolClass->end_time,
-            'days_of_week' => $schoolClass->days_of_week,
-            'max_students' => $schoolClass->max_students,
-            'current_students' => $schoolClass->students->count(),
-            'room' => $schoolClass->room,
-            'status' => $schoolClass->status,
-            'student_ids' => $schoolClass->students->pluck('id'),
+            'id' => $class->id,
+            'name' => $class->name,
+            'course_id' => $class->course_id,
+            'course_name' => $class->course ? $class->course->name : null,
+            'teacher_id' => $class->teacher_id,
+            'teacher_name' => $class->teacher ? $class->teacher->name : null,
+            'shift' => $class->shift,
+            'start_time' => $class->start_time,
+            'end_time' => $class->end_time,
+            'days_of_week' => $class->days_of_week,
+            'max_students' => $class->max_students,
+            'current_students' => $class->students->count(),
+            'room' => $class->room,
+            'status' => $class->status,
+            'student_ids' => $class->students->pluck('id'),
         ]);
     }
 
-    public function update(Request $request, SchoolClass $schoolClass)
+    public function update(Request $request, SchoolClass $class)
     {
         $validated = $request->validate([
             'name' => 'required|string',
@@ -107,18 +107,18 @@ class SchoolClassController extends Controller
             'student_ids.*' => 'exists:students,id',
         ]);
 
-        $schoolClass->update($validated);
+        $class->update($validated);
 
         if (isset($validated['student_ids'])) {
-            $schoolClass->students()->sync($validated['student_ids']);
+            $class->students()->sync($validated['student_ids']);
         }
 
-        return response()->json($schoolClass->load(['course', 'teacher', 'students']));
+        return response()->json($class->load(['course', 'teacher', 'students']));
     }
 
-    public function destroy(SchoolClass $schoolClass)
+    public function destroy(SchoolClass $class)
     {
-        $schoolClass->delete();
+        $class->delete();
         return response()->json(null, 204);
     }
 }
