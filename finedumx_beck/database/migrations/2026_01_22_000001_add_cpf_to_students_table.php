@@ -8,8 +8,12 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('students', function (Blueprint $table) {
-            $table->string('cpf', 14)->nullable()->after('email');
-            $table->string('active_responsible')->nullable()->after('cpf');
+            if (!Schema::hasColumn('students', 'cpf')) {
+                $table->string('cpf', 14)->nullable()->after('email');
+            }
+            if (!Schema::hasColumn('students', 'active_responsible')) {
+                $table->string('active_responsible')->nullable()->after('cpf');
+            }
         });
     }
 

@@ -11,7 +11,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('courses', function (Blueprint $table) {
-            $table->decimal('price', 10, 2)->default(0)->after('name');
+            if (!Schema::hasColumn('courses', 'price')) {
+                $table->decimal('price', 10, 2)->default(0)->after('name');
+            }
         });
     }
 
