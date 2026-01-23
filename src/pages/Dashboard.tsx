@@ -84,6 +84,14 @@ export default function Dashboard() {
     queryFn: () => apiFetch('/dashboard/stats'),
   });
 
+  const { data: todayAppointments = [] } = useQuery<any[]>({
+    queryKey: ['today-appointments'],
+    queryFn: () => {
+      const today = new Date().toISOString().split('T')[0];
+      return apiFetch(`/appointments?date=${today}`);
+    },
+  });
+
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [sheetStudentId, setSheetStudentId] = useState<number | null>(null);
 
@@ -325,6 +333,77 @@ export default function Dashboard() {
             </Card>
           </motion.div>
         </div>
+
+        {/* Today's Agenda */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <Card className="shadow-soft border-border/50 hover:shadow-card transition-shadow overflow-hidden bg-card/50 backdrop-blur-sm">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-primary/5">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <Clock className="w-5 h-5 text-primary" />
+                Agenda de Hoje
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-primary hover:bg-primary/5 font-medium"
+                onClick={() => navigate("/agenda")}
+              >
+                Ver agenda completa
+                <ArrowRight className="w-4 h-4 ml-1.5" />
+              </Button>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y divide-border/50">
+                {todayAppointments.length > 0 ? (
+                  todayAppointments.slice(0, 5).map((app, i) => (
+                    <div
+                      key={app.id}
+                      className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors cursor-pointer"
+                      onClick={() => {
+                        if (app.type === 'individual' && app.student_id) {
+                          setSheetStudentId(app.student_id);
+                          setIsSheetOpen(true);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-sm font-bold">
+                          {app.start_time.substring(0, 5)}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            {app.course?.name || "Aula"} - {app.type === 'individual' ? app.student?.name : app.school_class?.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground uppercase">
+                            {app.type} • {app.duration} min
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {app.status === 'realizado' ? (
+                          <StatusBadge status="success">Realizado</StatusBadge>
+                        ) : app.status === 'falta' ? (
+                          <StatusBadge status="danger">Falta</StatusBadge>
+                        ) : (
+                          <StatusBadge status="warning">Pendente</StatusBadge>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-12 text-center">
+                    <Calendar className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
+                    <p className="text-muted-foreground font-medium">Nenhuma aula agendada para hoje.</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       <StudentSheet

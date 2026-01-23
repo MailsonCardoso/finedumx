@@ -42,6 +42,17 @@ interface Tuition {
     type?: 'mensalidade' | 'matricula' | 'rematricula';
 }
 
+interface Appointment {
+    id: number;
+    type: 'individual' | 'grupo';
+    date: string;
+    start_time: string;
+    duration: string;
+    status: 'agendado' | 'realizado' | 'falta';
+    course?: { name: string };
+    notes?: string;
+}
+
 export function StudentSheet({ studentId, isOpen, onOpenChange }: StudentSheetProps) {
     const { data: student, isLoading: isLoadingStudent } = useQuery<Student>({
         queryKey: ['student', studentId],
@@ -52,6 +63,12 @@ export function StudentSheet({ studentId, isOpen, onOpenChange }: StudentSheetPr
     const { data: tuitions = [], isLoading: isLoadingTuitions } = useQuery<Tuition[]>({
         queryKey: ['student-tuitions', studentId],
         queryFn: () => apiFetch(`/tuitions?student_id=${studentId}`),
+        enabled: !!studentId && isOpen,
+    });
+
+    const { data: appointments = [], isLoading: isLoadingAppointments } = useQuery<Appointment[]>({
+        queryKey: ['student-appointments', studentId],
+        queryFn: () => apiFetch(`/appointments?student_id=${studentId}`),
         enabled: !!studentId && isOpen,
     });
 
@@ -75,6 +92,14 @@ export function StudentSheet({ studentId, isOpen, onOpenChange }: StudentSheetPr
         }
 
         return <StatusBadge status="warning">Pendente</StatusBadge>;
+    };
+
+    const getAppointmentStatusBadge = (status: string) => {
+        switch (status) {
+            case 'realizado': return <StatusBadge status="success">Realizado</StatusBadge>;
+            case 'falta': return <StatusBadge status="danger">Falta</StatusBadge>;
+            default: return <StatusBadge status="warning">Agendado</StatusBadge>;
+        }
     };
 
     const totalPaid = tuitions
@@ -190,11 +215,49 @@ export function StudentSheet({ studentId, isOpen, onOpenChange }: StudentSheetPr
                             </div>
                         </div>
 
+                        <div className="space-y-4">
+                            <h3 className="font-semibold text-lg flex items-center gap-2">
+                                <Clock className="w-5 h-5 text-primary" /> Histórico de Aulas
+                            </h3>
+
+                            {isLoadingAppointments ? (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="h-6 w-6 animate-spin text-primary/50" />
+                                </div>
+                            ) : appointments.length > 0 ? (
+                                <div className="space-y-3">
+                                    {appointments.map((app) => (
+                                        <div key={app.id} className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-card hover:bg-muted/30 transition-colors">
+                                            <div className="flex flex-col">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-semibold text-foreground">{app.course?.name || "Aula"}</span>
+                                                    <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-medium uppercase">
+                                                        {app.type}
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {format(new Date(app.date + 'T12:00:00'), "dd/MM/yyyy")} às {app.start_time.substring(0, 5)}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-end gap-1.5">
+                                                <span className="text-xs font-medium text-muted-foreground">{app.duration} min</span>
+                                                {getAppointmentStatusBadge(app.status)}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 bg-muted/20 rounded-xl border border-dashed border-border/50">
+                                    <p className="text-muted-foreground text-sm">Nenhuma aula registrada.</p>
+                                </div>
+                            )}
+                        </div>
+
                         <Separator className="my-6" />
 
                         <div className="space-y-4">
                             <h3 className="font-semibold text-lg flex items-center gap-2">
-                                <Clock className="w-5 h-5 text-primary" /> Histórico de Mensalidades
+                                <DollarSign className="w-5 h-5 text-primary" /> Histórico de Mensalidades
                             </h3>
 
                             {isLoadingTuitions ? (

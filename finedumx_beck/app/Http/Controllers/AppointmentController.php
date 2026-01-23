@@ -11,9 +11,23 @@ class AppointmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Appointment::with(['student', 'schoolClass', 'course'])->get();
+        $query = Appointment::with(['student', 'schoolClass', 'course']);
+
+        if ($request->has('student_id')) {
+            $query->where('student_id', $request->student_id);
+        }
+
+        if ($request->has('school_class_id')) {
+            $query->where('school_class_id', $request->school_class_id);
+        }
+
+        if ($request->has('date')) {
+            $query->where('date', $request->date);
+        }
+
+        return $query->orderBy('date', 'desc')->orderBy('start_time', 'asc')->get();
     }
 
     public function store(Request $request)
