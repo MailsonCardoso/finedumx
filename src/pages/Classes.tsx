@@ -454,7 +454,7 @@ export default function Classes() {
 
                 {/* Add/Edit Modal */}
                 <Dialog open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
-                    <DialogContent className="max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
+                    <DialogContent className="max-w-[480px] w-[calc(100%-2rem)] rounded-2xl border border-border bg-card p-6 shadow-2xl">
                         <DialogHeader className="mb-6">
                             <DialogTitle className="text-2xl font-bold text-foreground">
                                 {isEditOpen ? "Editar Turma" : "Nova Turma"}
