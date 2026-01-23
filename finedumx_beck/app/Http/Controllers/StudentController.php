@@ -57,13 +57,21 @@ class StudentController extends Controller
         if ($student->cpf) {
             $cpf = preg_replace('/\D/', '', $student->cpf);
             if (!empty($cpf)) {
-                \App\Models\User::create([
-                    'name' => $student->name,
-                    'email' => $cpf,
-                    'password' => \Illuminate\Support\Facades\Hash::make($cpf),
-                    'role' => 'student',
-                    'student_id' => $student->id
-                ]);
+                // Verificar se já existe usuário com esse login
+                $userExists = \App\Models\User::where('email', $cpf)
+                    ->orWhere('cpf', $cpf)
+                    ->exists();
+
+                if (!$userExists) {
+                    \App\Models\User::create([
+                        'name' => $student->name,
+                        'email' => $cpf,
+                        'cpf' => $cpf,
+                        'password' => \Illuminate\Support\Facades\Hash::make($cpf),
+                        'role' => 'student',
+                        'student_id' => $student->id
+                    ]);
+                }
             }
         }
 
