@@ -15,6 +15,7 @@ import Payments from "./pages/Payments";
 import Receipts from "./pages/Receipts";
 import Settings from "./pages/Settings";
 import Agenda from "./pages/Agenda";
+import StudentPortal from "./pages/StudentPortal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

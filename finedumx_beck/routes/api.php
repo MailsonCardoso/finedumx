@@ -54,6 +54,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Appointments
     Route::apiResource('appointments', App\Http\Controllers\AppointmentController::class);
 
+    // Student Portal
+    Route::get('/student/portal', [\App\Http\Controllers\StudentPortalController::class, 'index']);
+
     Route::get('/settings', [SettingController::class, 'index']);
     Route::put('/settings', [SettingController::class, 'update']);
 });

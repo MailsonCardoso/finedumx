@@ -38,14 +38,19 @@ export default function Login() {
       const response = await apiFetch<{ access_token: string; user: any }>('/login', {
         method: 'POST',
         body: JSON.stringify({
-          cpf: cpf, // O backend espera o CPF para bater com o admin criado
+          cpf: cpf.replace(/\D/g, ""), // Enviar CPF limpo
           password: password,
         }),
       });
 
       setAuthToken(response.access_token);
       toast.success("Login realizado com sucesso!");
-      navigate("/dashboard");
+
+      if (response.user?.role === 'student') {
+        navigate("/portal");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error: any) {
       toast.error(error.message || "Falha na autenticação. Verifique suas credenciais.");
     } finally {

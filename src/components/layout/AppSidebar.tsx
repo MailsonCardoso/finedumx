@@ -32,16 +32,17 @@ interface AppSidebarProps {
 }
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: Users, label: "Alunos", path: "/alunos" },
-  { icon: Briefcase, label: "Funcionários", path: "/funcionarios" },
-  { icon: GraduationCap, label: "Turmas", path: "/turmas" },
-  { icon: BookOpen, label: "Cursos", path: "/cursos" },
-  { icon: CalendarDays, label: "Agenda", path: "/agenda" },
-  { icon: Calendar, label: "Mensalidades", path: "/mensalidades" },
-  { icon: CreditCard, label: "Pagamentos", path: "/pagamentos" },
-  { icon: Receipt, label: "Recibos", path: "/recibos" },
-  { icon: Settings, label: "Configurações", path: "/configuracoes" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", roles: ["admin"] },
+  { icon: Users, label: "Alunos", path: "/alunos", roles: ["admin"] },
+  { icon: Briefcase, label: "Funcionários", path: "/funcionarios", roles: ["admin"] },
+  { icon: GraduationCap, label: "Turmas", path: "/turmas", roles: ["admin"] },
+  { icon: BookOpen, label: "Cursos", path: "/cursos", roles: ["admin"] },
+  { icon: CalendarDays, label: "Agenda", path: "/agenda", roles: ["admin"] },
+  { icon: Calendar, label: "Mensalidades", path: "/mensalidades", roles: ["admin"] },
+  { icon: CreditCard, label: "Pagamentos", path: "/pagamentos", roles: ["admin"] },
+  { icon: Receipt, label: "Recibos", path: "/recibos", roles: ["admin"] },
+  { icon: Settings, label: "Configurações", path: "/configuracoes", roles: ["admin"] },
+  { icon: LayoutDashboard, label: "Meu Portal", path: "/portal", roles: ["student"] },
 ];
 
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
@@ -91,26 +92,28 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
       {/* Menu */}
       <nav className="flex-1 py-4 px-3 overflow-y-auto">
         <ul className="space-y-1">
-          {menuItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <li key={item.path}>
-                <button
-                  onClick={() => navigate(item.path)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
-                    "hover:bg-sidebar-accent",
-                    isActive
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                      : "text-sidebar-foreground"
-                  )}
-                >
-                  <item.icon className={cn("w-5 h-5 flex-shrink-0", isActive && "text-primary")} />
-                  {!collapsed && <span className="text-sm">{item.label}</span>}
-                </button>
-              </li>
-            );
-          })}
+          {menuItems
+            .filter(item => item.roles.includes(user?.role || "admin"))
+            .map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <li key={item.path}>
+                  <button
+                    onClick={() => navigate(item.path)}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                      "hover:bg-sidebar-accent",
+                      isActive
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                        : "text-sidebar-foreground"
+                    )}
+                  >
+                    <item.icon className={cn("w-5 h-5 flex-shrink-0", isActive && "text-primary")} />
+                    {!collapsed && <span className="text-sm">{item.label}</span>}
+                  </button>
+                </li>
+              );
+            })}
         </ul>
       </nav>
 

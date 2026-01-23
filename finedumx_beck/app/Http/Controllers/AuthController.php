@@ -18,9 +18,18 @@ class AuthController extends Controller
         ]);
 
         $cpf = preg_replace('/\D/', '', $request->cpf);
-        $user = User::all()->first(function ($u) use ($cpf) {
-            return preg_replace('/\D/', '', $u->cpf) === $cpf;
-        });
+
+        // Tenta encontrar por CPF limpo ou por e-mail (onde salvamos o CPF do aluno)
+        $user = User::where('email', $cpf)
+            ->orWhere('cpf', $cpf)
+            ->first();
+
+        if (!$user) {
+            // Fallback para CPFs formatados no banco
+            $user = User::all()->first(function ($u) use ($cpf) {
+                return preg_replace('/\D/', '', $u->cpf) === $cpf;
+            });
+        }
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([

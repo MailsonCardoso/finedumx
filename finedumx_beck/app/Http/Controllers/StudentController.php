@@ -52,6 +52,20 @@ class StudentController extends Controller
 
         $student = Student::create($validated);
 
+        // Criar usuário de acesso para o portal (CPF limpo)
+        if ($student->cpf) {
+            $cpf = preg_replace('/\D/', '', $student->cpf);
+            if (!empty($cpf)) {
+                \App\Models\User::create([
+                    'name' => $student->name,
+                    'email' => $cpf,
+                    'password' => \Illuminate\Support\Facades\Hash::make($cpf),
+                    'role' => 'student',
+                    'student_id' => $student->id
+                ]);
+            }
+        }
+
         // Gerar Matrícula (Se solicitado)
         if ($request->input('generate_matricula')) {
             $val = $request->input('matricula_value', 100);
