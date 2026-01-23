@@ -14,6 +14,7 @@ import Tuition from "./pages/Tuition";
 import Payments from "./pages/Payments";
 import Receipts from "./pages/Receipts";
 import Settings from "./pages/Settings";
+import Agenda from "./pages/Agenda";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/pagamentos" element={<Payments />} />
             <Route path="/recibos" element={<Receipts />} />
             <Route path="/configuracoes" element={<Settings />} />
+            <Route path="/agenda" element={<Agenda />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

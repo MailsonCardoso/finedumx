@@ -1,0 +1,177 @@
+import { MainLayout } from "@/components/layout/MainLayout";
+import { motion } from "framer-motion";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { Card, CardContent } from "@/components/ui/card";
+import { Calendar as CalendarIcon, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { DateClickArg } from "@fullcalendar/interaction";
+import { EventClickArg } from "@fullcalendar/core";
+
+export default function Agenda() {
+    const handleDateClick = (arg: DateClickArg) => {
+        toast.info(`Data selecionada: ${arg.dateStr}`);
+    };
+
+    const handleEventClick = (arg: EventClickArg) => {
+        toast.info(`Evento clicado: ${arg.event.title}`);
+    };
+
+    return (
+        <MainLayout>
+            <div className="space-y-8">
+                {/* Header */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+                >
+                    <div>
+                        <h1 className="text-3xl font-bold text-foreground tracking-tight">Agenda</h1>
+                        <p className="text-muted-foreground mt-1 text-lg">
+                            Gerencie horários de aulas, reuniões e eventos.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Button className="flex items-center gap-2">
+                            <Plus className="w-4 h-4" />
+                            Novo Evento
+                        </Button>
+                        <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-xl border border-border/50 shadow-sm">
+                            <CalendarIcon className="w-4 h-4 text-primary" />
+                            <span className="text-sm font-semibold text-foreground">
+                                {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                            </span>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Calendar Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                    <Card className="shadow-soft border-border/50 overflow-hidden bg-card/50 backdrop-blur-sm">
+                        <CardContent className="p-6">
+                            <div className="full-calendar-container">
+                                <FullCalendar
+                                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                                    initialView="dayGridMonth"
+                                    headerToolbar={{
+                                        left: "prev,next today",
+                                        center: "title",
+                                        right: "dayGridMonth,timeGridWeek,timeGridDay",
+                                    }}
+                                    locale="pt-br"
+                                    buttonText={{
+                                        today: "Hoje",
+                                        month: "Mês",
+                                        week: "Semana",
+                                        day: "Dia",
+                                    }}
+                                    events={[
+                                        { title: "Aula de Matemática - Turma A", start: new Date(), color: "#3b82f6" },
+                                        {
+                                            title: "Reunião de Professores",
+                                            start: new Date(new Date().setHours(new Date().getHours() + 2)),
+                                            color: "#10b981"
+                                        },
+                                        {
+                                            title: "Pagamento de Professores",
+                                            start: new Date(new Date().setDate(new Date().getDate() + 1)),
+                                            color: "#f59e0b"
+                                        },
+                                    ]}
+                                    editable={true}
+                                    selectable={true}
+                                    selectMirror={true}
+                                    dayMaxEvents={true}
+                                    weekends={true}
+                                    dateClick={handleDateClick}
+                                    eventClick={handleEventClick}
+                                    height="auto"
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </div>
+
+            <style>{`
+        .full-calendar-container .fc {
+          --fc-border-color: hsl(var(--border) / 0.5);
+          --fc-button-bg-color: hsl(var(--primary));
+          --fc-button-border-color: hsl(var(--primary));
+          --fc-button-hover-bg-color: hsl(var(--primary) / 0.9);
+          --fc-button-hover-border-color: hsl(var(--primary) / 0.9);
+          --fc-button-active-bg-color: hsl(var(--primary) / 0.8);
+          --fc-button-active-border-color: hsl(var(--primary) / 0.8);
+          --fc-today-bg-color: hsl(var(--primary) / 0.05);
+          --fc-page-bg-color: transparent;
+          font-family: inherit;
+        }
+
+        .full-calendar-container .fc-toolbar-title {
+          font-size: 1.25rem !important;
+          font-weight: 700 !important;
+          color: hsl(var(--foreground));
+        }
+
+        .full-calendar-container .fc-col-header-cell {
+          padding: 12px 0 !important;
+          background: hsl(var(--muted) / 0.3);
+          font-weight: 600;
+          color: hsl(var(--muted-foreground));
+          text-transform: uppercase;
+          font-size: 0.75rem;
+          letter-spacing: 0.05em;
+        }
+
+        .full-calendar-container .fc-daygrid-day-number {
+          padding: 8px !important;
+          font-size: 0.875rem;
+          color: hsl(var(--foreground));
+        }
+
+        .full-calendar-container .fc-button {
+          padding: 8px 16px !important;
+          font-weight: 500 !important;
+          text-transform: capitalize !important;
+          border-radius: 8px !important;
+          font-size: 0.875rem !important;
+        }
+
+        .full-calendar-container .fc-button-primary:not(:disabled).fc-button-active, 
+        .full-calendar-container .fc-button-primary:not(:disabled):active {
+          background-color: hsl(var(--primary)) !important;
+          border-color: hsl(var(--primary)) !important;
+          box-shadow: none !important;
+        }
+
+        .full-calendar-container .fc-event {
+          border-radius: 4px !important;
+          padding: 2px 4px !important;
+          border: none !important;
+          font-weight: 500 !important;
+          font-size: 0.75rem !important;
+          cursor: pointer !important;
+          transition: transform 0.1s ease !important;
+        }
+
+        .full-calendar-container .fc-event:hover {
+          transform: translateY(-1px);
+          filter: brightness(1.1);
+        }
+
+        .dark .full-calendar-container .fc-daygrid-day-number {
+          color: #fff;
+        }
+      `}</style>
+        </MainLayout>
+    );
+}
