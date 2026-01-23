@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { motion } from "framer-motion";
 import FullCalendar from "@fullcalendar/react";
@@ -10,14 +11,56 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { DateClickArg } from "@fullcalendar/interaction";
 import { EventClickArg } from "@fullcalendar/core";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api-client";
+import { AppointmentModal } from "@/components/AppointmentModal";
 
 export default function Agenda() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+
+    const { data: appointments = [], isLoading } = useQuery({
+        queryKey: ["appointments"],
+        queryFn: () => apiFetch<any[]>("/appointments"),
+    });
+
+    const calendarEvents = useMemo(() => {
+        return appointments.map((app) => {
+            const start = `${app.date}T${app.start_time}`;
+            const startDate = new Date(start);
+            const endDate = new Date(startDate.getTime() + parseInt(app.duration) * 60000);
+
+            let color = "#3b82f6"; // agendado (azul)
+            if (app.status === "realizado") color = "#10b981"; // verde
+            if (app.status === "falta") color = "#ef4444"; // vermelho
+
+            const entityName = app.type === "individual" ? app.student?.name : app.school_class?.name;
+            const title = `${app.course?.name || "Aula"} - ${entityName || ""}`;
+
+            return {
+                id: app.id.toString(),
+                title,
+                start,
+                end: endDate.toISOString(),
+                backgroundColor: color,
+                borderColor: color,
+                extendedProps: { ...app },
+            };
+        });
+    }, [appointments]);
+
     const handleDateClick = (arg: DateClickArg) => {
-        toast.info(`Data selecionada: ${arg.dateStr}`);
+        setSelectedAppointment({
+            date: arg.dateStr,
+            start_time: "09:00",
+        });
+        setIsModalOpen(true);
     };
 
     const handleEventClick = (arg: EventClickArg) => {
-        toast.info(`Evento clicado: ${arg.event.title}`);
+        const app = arg.event.extendedProps;
+        setSelectedAppointment(app);
+        setIsModalOpen(true);
     };
 
     return (
@@ -37,7 +80,13 @@ export default function Agenda() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button className="flex items-center gap-2">
+                        <Button
+                            onClick={() => {
+                                setSelectedAppointment(null);
+                                setIsModalOpen(true);
+                            }}
+                            className="flex items-center gap-2"
+                        >
                             <Plus className="w-4 h-4" />
                             Novo Evento
                         </Button>
@@ -58,49 +107,52 @@ export default function Agenda() {
                 >
                     <Card className="shadow-soft border-border/50 overflow-hidden bg-card/50 backdrop-blur-sm">
                         <CardContent className="p-6">
-                            <div className="full-calendar-container">
-                                <FullCalendar
-                                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                                    initialView="dayGridMonth"
-                                    headerToolbar={{
-                                        left: "prev,next today",
-                                        center: "title",
-                                        right: "dayGridMonth,timeGridWeek,timeGridDay",
-                                    }}
-                                    locale="pt-br"
-                                    buttonText={{
-                                        today: "Hoje",
-                                        month: "Mês",
-                                        week: "Semana",
-                                        day: "Dia",
-                                    }}
-                                    events={[
-                                        { title: "Aula de Matemática - Turma A", start: new Date(), color: "#3b82f6" },
-                                        {
-                                            title: "Reunião de Professores",
-                                            start: new Date(new Date().setHours(new Date().getHours() + 2)),
-                                            color: "#10b981"
-                                        },
-                                        {
-                                            title: "Pagamento de Professores",
-                                            start: new Date(new Date().setDate(new Date().getDate() + 1)),
-                                            color: "#f59e0b"
-                                        },
-                                    ]}
-                                    editable={true}
-                                    selectable={true}
-                                    selectMirror={true}
-                                    dayMaxEvents={true}
-                                    weekends={true}
-                                    dateClick={handleDateClick}
-                                    eventClick={handleEventClick}
-                                    height="auto"
-                                />
-                            </div>
+                            {isLoading ? (
+                                <div className="h-[600px] flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                </div>
+                            ) : (
+                                <div className="full-calendar-container">
+                                    <FullCalendar
+                                        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                                        initialView="timeGridWeek"
+                                        headerToolbar={{
+                                            left: "prev,next today",
+                                            center: "title",
+                                            right: "dayGridMonth,timeGridWeek,timeGridDay",
+                                        }}
+                                        locale="pt-br"
+                                        buttonText={{
+                                            today: "Hoje",
+                                            month: "Mês",
+                                            week: "Semana",
+                                            day: "Dia",
+                                        }}
+                                        events={calendarEvents}
+                                        editable={true}
+                                        selectable={true}
+                                        selectMirror={true}
+                                        dayMaxEvents={true}
+                                        weekends={true}
+                                        dateClick={handleDateClick}
+                                        eventClick={handleEventClick}
+                                        height="auto"
+                                        slotMinTime="07:00:00"
+                                        slotMaxTime="22:00:00"
+                                        allDaySlot={false}
+                                    />
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </motion.div>
             </div>
+
+            <AppointmentModal
+                isOpen={isModalOpen}
+                onOpenChange={setIsModalOpen}
+                appointment={selectedAppointment}
+            />
 
             <style>{`
         .full-calendar-container .fc {

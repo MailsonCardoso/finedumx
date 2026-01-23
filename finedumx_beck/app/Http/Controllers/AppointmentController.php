@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Appointment;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class AppointmentController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return Appointment::with(['student', 'schoolClass', 'course'])->get();
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'type' => 'required|in:individual,grupo',
+            'student_id' => 'required_if:type,individual|nullable|exists:students,id',
+            'school_class_id' => 'required_if:type,grupo|nullable|exists:school_classes,id',
+            'course_id' => 'required|exists:courses,id',
+            'date' => 'required|date',
+            'start_time' => 'required',
+            'duration' => 'required|string',
+            'status' => 'required|in:agendado,realizado,falta',
+            'notes' => 'nullable|string'
+        ]);
+
+        return Appointment::create($validated);
+    }
+
+    public function show(Appointment $appointment)
+    {
+        return $appointment->load(['student', 'schoolClass', 'course']);
+    }
+
+    public function update(Request $request, Appointment $appointment)
+    {
+        $validated = $request->validate([
+            'type' => 'sometimes|required|in:individual,grupo',
+            'student_id' => 'nullable|exists:students,id',
+            'school_class_id' => 'nullable|exists:school_classes,id',
+            'course_id' => 'sometimes|required|exists:courses,id',
+            'date' => 'sometimes|required|date',
+            'start_time' => 'sometimes|required',
+            'duration' => 'sometimes|required|string',
+            'status' => 'sometimes|required|in:agendado,realizado,falta',
+            'notes' => 'nullable|string'
+        ]);
+
+        $appointment->update($validated);
+        return $appointment;
+    }
+
+    public function destroy(Appointment $appointment)
+    {
+        $appointment->delete();
+        return response()->noContent();
+    }
+}
