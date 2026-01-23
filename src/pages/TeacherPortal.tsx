@@ -147,7 +147,9 @@ export default function TeacherPortal() {
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-2">
                                                         <BookOpen className="w-4 h-4 text-primary/60" />
-                                                        <span className="font-medium">{app.course?.name || "N/A"}</span>
+                                                        <span className="font-medium">
+                                                            {app.course?.name || app.school_class?.course?.name || "Aula Avulsa"}
+                                                        </span>
                                                     </div>
                                                     {app.school_class && (
                                                         <div className="text-[10px] text-primary font-bold mt-0.5 uppercase">
