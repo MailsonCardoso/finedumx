@@ -16,6 +16,7 @@ class CourseController extends Controller
                 'name' => $course->name,
                 'price' => $course->price,
                 'description' => $course->description,
+                'days_of_week' => $course->days_of_week,
                 'teacher_id' => $course->teacher_id,
                 'teacher_name' => $course->teacher ? $course->teacher->name : null,
             ];
@@ -31,9 +32,10 @@ class CourseController extends Controller
             'price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
             'teacher_id' => 'nullable|exists:employees,id',
+            'days_of_week' => 'nullable|string',
         ]);
 
-        if (isset($validated['teacher_id']) && $request->teacher_id === 'none') {
+        if (isset($request->teacher_id) && $request->teacher_id === 'none') {
             $validated['teacher_id'] = null;
         }
 
@@ -53,6 +55,7 @@ class CourseController extends Controller
             'price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
             'teacher_id' => 'nullable|exists:employees,id',
+            'days_of_week' => 'nullable|string',
         ]);
 
         if (isset($request->teacher_id) && $request->teacher_id === 'none') {

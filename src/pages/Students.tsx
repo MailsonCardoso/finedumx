@@ -58,7 +58,7 @@ interface Student {
   email: string;
   cpf?: string;
   phone: string;
-  course: string;
+  course?: { name: string } | string;
   course_id?: number;
   due_day: number;
   monthly_fee: number;
@@ -362,7 +362,7 @@ export default function Students() {
                           </div>
                         </TableCell>
                         <TableCell className="py-4 text-muted-foreground">
-                          {student.course}
+                          {typeof student.course === 'object' ? student.course?.name : student.course}
                         </TableCell>
                         <TableCell className="py-4 text-center text-muted-foreground whitespace-nowrap">
                           <span className="bg-muted px-2 py-1 rounded text-xs font-medium">Dia {student.due_day}</span>
