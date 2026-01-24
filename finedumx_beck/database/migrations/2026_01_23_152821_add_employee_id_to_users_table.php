@@ -10,9 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('employee_id')->nullable()->after('student_id')->constrained('employees')->onDelete('cascade');
-        });
+        if (!Schema::hasColumn('users', 'employee_id')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->foreignId('employee_id')->nullable()->after('student_id')->constrained('employees')->onDelete('cascade');
+            });
+        }
     }
 
     /**

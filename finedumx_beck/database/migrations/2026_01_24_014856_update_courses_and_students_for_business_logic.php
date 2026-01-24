@@ -7,13 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('courses', function (Blueprint $table) {
-            $table->string('days_of_week')->nullable();
-        });
+        if (!Schema::hasColumn('courses', 'days_of_week')) {
+            Schema::table('courses', function (Blueprint $table) {
+                $table->string('days_of_week')->nullable();
+            });
+        }
 
-        Schema::table('students', function (Blueprint $table) {
-            $table->foreignId('course_id')->nullable()->constrained('courses')->onDelete('set null');
-        });
+        if (!Schema::hasColumn('students', 'course_id')) {
+            Schema::table('students', function (Blueprint $table) {
+                $table->foreignId('course_id')->nullable()->constrained('courses')->onDelete('set null');
+            });
+        }
     }
 
     public function down(): void
