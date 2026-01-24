@@ -130,6 +130,19 @@ export default function Students() {
     queryFn: () => apiFetch('/courses'),
   });
 
+  const { data: classesData = [] } = useQuery<any[]>({
+    queryKey: ['classes'],
+    queryFn: () => apiFetch('/classes'),
+  });
+
+  // Helper to get shifts for a selected course
+  const getCourseShifts = (courseId: string) => {
+    if (!courseId) return [];
+    const courseClasses = classesData.filter((c) => c.course_id.toString() === courseId);
+    const shifts = [...new Set(courseClasses.map((c) => c.shift))];
+    return shifts;
+  };
+
   // Mutations
   const createMutation = useMutation({
     mutationFn: (data: StudentFormData) =>
@@ -549,6 +562,15 @@ export default function Students() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {formData.course_id && (
+                        <div className="mt-2 text-xs text-muted-foreground p-2 bg-muted/50 rounded-lg border border-border/50">
+                          {getCourseShifts(formData.course_id).length > 0 ? (
+                            <p><span className="font-semibold text-primary">Turnos disponíveis:</span> {getCourseShifts(formData.course_id).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ')}</p>
+                          ) : (
+                            <p className="italic text-muted-foreground/70">Nenhuma turma cadastrada para este curso ainda.</p>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="due_day">Dia Vencimento</Label>

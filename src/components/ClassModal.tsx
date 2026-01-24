@@ -241,6 +241,26 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                         </SelectContent>
                                     </Select>
 
+                                    {formData.course_id && (
+                                        <div className="flex justify-end">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-xs h-7 text-primary hover:text-primary hover:bg-primary/10"
+                                                onClick={() => {
+                                                    const courseStudents = students.filter(s => s.course_id?.toString() === formData.course_id);
+                                                    const allIds = courseStudents.map(s => s.id);
+                                                    // Merge unique IDs
+                                                    const newIds = Array.from(new Set([...formData.student_ids, ...allIds]));
+                                                    setFormData({ ...formData, student_ids: newIds });
+                                                }}
+                                            >
+                                                + Adicionar todos os {students.filter(s => s.course_id?.toString() === formData.course_id).length} alunos
+                                            </Button>
+                                        </div>
+                                    )}
+
                                     <div className="h-[140px] p-3 rounded-xl bg-muted/10 border border-border flex flex-col gap-2 overflow-y-auto">
                                         <div className="flex flex-wrap gap-1.5">
                                             <AnimatePresence>
