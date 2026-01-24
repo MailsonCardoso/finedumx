@@ -19,7 +19,7 @@ class StudentController extends Controller
             $query->where('status', $request->status);
         }
 
-        return response()->json($query->with('schoolClasses')->get());
+        return response()->json($query->get());
     }
 
     public function store(Request $request)
@@ -33,9 +33,6 @@ class StudentController extends Controller
             'course' => 'nullable|string',
             'due_day' => 'required|integer|min:1|max:31',
             'monthly_fee' => 'required|numeric|min:0',
-            'class_type' => 'nullable|string',
-            'teacher_id' => 'nullable|exists:employees,id',
-            'class_id' => 'nullable|exists:school_classes,id',
             // Optional flags
             'generate_matricula' => 'boolean',
             'matricula_value' => 'nullable|numeric',
@@ -78,51 +75,45 @@ class StudentController extends Controller
             }
         }
 
-        return \DB::transaction(function () use ($student, $request) {
-            // Gerar Matrícula (Se solicitado)
-            if ($request->input('generate_matricula')) {
-                $val = $request->input('matricula_value', 100);
-                \App\Models\Tuition::create([
-                    'student_id' => $student->id,
-                    'reference' => 'Matrícula',
-                    'due_date' => now()->toDateString(), // Vence hoje
-                    'amount' => $val,
-                    'status' => 'pendente',
-                    'type' => 'matricula'
-                ]);
-            }
+        // Gerar Matrícula (Se solicitado)
+        if ($request->input('generate_matricula')) {
+            $val = $request->input('matricula_value', 100);
+            \App\Models\Tuition::create([
+                'student_id' => $student->id,
+                'reference' => 'Matrícula',
+                'due_date' => now()->toDateString(), // Vence hoje
+                'amount' => $val,
+                'status' => 'pendente',
+                'type' => 'matricula'
+            ]);
+        }
 
-            // Gerar 1ª Mensalidade (Se solicitado - para o próximo mês)
-            if ($request->input('generate_tuition')) {
-                $nextMonth = now()->addMonth();
-                $day = str_pad((string) $student->due_day, 2, '0', STR_PAD_LEFT);
-                $month = $nextMonth->format('m');
-                $year = $nextMonth->format('Y');
+        // Gerar 1ª Mensalidade (Se solicitado - para o próximo mês)
+        if ($request->input('generate_tuition')) {
+            $nextMonth = now()->addMonth();
+            $day = str_pad((string) $student->due_day, 2, '0', STR_PAD_LEFT);
+            $month = $nextMonth->format('m');
+            $year = $nextMonth->format('Y');
 
-                $months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-                $ref = $months[(int) $month - 1] . '/' . $year;
-                $dueDate = "{$year}-{$month}-{$day}";
+            // Ref: Mês/Ano (ex: Fev/2025)
+            $months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
-                \App\Models\Tuition::create([
-                    'student_id' => $student->id,
-                    'reference' => $ref,
-                    'due_date' => $dueDate,
-                    'amount' => $student->monthly_fee,
-                    'status' => 'pendente',
-                    'type' => 'mensalidade'
-                ]);
-            }
+            // Laravel format 'm' 01-12, array index 0-11
+            $ref = $months[(int) $month - 1] . '/' . $year;
 
-            // Associar à turma se for em grupo
-            if ($request->input('class_type') === 'grupo' && $request->input('class_id')) {
-                $schoolClass = \App\Models\SchoolClass::find($request->input('class_id'));
-                if ($schoolClass) {
-                    $schoolClass->students()->attach($student->id);
-                }
-            }
+            $dueDate = "{$year}-{$month}-{$day}";
 
-            return response()->json($student, 201);
-        });
+            \App\Models\Tuition::create([
+                'student_id' => $student->id,
+                'reference' => $ref,
+                'due_date' => $dueDate,
+                'amount' => $student->monthly_fee,
+                'status' => 'pendente',
+                'type' => 'mensalidade'
+            ]);
+        }
+
+        return response()->json($student, 201);
     }
 
     public function show(Student $student)
@@ -142,9 +133,6 @@ class StudentController extends Controller
             'due_day' => 'integer',
             'monthly_fee' => 'sometimes|required|numeric',
             'status' => 'sometimes|required|string',
-            'class_type' => 'nullable|string',
-            'teacher_id' => 'nullable|exists:employees,id',
-            'class_id' => 'nullable|exists:school_classes,id',
         ], [
             'email.unique' => 'Este e-mail já está sendo utilizado por outro aluno.',
             'email.required' => 'O campo e-mail é obrigatório.',
@@ -153,20 +141,8 @@ class StudentController extends Controller
             'monthly_fee.required' => 'O valor da mensalidade é obrigatório.',
         ]);
 
-        \DB::transaction(function () use ($student, $request, $validated) {
-            $student->update($validated);
-
-            // Sync Turma se vier no request
-            if ($request->has('class_type')) {
-                if ($request->input('class_type') === 'grupo' && $request->input('class_id')) {
-                    $student->schoolClasses()->sync([$request->input('class_id')]);
-                } else {
-                    $student->schoolClasses()->detach();
-                }
-            }
-        });
-
-        return response()->json($student->load('schoolClasses'));
+        $student->update($validated);
+        return response()->json($student);
     }
 
     public function destroy(Student $student)

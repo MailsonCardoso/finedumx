@@ -63,13 +63,10 @@ interface Employee {
 
 export default function Courses() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [classSearchTerm, setClassSearchTerm] = useState("");
-    const [statusFilter, setStatusFilter] = useState("todos");
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isManaging, setIsManaging] = useState(false);
-    const [activeMainTab, setActiveMainTab] = useState("cursos");
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const [formData, setFormData] = useState({ name: "", price: "", description: "", teacher_id: "" });
 
@@ -88,25 +85,28 @@ export default function Courses() {
 
     const teachers = employees.filter(emp => emp.is_teacher && emp.status === 'ativo');
 
-    const { data: courses = [], isLoading: isLoadingCourses } = useQuery<Course[]>({
+    const { data: courses = [], isLoading } = useQuery<Course[]>({
         queryKey: ['courses'],
         queryFn: () => apiFetch('/courses'),
     });
 
-    // Queries for Global Management
-    const { data: allClasses = [], isLoading: isLoadingClasses } = useQuery<any[]>({
+    // Queries for Management
+    const { data: allClasses = [] } = useQuery<any[]>({
         queryKey: ['classes'],
         queryFn: () => apiFetch('/classes'),
+        enabled: isManaging
     });
 
     const { data: allAppointments = [] } = useQuery<any[]>({
         queryKey: ['appointments'],
         queryFn: () => apiFetch('/appointments'),
+        enabled: isManaging
     });
 
     const { data: allStudents = [] } = useQuery<any[]>({
         queryKey: ['students'],
         queryFn: () => apiFetch('/students'),
+        enabled: isManaging
     });
 
     const createMutation = useMutation({
@@ -190,10 +190,7 @@ export default function Courses() {
 
     if (isManaging && selectedCourse) {
         const courseClasses = allClasses.filter(c => c.course_id === selectedCourse.id);
-        const courseStudents = allStudents.filter(s =>
-            s.course === selectedCourse.name &&
-            (!s.school_classes || s.school_classes.length === 0)
-        );
+        const courseStudents = allStudents.filter(s => s.course === selectedCourse.name);
         const courseAppointments = allAppointments.filter(app =>
             app.course_id === selectedCourse.id ||
             (app.school_class && app.school_class.course_id === selectedCourse.id)
@@ -284,19 +281,6 @@ export default function Courses() {
                                                     style={{ width: `${(cls.current_students / cls.max_students) * 100}%` }}
                                                 />
                                             </div>
-
-                                            {cls.students && cls.students.length > 0 && (
-                                                <div className="mt-4 pt-3 border-t border-border/50">
-                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Alunos Matriculados:</p>
-                                                    <div className="flex flex-wrap gap-1.5">
-                                                        {cls.students.map((s: any) => (
-                                                            <Badge key={s.id} variant="secondary" className="text-[10px] font-medium py-0 px-2 bg-primary/5 text-primary border-primary/10">
-                                                                {s.name.split(' ')[0]} {s.name.split(' ').length > 1 ? s.name.split(' ').pop()?.charAt(0) + '.' : ''}
-                                                            </Badge>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
                                         </div>
                                     </motion.div>
                                 ))}
@@ -391,278 +375,130 @@ export default function Courses() {
         );
     }
 
-    const getStatusBadge = (status: string) => {
-        switch (status) {
-            case "ativo":
-                return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Ativo</Badge>;
-            case "inativo":
-                return <Badge variant="outline" className="text-muted-foreground">Inativo</Badge>;
-            case "completo":
-                return <Badge className="bg-amber-500/10 text-amber-600 border-amber-200">Completo</Badge>;
-            default:
-                return <Badge variant="outline">{status}</Badge>;
-        }
-    };
-
     return (
         <MainLayout>
             <div className="space-y-8">
-                {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
                 >
                     <div>
-                        <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-3">
-                            <BookOpen className="w-8 h-8 text-primary" />
-                            Cursos e Turmas
-                        </h1>
+                        <h1 className="text-3xl font-bold text-foreground tracking-tight">Cursos</h1>
                         <p className="text-muted-foreground mt-1 text-lg">
-                            Gestão unificada de modalidades e logística da escola.
+                            Gerencie as opções de cursos e modalidades.
                         </p>
                     </div>
-                    {activeMainTab === "cursos" && (
-                        <Button onClick={() => setIsAddOpen(true)} className="gap-2 shadow-lg shadow-primary/20 h-11 px-6">
-                            <Plus className="w-5 h-5" />
-                            Novo Curso
-                        </Button>
-                    )}
-                    {activeMainTab === "turmas" && (
-                        <Button onClick={() => { setSelectedClass(null); setIsClassModalOpen(true); }} className="gap-2 shadow-lg shadow-primary/20 h-11 px-6">
-                            <Plus className="w-5 h-5" />
-                            Nova Turma
-                        </Button>
-                    )}
+                    <Button onClick={() => setIsAddOpen(true)} className="gap-2 shadow-lg shadow-primary/20 h-11 px-6">
+                        <Plus className="w-5 h-5" />
+                        Novo Curso
+                    </Button>
                 </motion.div>
 
-                <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
-                    <TabsList className="bg-muted/50 p-1 border border-border/50 rounded-xl mb-8">
-                        <TabsTrigger value="cursos" className="gap-2 rounded-lg py-2 px-6">
-                            <BookOpen className="w-4 h-4" /> Modalidades (Produtos)
-                        </TabsTrigger>
-                        <TabsTrigger value="turmas" className="gap-2 rounded-lg py-2 px-6">
-                            <GraduationCap className="w-4 h-4" /> Visão Geral de Turmas (Logística)
-                        </TabsTrigger>
-                    </TabsList>
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center gap-4 bg-muted/30 p-4 rounded-2xl border border-border/50 backdrop-blur-sm"
+                >
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Buscar curso..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 h-11 bg-background/50 border-border/50 focus:border-primary"
+                        />
+                    </div>
+                </motion.div>
 
-                    <TabsContent value="cursos" className="space-y-6">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex items-center gap-4 bg-muted/30 p-4 rounded-2xl border border-border/50 backdrop-blur-sm"
-                        >
-                            <div className="relative flex-1">
-                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                <Input
-                                    placeholder="Buscar curso..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10 h-11 bg-background/50 border-border/50 focus:border-primary"
-                                />
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-card/50 backdrop-blur-md rounded-2xl shadow-soft border border-border/50 overflow-hidden"
-                        >
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                                            <TableHead className="font-bold h-14 text-foreground">Nome do Curso</TableHead>
-                                            <TableHead className="font-bold h-14 text-foreground">Professor Responsável</TableHead>
-                                            <TableHead className="font-bold h-14 text-foreground text-right">Valor Padrão</TableHead>
-                                            <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {isLoadingCourses ? (
-                                            <TableRow>
-                                                <TableCell colSpan={4} className="h-48 text-center">
-                                                    <div className="flex flex-col items-center justify-center gap-2">
-                                                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                                        <p className="text-muted-foreground">Carregando cursos...</p>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="bg-card/50 backdrop-blur-md rounded-2xl shadow-soft border border-border/50 overflow-hidden"
+                >
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
+                                    <TableHead className="font-bold h-14 text-foreground">Nome do Curso</TableHead>
+                                    <TableHead className="font-bold h-14 text-foreground">Professor Responsável</TableHead>
+                                    <TableHead className="font-bold h-14 text-foreground text-right">Valor Padrão</TableHead>
+                                    <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {isLoading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="h-48 text-center">
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                                <p className="text-muted-foreground">Carregando cursos...</p>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    <AnimatePresence mode="popLayout">
+                                        {filteredCourses.map((course, i) => (
+                                            <motion.tr
+                                                key={course.id}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0, x: -10 }}
+                                                transition={{ delay: i * 0.05 }}
+                                                className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
+                                            >
+                                                <TableCell className="py-4 font-medium text-foreground">
+                                                    <div className="flex items-center gap-2">
+                                                        <BookOpen className="w-4 h-4 text-primary/70" />
+                                                        {course.name}
                                                     </div>
                                                 </TableCell>
-                                            </TableRow>
-                                        ) : (
-                                            <AnimatePresence mode="popLayout">
-                                                {filteredCourses.map((course, i) => (
-                                                    <motion.tr
-                                                        key={course.id}
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        exit={{ opacity: 0, x: -10 }}
-                                                        transition={{ delay: i * 0.05 }}
-                                                        className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
-                                                    >
-                                                        <TableCell className="py-4 font-medium text-foreground">
-                                                            <div className="flex items-center gap-2">
-                                                                <BookOpen className="w-4 h-4 text-primary/70" />
-                                                                {course.name}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="py-4 text-muted-foreground">
-                                                            {course.teacher_name ? (
-                                                                <div className="flex items-center gap-2">
-                                                                    <User className="w-3.5 h-3.5" />
-                                                                    {course.teacher_name}
-                                                                </div>
-                                                            ) : (
-                                                                <span className="text-muted-foreground/50 italic">Não associado</span>
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="py-4 text-right">
-                                                            {new Intl.NumberFormat("pt-BR", {
-                                                                style: "currency",
-                                                                currency: "BRL",
-                                                            }).format(course.price)}
-                                                        </TableCell>
-                                                        <TableCell className="py-4 text-right pr-6">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                <Button variant="outline" size="sm" onClick={() => openManage(course)} className="gap-2 h-8 px-3 text-xs border-primary/20 text-primary hover:bg-primary hover:text-white transition-all">
-                                                                    Gerenciar
-                                                                </Button>
-                                                                <Button variant="ghost" size="icon" onClick={() => openEdit(course)} className="h-8 w-8">
-                                                                    <Edit2 className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
-                                                                </Button>
-                                                                <Button variant="ghost" size="icon" onClick={() => openDelete(course)} className="h-8 w-8">
-                                                                    <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive transition-colors" />
-                                                                </Button>
-                                                            </div>
-                                                        </TableCell>
-                                                    </motion.tr>
-                                                ))}
-                                            </AnimatePresence>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        </motion.div>
-                    </TabsContent>
-
-                    <TabsContent value="turmas" className="space-y-6">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex flex-col sm:flex-row gap-4 bg-muted/30 p-4 rounded-2xl border border-border/50 backdrop-blur-sm"
-                        >
-                            <div className="relative flex-1">
-                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                <Input
-                                    placeholder="Buscar turma por nome..."
-                                    value={classSearchTerm}
-                                    onChange={(e) => setClassSearchTerm(e.target.value)}
-                                    className="pl-10 h-11 bg-background border-border/50 focus:border-primary transition-all"
-                                />
-                            </div>
-                            <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                <SelectTrigger className="w-full sm:w-[200px] h-11 bg-background">
-                                    <SelectValue placeholder="Status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="todos">Todos status</SelectItem>
-                                    <SelectItem value="ativo">Ativo</SelectItem>
-                                    <SelectItem value="inativo">Inativo</SelectItem>
-                                    <SelectItem value="completo">Completo</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-card/50 backdrop-blur-md rounded-2xl shadow-soft border border-border/50 overflow-hidden"
-                        >
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                                            <TableHead className="font-bold h-14 text-foreground">Turma</TableHead>
-                                            <TableHead className="font-bold h-14 text-foreground">Professor</TableHead>
-                                            <TableHead className="font-bold h-14 text-foreground">Horário</TableHead>
-                                            <TableHead className="font-bold h-14 text-foreground text-center">Alunos</TableHead>
-                                            <TableHead className="font-bold h-14 text-foreground">Status</TableHead>
-                                            <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {isLoadingClasses ? (
+                                                <TableCell className="py-4 text-muted-foreground">
+                                                    {course.teacher_name ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <User className="w-3.5 h-3.5" />
+                                                            {course.teacher_name}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground/50 italic">Não associado</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="py-4 text-right">
+                                                    {new Intl.NumberFormat("pt-BR", {
+                                                        style: "currency",
+                                                        currency: "BRL",
+                                                    }).format(course.price)}
+                                                </TableCell>
+                                                <TableCell className="py-4 text-right pr-6">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <Button variant="outline" size="sm" onClick={() => openManage(course)} className="gap-2 h-8 px-3 text-xs border-primary/20 text-primary hover:bg-primary hover:text-white transition-all">
+                                                            Gerenciar
+                                                        </Button>
+                                                        <Button variant="ghost" size="icon" onClick={() => openEdit(course)} className="h-8 w-8">
+                                                            <Edit2 className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
+                                                        </Button>
+                                                        <Button variant="ghost" size="icon" onClick={() => openDelete(course)} className="h-8 w-8">
+                                                            <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive transition-colors" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </motion.tr>
+                                        ))}
+                                        {!isLoading && filteredCourses.length === 0 && (
                                             <TableRow>
-                                                <TableCell colSpan={6} className="h-48 text-center">
-                                                    <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+                                                <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                                                    Nenhum curso encontrado.
                                                 </TableCell>
                                             </TableRow>
-                                        ) : (
-                                            <AnimatePresence mode="popLayout">
-                                                {allClasses
-                                                    .filter(cls => (statusFilter === 'todos' || cls.status === statusFilter) &&
-                                                        cls.name.toLowerCase().includes(classSearchTerm.toLowerCase()))
-                                                    .map((cls, i) => (
-                                                        <motion.tr
-                                                            key={cls.id}
-                                                            initial={{ opacity: 0 }}
-                                                            animate={{ opacity: 1 }}
-                                                            className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
-                                                        >
-                                                            <TableCell className="py-4 font-semibold text-foreground">
-                                                                <div className="flex flex-col">
-                                                                    <span>{cls.name}</span>
-                                                                    <span className="text-xs text-muted-foreground font-normal">{cls.course_name}</span>
-                                                                </div>
-                                                            </TableCell>
-                                                            <TableCell className="py-4 text-muted-foreground">
-                                                                <div className="flex items-center gap-2">
-                                                                    <User className="w-3.5 h-3.5" />
-                                                                    {cls.teacher_name || "A definir"}
-                                                                </div>
-                                                            </TableCell>
-                                                            <TableCell className="py-4 text-muted-foreground">
-                                                                <div className="flex flex-col text-xs">
-                                                                    <span className="font-bold">{cls.days_of_week}</span>
-                                                                    <span>{cls.start_time} - {cls.end_time}</span>
-                                                                </div>
-                                                            </TableCell>
-                                                            <TableCell className="py-4 text-center">
-                                                                <Badge variant="secondary" className="font-bold">
-                                                                    {cls.current_students}/{cls.max_students}
-                                                                </Badge>
-                                                            </TableCell>
-                                                            <TableCell className="py-4">
-                                                                {getStatusBadge(cls.status)}
-                                                            </TableCell>
-                                                            <TableCell className="py-4 text-right pr-6">
-                                                                <div className="flex items-center justify-end gap-2">
-                                                                    <Button variant="ghost" size="icon" onClick={() => { setSelectedClass(cls); setIsClassModalOpen(true); }} className="h-8 w-8">
-                                                                        <Edit2 className="w-4 h-4" />
-                                                                    </Button>
-                                                                </div>
-                                                            </TableCell>
-                                                        </motion.tr>
-                                                    ))}
-                                            </AnimatePresence>
                                         )}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        </motion.div>
-                    </TabsContent>
-                </Tabs>
-
-                <ClassModal
-                    isOpen={isClassModalOpen}
-                    onOpenChange={setIsClassModalOpen}
-                    classItem={selectedClass}
-                />
-
-                <AppointmentModal
-                    isOpen={isAppointmentModalOpen}
-                    onOpenChange={setIsAppointmentModalOpen}
-                    appointment={selectedAppointment}
-                />
+                                    </AnimatePresence>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </motion.div>
 
                 {/* Add Modal */}
                 <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>

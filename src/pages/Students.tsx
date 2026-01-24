@@ -71,9 +71,6 @@ interface StudentFormData {
   cpf?: string;
   phone: string;
   course: string;
-  class_type: "individual" | "grupo";
-  class_id?: string;
-  teacher_id?: string;
   due_day: number;
   monthly_fee: number | string;
   status: string;
@@ -89,9 +86,6 @@ const initialFormData: StudentFormData = {
   cpf: "",
   phone: "",
   course: "",
-  class_type: "individual",
-  class_id: "",
-  teacher_id: "",
   due_day: 10,
   monthly_fee: "",
   status: "ativo",
@@ -134,23 +128,6 @@ export default function Students() {
     queryKey: ['courses'],
     queryFn: () => apiFetch('/courses'),
   });
-
-  const { data: classesData = [] } = useQuery<any[]>({
-    queryKey: ['classes'],
-    queryFn: () => apiFetch('/classes'),
-  });
-
-  const { data: employeesData = [] } = useQuery<any[]>({
-    queryKey: ['employees'],
-    queryFn: () => apiFetch('/employees'),
-  });
-
-  const teachers = employeesData.filter((emp: any) => emp.is_teacher && emp.status === 'ativo');
-
-  // Filter classes based on selected course
-  const availableClasses = classesData.filter((cls: any) =>
-    cls.course_name === formData.course && cls.status === 'ativo'
-  );
 
   // Mutations
   const createMutation = useMutation({
@@ -205,11 +182,6 @@ export default function Students() {
 
   // Handlers
   const handleEditClick = (student: Student) => {
-    const studentData = student as any;
-    const classId = studentData.school_classes && studentData.school_classes.length > 0
-      ? studentData.school_classes[0].id.toString()
-      : "";
-
     setSelectedStudent(student);
     setFormData({
       name: student.name,
@@ -218,9 +190,6 @@ export default function Students() {
       cpf: student.cpf || "",
       phone: student.phone,
       course: student.course,
-      class_type: studentData.class_type || "individual",
-      class_id: classId,
-      teacher_id: studentData.teacher_id?.toString() || "",
       due_day: student.due_day,
       monthly_fee: student.monthly_fee,
       status: student.status,
@@ -566,8 +535,7 @@ export default function Students() {
                           setFormData({
                             ...formData,
                             course: value,
-                            monthly_fee: course ? course.price : formData.monthly_fee,
-                            class_id: "" // Reset class when course changes
+                            monthly_fee: course ? course.price : formData.monthly_fee
                           });
                         }}
                       >
@@ -581,73 +549,7 @@ export default function Students() {
                         </SelectContent>
                       </Select>
                     </div>
-
                     <div className="space-y-2">
-                      <Label htmlFor="class_type">Tipo de Aula</Label>
-                      <Select
-                        value={formData.class_type}
-                        onValueChange={(value: any) => setFormData({ ...formData, class_type: value, class_id: "", teacher_id: "" })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o tipo..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="individual">Particular (Individual)</SelectItem>
-                          <SelectItem value="grupo">Turma (Grupo)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4">
-                    {formData.class_type === "grupo" ? (
-                      <div className="space-y-2">
-                        <Label htmlFor="class_id">Vincular à Turma</Label>
-                        <Select
-                          value={formData.class_id}
-                          onValueChange={(value) => setFormData({ ...formData, class_id: value })}
-                          disabled={!formData.course}
-                        >
-                          <SelectTrigger className={!formData.course ? "opacity-50" : ""}>
-                            <SelectValue placeholder={formData.course ? "Selecione uma turma..." : "Selecione um curso primeiro"} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {availableClasses.length > 0 ? (
-                              availableClasses.map((cls: any) => (
-                                <SelectItem key={cls.id} value={cls.id.toString()}>
-                                  {cls.name} ({cls.days_of_week} - {cls.start_time}) - {cls.current_students}/{cls.max_students} vagas
-                                </SelectItem>
-                              ))
-                            ) : (
-                              <div className="p-2 text-xs text-muted-foreground text-center">Nenhuma turma ativa encontrada para este curso.</div>
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <Label htmlFor="teacher_id">Professor Preferencial (Opcional)</Label>
-                        <Select
-                          value={formData.teacher_id}
-                          onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione um professor..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">Nenhum (Qualquer)</SelectItem>
-                            {teachers.map((t: any) => (
-                              <SelectItem key={t.id} value={t.id.toString()}>{t.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <p className="text-[10px] text-muted-foreground">Para aulas individuais, o agendamento de horários é feito separadamente na agenda.</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2 col-span-1">
                       <Label htmlFor="due_day">Dia Vencimento</Label>
                       <Input
                         id="due_day"
@@ -659,8 +561,11 @@ export default function Students() {
                         required
                       />
                     </div>
-                    <div className="space-y-2 col-span-1">
-                      <Label htmlFor="monthly_fee">Mensalidade (R$)</Label>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="monthly_fee">Valor da Mensalidade (R$)</Label>
                       <Input
                         id="monthly_fee"
                         type="number"
@@ -671,7 +576,7 @@ export default function Students() {
                         required
                       />
                     </div>
-                    <div className="space-y-2 col-span-1">
+                    <div className="space-y-2">
                       <Label htmlFor="status">Status</Label>
                       <Select
                         value={formData.status || "ativo"}
