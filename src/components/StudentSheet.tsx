@@ -27,7 +27,8 @@ interface Student {
     active_responsible?: string;
     email: string;
     phone: string;
-    course: string;
+    course?: { name: string };
+    course_id?: number;
     due_day: number;
     monthly_fee: number;
     status: string;
@@ -140,7 +141,7 @@ export function StudentSheet({ studentId, isOpen, onOpenChange }: StudentSheetPr
                                         <StatusBadge status={student.status === 'ativo' ? 'success' : 'neutral'}>
                                             {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
                                         </StatusBadge>
-                                        <span className="text-sm text-muted-foreground">• {student.course}</span>
+                                        <span className="text-sm text-muted-foreground">• {student.course?.name || "Sem curso"}</span>
                                     </div>
                                 </div>
                             </div>

@@ -19,7 +19,7 @@ class StudentController extends Controller
             $query->where('status', $request->status);
         }
 
-        return response()->json($query->get());
+        return response()->json($query->with('course')->get());
     }
 
     public function store(Request $request)
@@ -33,6 +33,7 @@ class StudentController extends Controller
             'course' => 'nullable|string',
             'due_day' => 'required|integer|min:1|max:31',
             'monthly_fee' => 'required|numeric|min:0',
+            'course_id' => 'nullable|exists:courses,id',
             // Optional flags
             'generate_matricula' => 'boolean',
             'matricula_value' => 'nullable|numeric',
@@ -133,6 +134,7 @@ class StudentController extends Controller
             'due_day' => 'integer',
             'monthly_fee' => 'sometimes|required|numeric',
             'status' => 'sometimes|required|string',
+            'course_id' => 'nullable|exists:courses,id',
         ], [
             'email.unique' => 'Este e-mail já está sendo utilizado por outro aluno.',
             'email.required' => 'O campo e-mail é obrigatório.',

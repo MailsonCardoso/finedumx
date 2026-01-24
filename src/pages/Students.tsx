@@ -59,6 +59,7 @@ interface Student {
   cpf?: string;
   phone: string;
   course: string;
+  course_id?: number;
   due_day: number;
   monthly_fee: number;
   status: string;
@@ -70,7 +71,7 @@ interface StudentFormData {
   email: string;
   cpf?: string;
   phone: string;
-  course: string;
+  course_id: string;
   due_day: number;
   monthly_fee: number | string;
   status: string;
@@ -85,7 +86,7 @@ const initialFormData: StudentFormData = {
   email: "",
   cpf: "",
   phone: "",
-  course: "",
+  course_id: "",
   due_day: 10,
   monthly_fee: "",
   status: "ativo",
@@ -189,7 +190,7 @@ export default function Students() {
       email: student.email,
       cpf: student.cpf || "",
       phone: student.phone,
-      course: student.course,
+      course_id: student.course_id?.toString() || "",
       due_day: student.due_day,
       monthly_fee: student.monthly_fee,
       status: student.status,
@@ -529,12 +530,12 @@ export default function Students() {
                     <div className="space-y-2">
                       <Label htmlFor="course">Modalidade (Curso)</Label>
                       <Select
-                        value={formData.course}
+                        value={formData.course_id}
                         onValueChange={(value) => {
-                          const course = coursesData?.find((c: any) => c.name === value);
+                          const course = coursesData?.find((c: any) => c.id.toString() === value);
                           setFormData({
                             ...formData,
-                            course: value,
+                            course_id: value,
                             monthly_fee: course ? course.price : formData.monthly_fee
                           });
                         }}
@@ -544,7 +545,7 @@ export default function Students() {
                         </SelectTrigger>
                         <SelectContent>
                           {coursesData?.map((course: any) => (
-                            <SelectItem key={course.id} value={course.name}>{course.name}</SelectItem>
+                            <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>

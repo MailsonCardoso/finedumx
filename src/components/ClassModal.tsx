@@ -145,12 +145,14 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                 <Select
                                     value={formData.course_id}
                                     onValueChange={(value) => {
-                                        const course = courses.find(c => c.id.toString() === value);
-                                        const filteredStudents = students.filter(s => s.course === course?.name);
+                                        const filteredStudents = students.filter(s => s.course_id?.toString() === value);
+                                        const newStudentIds = formData.student_ids.filter((id: number) =>
+                                            filteredStudents.some(s => s.id === id)
+                                        );
                                         setFormData({
                                             ...formData,
                                             course_id: value,
-                                            student_ids: filteredStudents.map(s => s.id)
+                                            student_ids: newStudentIds
                                         });
                                     }}
                                 >
@@ -213,37 +215,64 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label>Alunos Integrantes</Label>
-                                <div className="h-[200px] p-3 rounded-xl bg-muted/10 border border-border flex flex-col gap-2 overflow-y-auto">
-                                    <div className="flex flex-wrap gap-1.5">
-                                        <AnimatePresence>
-                                            {formData.student_ids.map((id: number) => {
-                                                const student = students.find(s => s.id === id);
-                                                return (
-                                                    <motion.div
-                                                        key={id}
-                                                        initial={{ scale: 0.9, opacity: 0 }}
-                                                        animate={{ scale: 1, opacity: 1 }}
-                                                        exit={{ scale: 0.9, opacity: 0 }}
-                                                        className="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full flex items-center gap-1.5 text-[10px] font-bold"
-                                                    >
-                                                        {student?.name}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setFormData({
-                                                                ...formData,
-                                                                student_ids: formData.student_ids.filter((sid: number) => sid !== id)
-                                                            })}
-                                                            className="hover:bg-primary/20 rounded-full p-0.5"
+                                <div className="space-y-3">
+                                    <Select
+                                        onValueChange={(val) => {
+                                            const id = parseInt(val);
+                                            if (!formData.student_ids.includes(id)) {
+                                                setFormData({ ...formData, student_ids: [...formData.student_ids, id] });
+                                            }
+                                        }}
+                                        disabled={!formData.course_id}
+                                    >
+                                        <SelectTrigger className="bg-background">
+                                            <SelectValue placeholder={formData.course_id ? "Adicionar aluno matriculado..." : "Selecione um curso primeiro"} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {students
+                                                .filter(s => s.course_id?.toString() === formData.course_id && !formData.student_ids.includes(s.id))
+                                                .map(s => (
+                                                    <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>
+                                                ))
+                                            }
+                                            {students.filter(s => s.course_id?.toString() === formData.course_id && !formData.student_ids.includes(s.id)).length === 0 && (
+                                                <div className="p-2 text-xs text-muted-foreground text-center">Nenhum aluno disponível para este curso.</div>
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+
+                                    <div className="h-[140px] p-3 rounded-xl bg-muted/10 border border-border flex flex-col gap-2 overflow-y-auto">
+                                        <div className="flex flex-wrap gap-1.5">
+                                            <AnimatePresence>
+                                                {formData.student_ids.map((id: number) => {
+                                                    const student = students.find(s => s.id === id);
+                                                    return (
+                                                        <motion.div
+                                                            key={id}
+                                                            initial={{ scale: 0.9, opacity: 0 }}
+                                                            animate={{ scale: 1, opacity: 1 }}
+                                                            exit={{ scale: 0.9, opacity: 0 }}
+                                                            className="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full flex items-center gap-1.5 text-[10px] font-bold"
                                                         >
-                                                            <Trash2 className="w-2.5 h-2.5" />
-                                                        </button>
-                                                    </motion.div>
-                                                );
-                                            })}
-                                        </AnimatePresence>
-                                        {formData.student_ids.length === 0 && (
-                                            <p className="text-muted-foreground/50 text-xs italic">Lista vazia.</p>
-                                        )}
+                                                            {student?.name}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setFormData({
+                                                                    ...formData,
+                                                                    student_ids: formData.student_ids.filter((sid: number) => sid !== id)
+                                                                })}
+                                                                className="hover:bg-primary/20 rounded-full p-0.5"
+                                                            >
+                                                                <Trash2 className="w-2.5 h-2.5" />
+                                                            </button>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </AnimatePresence>
+                                            {formData.student_ids.length === 0 && (
+                                                <p className="text-muted-foreground/50 text-xs italic">Nenhum integrante selecionado.</p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

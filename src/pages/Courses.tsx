@@ -52,6 +52,7 @@ interface Course {
     description?: string;
     teacher_id?: number | string;
     teacher_name?: string;
+    days_of_week?: string;
 }
 
 interface Employee {
@@ -68,7 +69,7 @@ export default function Courses() {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isManaging, setIsManaging] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-    const [formData, setFormData] = useState({ name: "", price: "", description: "", teacher_id: "" });
+    const [formData, setFormData] = useState({ name: "", price: "", description: "", teacher_id: "", days_of_week: "" });
 
     // Modals for management
     const [isClassModalOpen, setIsClassModalOpen] = useState(false);
@@ -118,7 +119,7 @@ export default function Courses() {
             queryClient.invalidateQueries({ queryKey: ['courses'] });
             toast.success("Curso criado com sucesso!");
             setIsAddOpen(false);
-            setFormData({ name: "", price: "", description: "", teacher_id: "" });
+            setFormData({ name: "", price: "", description: "", teacher_id: "", days_of_week: "" });
         },
         onError: () => toast.error("Erro ao criar curso")
     });
@@ -157,7 +158,8 @@ export default function Courses() {
         e.preventDefault();
         const data = {
             ...formData,
-            price: formData.price === "" ? 0 : parseFloat(formData.price)
+            price: formData.price === "" ? 0 : parseFloat(formData.price),
+            teacher_id: formData.teacher_id === "none" ? null : formData.teacher_id
         };
 
         if (isEdit) {
@@ -173,7 +175,8 @@ export default function Courses() {
             name: course.name,
             price: course.price.toString(),
             description: course.description || "",
-            teacher_id: course.teacher_id?.toString() || ""
+            teacher_id: course.teacher_id?.toString() || "none",
+            days_of_week: course.days_of_week || ""
         });
         setIsEditOpen(true);
     };
@@ -190,7 +193,7 @@ export default function Courses() {
 
     if (isManaging && selectedCourse) {
         const courseClasses = allClasses.filter(c => c.course_id === selectedCourse.id);
-        const courseStudents = allStudents.filter(s => s.course === selectedCourse.name);
+        const courseStudents = allStudents.filter(s => s.course_id === selectedCourse.id);
         const courseAppointments = allAppointments.filter(app =>
             app.course_id === selectedCourse.id ||
             (app.school_class && app.school_class.course_id === selectedCourse.id)
@@ -332,7 +335,7 @@ export default function Courses() {
                                         {courseAppointments.filter(app => app.type === 'individual').length > 0 ? (
                                             courseAppointments.filter(app => app.type === 'individual').map(app => (
                                                 <div key={app.id} className="flex items-center gap-4 bg-muted/30 p-4 rounded-xl border border-border/50">
-                                                    <div className="flex flex-col items-center justify-center bg-background px-3 py-2 rounded-lg border shadow-sm min-w-[70px]">
+                                                    <div className="flex flex-col items-center justify-center bg-background px-3 package py-2 rounded-lg border shadow-sm min-w-[70px]">
                                                         <span className="text-[10px] uppercase font-bold text-primary">
                                                             {new Date(app.date + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short' })}
                                                         </span>
@@ -389,7 +392,7 @@ export default function Courses() {
                             Gerencie as opções de cursos e modalidades.
                         </p>
                     </div>
-                    <Button onClick={() => setIsAddOpen(true)} className="gap-2 shadow-lg shadow-primary/20 h-11 px-6">
+                    <Button onClick={() => { setFormData({ name: "", price: "", description: "", teacher_id: "none", days_of_week: "" }); setIsAddOpen(true); }} className="gap-2 shadow-lg shadow-primary/20 h-11 px-6">
                         <Plus className="w-5 h-5" />
                         Novo Curso
                     </Button>
@@ -558,9 +561,18 @@ export default function Courses() {
                                     </Select>
                                     <p className="text-[10px] text-muted-foreground">Apenas funcionários habilitados para dar aula aparecem aqui.</p>
                                 </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="days">Dias Sugeridos</Label>
+                                    <Input
+                                        id="days"
+                                        placeholder="Ex: Seg, Qua, Sex"
+                                        value={formData.days_of_week}
+                                        onChange={(e) => setFormData({ ...formData, days_of_week: e.target.value })}
+                                    />
+                                </div>
                             </div>
                             <DialogFooter>
-                                <Button variant="outline" type="button" onClick={() => { setIsAddOpen(false); setFormData({ name: "", price: "", description: "", teacher_id: "" }); }}>Cancelar</Button>
+                                <Button variant="outline" type="button" onClick={() => setIsAddOpen(false)}>Cancelar</Button>
                                 <Button type="submit" disabled={createMutation.isPending}>
                                     {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                                     Salvar
@@ -624,6 +636,16 @@ export default function Courses() {
                                             ))}
                                         </SelectContent>
                                     </Select>
+                                    <p className="text-[10px] text-muted-foreground">Apenas funcionários habilitados para dar aula aparecem aqui.</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="edit-days">Dias Sugeridos</Label>
+                                    <Input
+                                        id="edit-days"
+                                        placeholder="Ex: Seg, Qua, Sex"
+                                        value={formData.days_of_week}
+                                        onChange={(e) => setFormData({ ...formData, days_of_week: e.target.value })}
+                                    />
                                 </div>
                             </div>
                             <DialogFooter>
@@ -660,6 +682,6 @@ export default function Courses() {
                     </AlertDialogContent>
                 </AlertDialog>
             </div>
-        </MainLayout>
+        </MainLayout >
     );
 }

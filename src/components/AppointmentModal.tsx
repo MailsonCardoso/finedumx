@@ -203,9 +203,8 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                                     onValueChange={(val) => {
                                         setValue("student_id", val);
                                         const student = students.find(s => s.id.toString() === val);
-                                        if (student && student.course) {
-                                            const course = courses.find(c => c.name === student.course);
-                                            if (course) setValue("course_id", course.id.toString());
+                                        if (student && student.course_id) {
+                                            setValue("course_id", student.course_id.toString());
                                         }
                                     }}
                                 >
@@ -226,13 +225,13 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Curso / Instrumento</Label>
+                                <Label>Matéria / Disciplina</Label>
                                 <Select
                                     value={watch("course_id")}
                                     onValueChange={(val) => setValue("course_id", val)}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Selecione o curso" />
+                                        <SelectValue placeholder="Selecione a matéria" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {courses.map((course) => (
@@ -245,23 +244,50 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-2">
-                            <Label>Turma</Label>
-                            <Select
-                                value={watch("school_class_id")}
-                                onValueChange={(val) => setValue("school_class_id", val)}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Selecione a turma" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {classes.map((cls) => (
-                                        <SelectItem key={cls.id} value={cls.id.toString()}>
-                                            {cls.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label>Turma</Label>
+                                <Select
+                                    value={watch("school_class_id")}
+                                    onValueChange={(val) => {
+                                        setValue("school_class_id", val);
+                                        const cls = classes.find(c => c.id.toString() === val);
+                                        if (cls && cls.course_id) {
+                                            setValue("course_id", cls.course_id.toString());
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecione a turma" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {classes.map((cls) => (
+                                            <SelectItem key={cls.id} value={cls.id.toString()}>
+                                                {cls.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Matéria (Vinculada à Turma)</Label>
+                                <Select
+                                    value={watch("course_id")}
+                                    disabled={true}
+                                >
+                                    <SelectTrigger className="bg-muted">
+                                        <SelectValue placeholder="Matéria da turma" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {courses.map((course) => (
+                                            <SelectItem key={course.id} value={course.id.toString()}>
+                                                {course.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     )}
 

@@ -19,9 +19,15 @@ class Student extends Model
         'due_day',
         'monthly_fee',
         'status',
+        'course_id',
         'class_type',
         'teacher_id',
     ];
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
 
     public function tuitions()
     {
