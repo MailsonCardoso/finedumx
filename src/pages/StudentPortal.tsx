@@ -108,7 +108,7 @@ export default function StudentPortal() {
                     <KPICard
                         index={0}
                         title="Meu Curso"
-                        value={data?.student?.student?.course?.name || data?.student?.student?.course || "Nenhum"}
+                        value={typeof data?.student?.student?.course === 'object' ? data?.student?.student?.course?.name : (data?.student?.student?.course || "Nenhum")}
                         icon={<GraduationCap className="w-5 h-5" />}
                         className="border-primary/20 bg-primary/5"
                     />
@@ -154,8 +154,7 @@ export default function StudentPortal() {
                                                     <Music className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-semibold text-foreground">{app.course?.name || app.school_class?.name || "Aula"}</p>
-                                                    <p className="text-[10px] font-bold text-primary uppercase">
+                                                    <p className="text-sm font-bold text-foreground uppercase">
                                                         Prof. {app.course?.teacher?.name || app.school_class?.teacher?.name || "A definir"}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground uppercase mt-0.5">
