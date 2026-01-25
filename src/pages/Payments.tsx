@@ -9,6 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   QrCode,
   FileText,
@@ -18,10 +27,14 @@ import {
   Loader2,
   DollarSign,
   Landmark,
-  AlertCircle
+  AlertCircle,
+  MoreVertical,
+  Calendar,
+  Eye
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Payment {
   id: number;
@@ -158,72 +171,117 @@ export default function Payments() {
             </CardContent>
           </Card>
         </div>
-        <div className="bg-card rounded-xl shadow-soft border border-border/50 overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="font-semibold">Aluno</TableHead>
-                  <TableHead className="font-semibold">Tipo</TableHead>
-                  <TableHead className="font-semibold">Método</TableHead>
-                  <TableHead className="font-semibold">Data</TableHead>
-                  <TableHead className="font-semibold">Hora</TableHead>
-                  <TableHead className="font-semibold">Valor</TableHead>
-                  <TableHead className="font-semibold">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-48 text-center">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-muted-foreground">Carregando pagamentos...</p>
+        {/* Grid of Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {isLoading ? (
+            Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-[200px] bg-card rounded-[24px] border border-border/50 animate-pulse" />
+            ))
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {payments.map((payment, i) => (
+                <motion.div
+                  key={payment.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="bg-card rounded-[24px] shadow-sm hover:shadow-lg transition-all border border-border/40 overflow-hidden relative flex flex-col group h-full"
+                >
+                  {/* Top Accent based on status */}
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 ${payment.status === 'confirmado' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+
+                  {/* Actions Menu Absolute */}
+                  <div className="absolute top-3 right-3 z-10">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground bg-background/50 backdrop-blur-sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[160px]">
+                        <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                        <DropdownMenuItem disabled>
+                          <FileText className="mr-2 h-4 w-4" />
+                          Gerar Recibo
+                        </DropdownMenuItem>
+                        <DropdownMenuItem disabled>
+                          <Eye className="mr-2 h-4 w-4" />
+                          Ver Detalhes
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  <div className="p-6 flex flex-col gap-5 h-full pt-8">
+                    {/* Header: Student & Status */}
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary shrink-0 border border-primary/10">
+                        {payment.student?.name?.charAt(0).toUpperCase()}
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  <>
-                    {payments.map((payment) => (
-                      <TableRow
-                        key={payment.id}
-                        className="hover:bg-muted/30 transition-colors"
-                      >
-                        <TableCell className="font-medium">{payment.student?.name}</TableCell>
-                        <TableCell className="text-muted-foreground">{payment.type}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {getMethodIcon(payment.method)}
-                            <span className="text-muted-foreground">
-                              {getMethodLabel(payment.method)}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {formatDate(payment.payment_date)}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {formatTime(payment.created_at)}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {formatCurrency(Number(payment.amount))}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                      </TableRow>
-                    ))}
-                    {payments.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
-                          Nenhum pagamento encontrado.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                      <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
+                        <h3 className="font-bold text-foreground leading-tight truncate w-full pr-6" title={payment.student?.name}>
+                          {payment.student?.name}
+                        </h3>
+                        <div className="scale-90 origin-left">
+                          {getStatusBadge(payment.status)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Info: Method & Date */}
+                    <div className="space-y-2.5">
+                      <div className="bg-muted/30 rounded-xl px-3 py-2 flex items-center gap-3 text-sm border border-border/20">
+                        {getMethodIcon(payment.method)}
+                        <span className="text-xs font-semibold text-foreground/80">
+                          {getMethodLabel(payment.method)}
+                        </span>
+                      </div>
+
+                      <div className="bg-muted/30 rounded-xl px-3 py-2 flex items-center gap-3 text-sm border border-border/20">
+                        <Calendar className="w-4 h-4 text-primary/60" />
+                        <span className="text-xs font-medium text-foreground/80">
+                          {formatDate(payment.payment_date)} às {formatTime(payment.created_at)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Footer: Amount */}
+                    <div className="mt-auto pt-4 flex items-center justify-between border-t border-border/40">
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        Recebido
+                      </div>
+                      <div className="text-right">
+                        <span className="font-bold text-emerald-600 text-lg">
+                          + {formatCurrency(Number(payment.amount))}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
         </div>
+
+        {!isLoading && payments.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="p-16 text-center flex flex-col items-center gap-4 bg-card/50 border border-dashed border-border rounded-xl"
+          >
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground opacity-50">
+              <Clock className="w-8 h-8" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-foreground">Sem histórico</h3>
+              <p className="text-muted-foreground max-w-xs mx-auto mt-2">
+                Ainda não foram registrados pagamentos no sistema.
+              </p>
+            </div>
+          </motion.div>
+        )}
       </div>
     </MainLayout>
   );

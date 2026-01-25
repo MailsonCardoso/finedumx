@@ -539,169 +539,142 @@ export default function Tuition() {
           </Select>
         </motion.div>
 
-        {/* Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-card rounded-2xl shadow-soft border border-border/50 overflow-hidden"
-        >
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                  <TableHead className="font-bold h-14 text-foreground">Referência</TableHead>
-                  <TableHead className="font-bold h-14 text-foreground">Aluno</TableHead>
-                  <TableHead className="font-bold h-14 text-foreground">Vencimento</TableHead>
-                  <TableHead className="font-bold h-14 text-foreground">Valor</TableHead>
-                  <TableHead className="font-bold h-14 text-foreground">Status</TableHead>
-                  <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-48 text-center">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-muted-foreground">Carregando mensalidades...</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  <AnimatePresence mode="popLayout">
-                    {sortedTuitions.map((tuition, i) => (
-                      <motion.tr
-                        key={tuition.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
-                      >
-                        <TableCell className="py-4 font-medium">
-                          <div className="flex flex-col">
-                            <span>{tuition.reference}</span>
-                            {tuition.type === 'matricula' && (
-                              <span className="inline-flex items-center rounded-sm bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 w-fit mt-0.5">
-                                MATRÍCULA
-                              </span>
-                            )}
-                            {tuition.type === 'rematricula' && (
-                              <span className="inline-flex items-center rounded-sm bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 w-fit mt-0.5">
-                                REMATRÍCULA
-                              </span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell
-                          className="py-4 font-medium text-foreground group-hover:text-primary transition-colors cursor-pointer"
-                          onClick={() => {
-                            if (tuition.student_id) {
-                              setSheetStudentId(tuition.student_id);
-                              setIsSheetOpen(true);
-                            }
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            {tuition.student?.name}
-                            <Eye className="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" />
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 text-muted-foreground">
-                          {formatDate(tuition.due_date)}
-                        </TableCell>
-                        <TableCell className="py-4 font-bold text-foreground">
-                          {formatCurrency(Number(tuition.amount))}
-                        </TableCell>
-                        <TableCell className="py-4">{getStatusBadge(tuition)}</TableCell>
-                        <TableCell className="py-4 text-right pr-6">
-                          <div className="flex items-center justify-end gap-2">
-                            {tuition.status !== 'pago' && (
-                              <>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className={`h-8 w-8 transition-colors relative ${(() => {
-                                    if (!tuition.last_notification_at) return false;
-                                    const lastNotify = new Date(tuition.last_notification_at);
-                                    const diffDays = (new Date().getTime() - lastNotify.getTime()) / (1000 * 60 * 60 * 24);
-                                    return diffDays < 5;
-                                  })()
-                                    ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
-                                    : "text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10"
-                                    }`}
-                                  onClick={() => handleWhatsAppClick(tuition)}
-                                  title={tuition.last_notification_at
-                                    ? `Último envio: ${new Date(tuition.last_notification_at).toLocaleString('pt-BR')}`
-                                    : "Enviar WhatsApp"
-                                  }
-                                >
-                                  <MessageCircle className="w-5 h-5" />
-                                  {(() => {
-                                    if (!tuition.last_notification_at) return false;
-                                    const lastNotify = new Date(tuition.last_notification_at);
-                                    const diffDays = (new Date().getTime() - lastNotify.getTime()) / (1000 * 60 * 60 * 24);
-                                    return diffDays < 5;
-                                  })() && (
-                                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-background" />
-                                    )}
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                                  onClick={() => handlePayClick(tuition)}
-                                  title="Confirmar Pagamento"
-                                >
-                                  <DollarSign className="w-4 h-4 mr-1.5" />
-                                  Receber
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                  onClick={() => {
-                                    setTuitionToDelete(tuition);
-                                    setIsDeleteOpen(true);
-                                  }}
-                                  title="Excluir Mensalidade"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </>
-                            )}
+        {/* Grid of Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {isLoading ? (
+            Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-[280px] bg-card rounded-[24px] border border-border/50 animate-pulse" />
+            ))
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {sortedTuitions.map((tuition, i) => (
+                <motion.div
+                  key={tuition.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="bg-card rounded-[24px] shadow-sm hover:shadow-lg transition-all border border-border/40 overflow-hidden relative flex flex-col group h-full"
+                >
+                  {/* Top Accent based on status */}
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 ${tuition.status === 'pago' ? 'bg-emerald-500' : (tuition.status === 'atrasado' || new Date(tuition.due_date + 'T23:59:59') < new Date() ? 'bg-destructive' : 'bg-gradient-to-r from-primary to-primary/40')}`} />
 
-                            {tuition.status === 'pago' && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 text-muted-foreground"
-                                onClick={() => {
-                                  setSelectedTuition(tuition);
-                                  setIsReceiptOpen(true);
-                                }}
-                                title="Imprimir Recibo"
-                              >
-                                <Printer className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </motion.tr>
-                    ))}
-                    {!isLoading && sortedTuitions.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                          Nenhuma mensalidade encontrada.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </AnimatePresence>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </motion.div>
+                  {/* Actions Menu Absolute */}
+                  <div className="absolute top-3 right-3 z-10">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[180px]">
+                        <DropdownMenuLabel>Opções</DropdownMenuLabel>
+
+                        {tuition.status !== 'pago' && (
+                          <DropdownMenuItem onClick={() => handlePayClick(tuition)} className="text-emerald-600 focus:text-emerald-600 focus:bg-emerald-50">
+                            <DollarSign className="mr-2 h-4 w-4" />
+                            Receber Pagamento
+                          </DropdownMenuItem>
+                        )}
+
+                        <DropdownMenuItem onClick={() => handleWhatsAppClick(tuition)}>
+                          <MessageCircle className="mr-2 h-4 w-4" />
+                          Enviar WhatsApp
+                        </DropdownMenuItem>
+
+                        {tuition.status === 'pago' && (
+                          <DropdownMenuItem onClick={() => { setSelectedTuition(tuition); setIsReceiptOpen(true); }}>
+                            <Printer className="mr-2 h-4 w-4" />
+                            Imprimir Recibo
+                          </DropdownMenuItem>
+                        )}
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem onClick={() => { setSheetStudentId(tuition.student_id); setIsSheetOpen(true); }}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          Dados do Aluno
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => { setTuitionToDelete(tuition); setIsDeleteOpen(true); }}>
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Excluir Cobrança
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  <div className="p-6 flex flex-col gap-5 h-full pt-8">
+                    {/* Header: Student & Status */}
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary shrink-0 border border-primary/10">
+                        {tuition.student?.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
+                        <h3 className="font-bold text-foreground leading-tight truncate w-full pr-6" title={tuition.student?.name}>
+                          {tuition.student?.name}
+                        </h3>
+                        <div className="scale-90 origin-left">
+                          {getStatusBadge(tuition)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Description & Date Pills */}
+                    <div className="space-y-3">
+                      <div className="bg-muted/30 rounded-2xl px-4 py-2.5 flex items-center justify-between text-sm border border-border/20">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <FileText className="w-3.5 h-3.5" />
+                          <span className="text-[11px] font-bold uppercase tracking-wider">Referência</span>
+                        </div>
+                        <span className="font-bold text-foreground text-xs">{tuition.reference}</span>
+                      </div>
+
+                      <div className="bg-muted/30 rounded-2xl px-4 py-2.5 flex items-center justify-between text-sm border border-border/20">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span className="text-[11px] font-bold uppercase tracking-wider">Vencimento</span>
+                        </div>
+                        <span className="font-medium text-foreground text-xs">{formatDate(tuition.due_date)}</span>
+                      </div>
+                    </div>
+
+                    {/* Footer: Amount */}
+                    <div className="mt-auto pt-4 flex items-center justify-between border-t border-border/40">
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        Total
+                      </div>
+                      <div className="text-right">
+                        <span className="font-bold text-foreground text-lg">
+                          {formatCurrency(Number(tuition.amount))}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
+        </div>
+
+        {!isLoading && sortedTuitions.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="p-16 text-center flex flex-col items-center gap-4 bg-card/50 border border-dashed border-border rounded-xl"
+          >
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground opacity-50">
+              <DollarSign className="w-8 h-8" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-foreground">Nenhuma cobrança</h3>
+              <p className="text-muted-foreground max-w-xs mx-auto mt-2">
+                Não encontramos mensalidades para o filtro selecionado.
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Payment Confirmation Modal */}
         <Dialog open={isPayOpen} onOpenChange={setIsPayOpen}>
