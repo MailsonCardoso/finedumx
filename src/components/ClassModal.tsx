@@ -19,9 +19,18 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, AlertTriangle, CalendarRange } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/ui/alert";
+import {
+    RadioGroup,
+    RadioGroupItem
+} from "@/components/ui/radio-group";
 
 interface ClassModalProps {
     isOpen: boolean;
@@ -43,6 +52,7 @@ const initialFormData = {
     status: "ativo",
     student_ids: [],
     generate_appointments: false,
+    generate_type: "future", // 'all' or 'future'
 };
 
 export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }: ClassModalProps) {
@@ -89,6 +99,23 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
         queryKey: ['students'],
         queryFn: () => apiFetch<any[]>('/students'),
         enabled: isOpen,
+    });
+
+    // Conflict Check
+    const { data: conflictData, isFetching: isCheckingConflicts } = useQuery({
+        queryKey: ['conflicts', formData.teacher_id, formData.days_of_week, formData.start_time, formData.end_time],
+        queryFn: () => apiFetch<any>('/classes/check-conflicts', {
+            method: 'POST',
+            body: JSON.stringify({
+                teacher_id: formData.teacher_id,
+                days_of_week: formData.days_of_week,
+                start_time: formData.start_time,
+                end_time: formData.end_time,
+                exclude_class_id: isEditing ? classItem.id : undefined
+            })
+        }),
+        enabled: !!(formData.teacher_id && formData.days_of_week && formData.start_time && formData.end_time) && isOpen,
+        staleTime: 5000
     });
 
     const teachers = employees.filter(emp => emp.is_teacher && emp.status === 'ativo');
@@ -344,7 +371,7 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                 </div>
                             </div>
 
-                            {!isEditing && (
+                            {!isEditing ? (
                                 <div className="flex items-center gap-2 bg-primary/5 p-3 rounded-xl border border-primary/10">
                                     <Checkbox
                                         id="generate_appointments"
@@ -356,10 +383,61 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                             Gerar agenda automaticamente
                                         </Label>
                                         <p className="text-[10px] text-muted-foreground">
-                                            Cria as aulas na agenda para todos os dias selecionados até 31/12/2026.
+                                            Cria as aulas na agenda para todos os selecionados até 31/12/2026.
                                         </p>
                                     </div>
                                 </div>
+                            ) : (
+                                <div className="space-y-3 bg-muted/20 p-3 rounded-xl border border-border/50">
+                                    <div className="flex items-center gap-2">
+                                        <Checkbox
+                                            id="generate_appointments"
+                                            checked={formData.generate_appointments}
+                                            onCheckedChange={(checked) => setFormData({ ...formData, generate_appointments: !!checked })}
+                                        />
+                                        <Label htmlFor="generate_appointments" className="text-xs font-bold cursor-pointer">
+                                            Sincronizar e Replicar para Agenda
+                                        </Label>
+                                    </div>
+
+                                    {formData.generate_appointments && (
+                                        <div className="pl-6 space-y-2">
+                                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Modo de Atualização</p>
+                                            <RadioGroup
+                                                value={formData.generate_type}
+                                                onValueChange={(val) => setFormData({ ...formData, generate_type: val })}
+                                                className="flex flex-col gap-2"
+                                            >
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="future" id="r-future" />
+                                                    <Label htmlFor="r-future" className="text-xs font-medium cursor-pointer flex items-center gap-2">
+                                                        <CalendarRange className="w-3 h-3 text-primary" />
+                                                        Apenas aulas futuras (Hoje em diante)
+                                                    </Label>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="all" id="r-all" />
+                                                    <Label htmlFor="r-all" className="text-xs font-medium cursor-pointer flex items-center gap-2">
+                                                        <Trash2 className="w-3 h-3 text-destructive" />
+                                                        Refazer tudo (Apagar anteriores e gerar novas)
+                                                    </Label>
+                                                </div>
+                                            </RadioGroup>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {conflictData?.has_conflicts && (
+                                <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive py-3">
+                                    <AlertTriangle className="h-4 w-4" />
+                                    <AlertTitle className="text-xs font-bold">Conflito de Professor</AlertTitle>
+                                    <AlertDescription className="text-[10px] leading-tight mt-1 opacity-90">
+                                        {conflictData.conflicts.map((c: any, i: number) => (
+                                            <div key={i}>• Já possui a turma <b>{c.class_name}</b> em <b>{c.days}</b> às <b>{c.time}</b>.</div>
+                                        ))}
+                                    </AlertDescription>
+                                </Alert>
                             )}
 
                             <div className="space-y-2">

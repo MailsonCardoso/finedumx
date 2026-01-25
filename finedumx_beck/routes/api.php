@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('employees', EmployeeController::class);
 
     // Classes
+    Route::post('/classes/check-conflicts', [App\Http\Controllers\SchoolClassController::class, 'checkConflicts']);
     Route::apiResource('classes', App\Http\Controllers\SchoolClassController::class);
 
     // Appointments

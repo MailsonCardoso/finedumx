@@ -7,6 +7,20 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [0.7.0] - 2026-01-25
+
+### ✨ Adicionado
+- **🚨 Verificação de Conflitos**: Sistema agora avisa se o professor já possui outra turma no mesmo dia e horário.
+- **🔄 Gestão Flexível de Agenda**: Ao editar uma turma, você pode escolher:
+  - "Apenas aulas futuras": Altera a agenda de hoje em diante, preservando o histórico passado.
+  - "Refazer tudo": Limpa toda a agenda desta turma no ano e gera novamente (Opção B solicitada).
+- **🛠️ Refinamento de Interface**: Inclusão de alertas visuais e seletores de rádio para controle de replicação na agenda.
+
+### 📦 Build
+- Build de produção gerado com as melhorias de inteligência de agenda (v0.7.0).
+
+---
+
 ## [0.6.0] - 2026-01-25
 
 ### ✨ Adicionado
@@ -138,5 +152,5 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
-**Versão Atual**: 0.6.0  
+**Versão Atual**: 0.7.0  
 **Data**: 25 de Janeiro de 2026
