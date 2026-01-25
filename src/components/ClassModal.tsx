@@ -330,15 +330,6 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Sala</Label>
-                                <Input
-                                    placeholder="Ex: Sala 01, Auditório..."
-                                    value={formData.room}
-                                    onChange={(e) => setFormData({ ...formData, room: e.target.value })}
-                                />
-                            </div>
-
                             {!isEditing && (
                                 <div className="flex items-center gap-2 bg-primary/5 p-3 rounded-xl border border-primary/10">
                                     <Checkbox

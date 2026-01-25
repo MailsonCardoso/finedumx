@@ -308,9 +308,6 @@ export default function Classes() {
                                                     {getStatusBadge(classItem.status)}
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal border-border/60 text-muted-foreground">
-                                                        {classItem.room}
-                                                    </Badge>
                                                     <div className="scale-90 origin-right">
                                                         {getShiftBadge(classItem.shift)}
                                                     </div>
