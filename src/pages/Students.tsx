@@ -336,9 +336,8 @@ export default function Students() {
                   transition={{ delay: i * 0.05 }}
                   className="bg-card rounded-[24px] shadow-sm hover:shadow-lg transition-all border border-border/40 overflow-hidden relative flex flex-col group h-full"
                 >
-                  {/* Top Accent */}
-                  {/* Top Accent */}
-                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 to-primary/40" />
+                  {/* Top Accent based on status */}
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 ${student.status === 'ativo' ? 'bg-emerald-500' : 'bg-muted-foreground/30'}`} />
 
                   {/* Actions Menu Absolute */}
                   <div className="absolute top-3 right-3 z-10">
@@ -367,68 +366,45 @@ export default function Students() {
                     </DropdownMenu>
                   </div>
 
-                  <div className="p-5 flex flex-col gap-4 h-full pt-7">
-                    {/* Header */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 w-full cursor-pointer hover:opacity-80 transition-opacity" onClick={() => { setSheetStudentId(student.id); setIsSheetOpen(true); }}>
-                        <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-lg font-bold text-primary-foreground shrink-0 shadow-lg shadow-primary/20">
-                          {student.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
-                          <h3 className="font-bold text-foreground leading-tight truncate w-full pr-6" title={student.name}>
-                            {student.name}
-                          </h3>
-                          {student.active_responsible ? (
-                            <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 h-auto truncate max-w-full border-primary/20 text-primary">
-                              Resp: {student.active_responsible}
-                            </Badge>
-                          ) : (
-                            <span className="text-xs text-muted-foreground truncate">{student.email}</span>
-                          )}
+                  <div className="p-6 flex flex-col gap-6 h-full pt-8">
+                    {/* Header: Avatar, Name & Status */}
+                    <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => { setSheetStudentId(student.id); setIsSheetOpen(true); }}>
+                      <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary shrink-0 shadow-sm border border-primary/10">
+                        {student.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex flex-col items-start gap-1.5 min-w-0 flex-1">
+                        <h3 className="font-bold text-foreground text-lg leading-tight truncate w-full pr-6" title={student.name}>
+                          {student.name}
+                        </h3>
+                        <div className="scale-90 origin-left">
+                          {getStatusBadge(student.status)}
                         </div>
                       </div>
                     </div>
 
-                    {/* Body Information */}
-                    <div className="space-y-3 mt-2">
-                      {/* Curso */}
-                      <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
-                        <GraduationCap className="w-4 h-4 text-muted-foreground/70 shrink-0" />
-                        <span className="truncate text-xs font-medium">
+                    {/* Contact Information Pills */}
+                    <div className="space-y-3">
+                      <div className="bg-muted/30 rounded-2xl px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/80 border border-border/20">
+                        <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <span className="truncate text-xs font-medium">{student.email}</span>
+                      </div>
+
+                      <div className="bg-muted/30 rounded-2xl px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/80 border border-border/20">
+                        <Phone className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <span className="truncate text-xs font-medium">{student.phone || "(00) 00000-0000"}</span>
+                      </div>
+                    </div>
+
+                    {/* Courses Section */}
+                    <div className="mt-auto space-y-3">
+                      <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">
+                        Cursos Matriculados
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="outline" className="bg-background px-3 py-1.5 rounded-xl border-border/50 text-foreground/80 font-medium">
+                          <GraduationCap className="w-3.5 h-3.5 mr-2 text-primary/70" />
                           {typeof student.course === 'object' ? student.course?.name : (student.course || "Sem curso")}
-                        </span>
-                      </div>
-
-                      {/* Contato (Se houver responsavel, mostra email aqui, senao telefone) */}
-                      <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
-                        <Mail className="w-4 h-4 text-muted-foreground/70 shrink-0" />
-                        <span className="truncate text-xs">
-                          {student.email}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mt-auto pt-4 space-y-4">
-                      {/* Divider */}
-                      <div className="h-px w-full bg-border/40" />
-
-                      {/* Footer: Price & Status */}
-                      <div className="flex items-center justify-between px-2">
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                          <div className="scale-90 origin-left">
-                            {getStatusBadge(student.status)}
-                          </div>
-                          <div className="flex items-center gap-1 font-medium bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded border border-amber-500/20">
-                            <Calendar className="w-3 h-3" />
-                            Dia {student.due_day}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="font-bold text-foreground text-lg">
-                            {formatCurrency(student.monthly_fee)}
-                          </span>
-                          <span className="text-xs font-medium text-muted-foreground ml-1">/mês</span>
-                        </div>
+                        </Badge>
                       </div>
                     </div>
                   </div>
