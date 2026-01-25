@@ -5,14 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import {
     Select,
     SelectContent,
@@ -306,100 +299,128 @@ export default function Employees() {
                 </motion.div>
 
                 {/* Table */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-card rounded-2xl shadow-soft border border-border/50 overflow-hidden"
-                >
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                                    <TableHead className="font-bold h-14 text-foreground">Nome</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Cargo</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Salário</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Status</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-48 text-center">
-                                            <div className="flex flex-col items-center justify-center gap-2">
-                                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                                <p className="text-muted-foreground">Carregando funcionários...</p>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    <AnimatePresence mode="popLayout">
-                                        {sortedEmployees.map((employee, i) => (
-                                            <motion.tr
-                                                key={employee.id}
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                exit={{ opacity: 0, x: -10 }}
-                                                transition={{ delay: i * 0.05 }}
-                                                className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
-                                            >
-                                                <TableCell className="py-4 font-semibold text-foreground">
-                                                    <div className="flex flex-col">
-                                                        <span>{employee.name}</span>
-                                                        <span className="text-xs text-muted-foreground font-normal">{employee.email}</span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="py-4 text-muted-foreground">
-                                                    {employee.role}
-                                                </TableCell>
-                                                <TableCell className="py-4 font-bold text-foreground">
-                                                    {formatCurrency(employee.salary)}
-                                                </TableCell>
-                                                <TableCell className="py-4">{getStatusBadge(employee.status)}</TableCell>
-                                                <TableCell className="py-4 text-right pr-6">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => handleEditClick(employee)}>
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteClick(employee)}>
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </TableCell>
-                                            </motion.tr>
-                                        ))}
-                                    </AnimatePresence>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
+                {/* Grid of Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {isLoading ? (
+                        Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className="h-[320px] bg-card rounded-[24px] border border-border/50 animate-pulse" />
+                        ))
+                    ) : (
+                        <AnimatePresence mode="popLayout">
+                            {sortedEmployees.map((employee, i) => (
+                                <motion.div
+                                    key={employee.id}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ delay: i * 0.05 }}
+                                    className="bg-card rounded-[24px] shadow-sm hover:shadow-lg transition-all border border-border/40 overflow-hidden relative flex flex-col group"
+                                >
+                                    {/* Top Accent */}
+                                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 to-primary/40" />
 
-                    {!isLoading && sortedEmployees.length === 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="p-16 text-center flex flex-col items-center gap-4"
-                        >
-                            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                                <UserX className="w-8 h-8" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-semibold text-foreground">Nenhum funcionário encontrado</h3>
-                                <p className="text-muted-foreground max-w-xs mx-auto mt-2">
-                                    Tente ajustar seus filtros ou termos de busca para encontrar o que procura.
-                                </p>
-                            </div>
-                            <Button
-                                variant="outline"
-                                onClick={() => { setSearchTerm(""); setStatusFilter("todos"); }}
-                                className="mt-2"
-                            >
-                                Limpar filtros
-                            </Button>
-                        </motion.div>
+                                    <div className="p-5 flex flex-col gap-4 h-full pt-7">
+                                        {/* Header */}
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex items-center gap-3 w-full">
+                                                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-lg font-bold text-primary-foreground shrink-0 shadow-lg shadow-primary/20">
+                                                    {employee.name.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
+                                                    <h3 className="font-bold text-foreground leading-tight truncate w-full" title={employee.name}>
+                                                        {employee.name}
+                                                    </h3>
+                                                    <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground hover:bg-muted px-2 py-0.5 h-auto">
+                                                        {employee.role}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+
+                                            {/* Actions Button Group */}
+                                            <div className="flex items-center -mr-2 -mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleEditClick(employee)}>
+                                                    <Pencil className="h-3.5 w-3.5" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={() => handleDeleteClick(employee)}>
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        {/* Body Information */}
+                                        <div className="space-y-3 mt-2">
+                                            {/* Email */}
+                                            <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
+                                                <Mail className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+                                                <span className="truncate text-xs">{employee.email}</span>
+                                            </div>
+
+                                            {/* Phone */}
+                                            <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
+                                                <Phone className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+                                                <span className="truncate text-xs">{employee.phone}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-auto pt-4 space-y-4">
+                                            {/* Salary */}
+                                            <div className="flex items-center justify-between px-2">
+                                                <div className="flex items-center gap-2 text-muted-foreground">
+                                                    <DollarSign className="w-4 h-4" />
+                                                    <span className="text-sm font-medium">Salário</span>
+                                                </div>
+                                                <span className="font-bold text-emerald-600">
+                                                    {formatCurrency(employee.salary)}
+                                                </span>
+                                            </div>
+
+                                            {/* Divider */}
+                                            <div className="h-px w-full bg-border/40" />
+
+                                            {/* Footer: Date & Status */}
+                                            <div className="flex items-center justify-between text-xs text-muted-foreground px-2">
+                                                {/* Status Badge Customization to fit card */}
+                                                <div className="scale-90 origin-left">
+                                                    {getStatusBadge(employee.status)}
+                                                </div>
+                                                <div className="flex items-center gap-1.5 opacity-70">
+                                                    <CalendarDays className="w-3.5 h-3.5" />
+                                                    <span>Pgto. dia {employee.payment_day || 5}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
                     )}
-                </motion.div>
+                </div>
+
+                {!isLoading && sortedEmployees.length === 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="p-16 text-center flex flex-col items-center gap-4 border border-dashed border-border rounded-xl bg-card/50"
+                    >
+                        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                            <UserX className="w-8 h-8" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-semibold text-foreground">Nenhum funcionário encontrado</h3>
+                            <p className="text-muted-foreground max-w-xs mx-auto mt-2">
+                                Tente ajustar seus filtros ou termos de busca para encontrar o que procura.
+                            </p>
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => { setSearchTerm(""); setStatusFilter("todos"); }}
+                            className="mt-2"
+                        >
+                            Limpar filtros
+                        </Button>
+                    </motion.div>
+                )}
 
                 {/* Add/Edit Modal */}
                 <Dialog open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
