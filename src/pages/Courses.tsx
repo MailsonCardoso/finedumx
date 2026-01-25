@@ -276,11 +276,7 @@ export default function Courses() {
                                             <div className="h-px w-full bg-border/40" />
 
                                             {/* Footer: Price */}
-                                            <div className="flex items-center justify-between px-2">
-                                                <div className="flex items-center gap-2 text-muted-foreground/60">
-                                                    <DollarSign className="w-3.5 h-3.5" />
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Mensalidade</span>
-                                                </div>
+                                            <div className="flex items-center justify-end px-2">
                                                 <div className="text-right">
                                                     <span className="font-bold text-foreground text-lg">
                                                         {new Intl.NumberFormat("pt-BR", {

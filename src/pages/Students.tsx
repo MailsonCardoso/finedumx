@@ -337,7 +337,7 @@ export default function Students() {
                   className="bg-card rounded-[24px] shadow-sm hover:shadow-lg transition-all border border-border/40 overflow-hidden relative flex flex-col group h-full"
                 >
                   {/* Top Accent based on status */}
-                  <div className={`absolute top-0 left-0 right-0 h-1.5 ${student.status === 'ativo' ? 'bg-emerald-500' : 'bg-muted-foreground/30'}`} />
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 ${student.status === 'ativo' ? 'bg-primary' : 'bg-muted-foreground/30'}`} />
 
                   {/* Actions Menu Absolute */}
                   <div className="absolute top-3 right-3 z-10">
