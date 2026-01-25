@@ -32,7 +32,7 @@ interface ClassModalProps {
 const initialFormData = {
     name: "",
     course_id: "",
-    teacher_id: "",
+    teacher_id: undefined as string | undefined,
     shift: "manha",
     start_time: "08:00",
     end_time: "12:00",
@@ -53,7 +53,7 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
             setFormData({
                 name: classItem.name,
                 course_id: classItem.course_id.toString(),
-                teacher_id: classItem.teacher_id?.toString() || "",
+                teacher_id: classItem.teacher_id ? classItem.teacher_id.toString() : undefined,
                 shift: classItem.shift,
                 start_time: classItem.start_time,
                 end_time: classItem.end_time,
