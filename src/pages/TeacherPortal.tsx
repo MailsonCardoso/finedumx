@@ -171,12 +171,26 @@ export default function TeacherPortal() {
                                                             {app.type === 'individual' ? (
                                                                 <div className="flex items-center gap-2">
                                                                     <GraduationCap className="w-4 h-4 text-muted-foreground" />
-                                                                    <span>{app.student?.name || "Não informado"}</span>
+                                                                    <span className={app.student_response === 'declined' ? 'text-red-500 font-bold' : app.student_response === 'confirmed' ? 'text-emerald-500 font-bold' : ''}>
+                                                                        {app.student?.name || "Não informado"}
+                                                                        {app.student_response === 'declined' && " (NÃO VEM)"}
+                                                                        {app.student_response === 'confirmed' && " (CONFIRMADO)"}
+                                                                    </span>
                                                                 </div>
                                                             ) : (
-                                                                <div className="flex items-center gap-2">
-                                                                    <Users className="w-4 h-4 text-muted-foreground" />
-                                                                    <span>{app.school_class?.students?.length || 0} Alunos</span>
+                                                                <div className="flex flex-col gap-1">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <Users className="w-4 h-4 text-muted-foreground" />
+                                                                        <span>{app.school_class?.students?.length || 0} Alunos</span>
+                                                                    </div>
+                                                                    <div className="flex gap-2 text-[10px] font-bold">
+                                                                        <span className="text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                                                                            {app.confirmed_count} SIM
+                                                                        </span>
+                                                                        <span className="text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">
+                                                                            {app.declined_count} NÃO
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                         </td>

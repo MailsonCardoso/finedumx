@@ -24,7 +24,13 @@ class StudentPortalController extends Controller
             $q->where('student_id', $studentId);
         })->pluck('id');
 
-        $appointments = Appointment::with(['course.teacher', 'schoolClass.teacher'])
+        $appointments = Appointment::with([
+            'course.teacher',
+            'schoolClass.teacher',
+            'responses' => function ($q) use ($studentId) {
+                $q->where('student_id', $studentId);
+            }
+        ])
             ->where(function ($q) use ($studentId, $classIds) {
                 $q->where('student_id', $studentId)
                     ->orWhereIn('school_class_id', $classIds);
@@ -32,8 +38,12 @@ class StudentPortalController extends Controller
             ->where('date', '>=', now()->toDateString())
             ->orderBy('date')
             ->orderBy('start_time')
-            ->limit(10)
-            ->get();
+            ->limit(15)
+            ->get()
+            ->map(function ($app) {
+                $app->my_response = $app->responses->first()?->response ?? 'pending';
+                return $app;
+            });
 
         // Minhas Mensalidades com lógica de status e links
         $tuitions = Tuition::where('student_id', $studentId)
@@ -87,5 +97,28 @@ class StudentPortalController extends Controller
             'enrolled' => $enrolled,
             'stats' => $stats
         ]);
+    }
+
+    public function respond(Request $request, Appointment $appointment)
+    {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'student' || !$user->student_id) {
+            return response()->json(['error' => 'Acesso negado'], 403);
+        }
+
+        $validated = $request->validate([
+            'response' => 'required|in:confirmed,declined',
+            'reason' => 'nullable|string'
+        ]);
+
+        $response = \App\Models\AppointmentResponse::updateOrCreate([
+            'appointment_id' => $appointment->id,
+            'student_id' => $user->student_id
+        ], [
+            'response' => $validated['response'],
+            'reason' => $validated['reason'] ?? null
+        ]);
+
+        return response()->json($response);
     }
 }

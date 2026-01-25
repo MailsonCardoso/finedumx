@@ -35,4 +35,9 @@ class Appointment extends Model
     {
         return $this->belongsTo(Course::class, 'course_id');
     }
+
+    public function responses()
+    {
+        return $this->hasMany(AppointmentResponse::class);
+    }
 }

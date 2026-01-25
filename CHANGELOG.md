@@ -7,6 +7,22 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [0.8.0] - 2026-01-25
+
+### ✨ Adicionado
+- **✅ Confirmação de Presença pelo Aluno**: Estudantes agora podem "Confirmar" ou marcar que "Não vão" direto do portal.
+- **📅 Agenda Inteligente**: 
+  - Datas passadas agora são ocultadas automaticamente da lista de horários.
+  - Alunos veem botões de interação apenas para aulas futuras.
+- **👨‍🏫 Visão do Professor Otimizada**:
+  - O professor visualiza em tempo real quantos alunos confirmaram e quem não vem.
+  - Destaque em cores (Verde/Vermelho) para facilitar a conferência rápida.
+
+### 📦 Build
+- Build de produção gerado com o novo sistema de check-in (v0.8.0).
+
+---
+
 ## [0.7.0] - 2026-01-25
 
 ### ✨ Adicionado
@@ -152,5 +168,5 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
-**Versão Atual**: 0.7.0  
+**Versão Atual**: 0.8.0  
 **Data**: 25 de Janeiro de 2026

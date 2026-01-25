@@ -19,7 +19,7 @@ class TeacherPortalController extends Controller
         $teacherId = $user->employee_id;
 
         // Recuperar agendamentos vinculados ao professor via Curso OU Turma
-        $myAppointments = Appointment::with(['course', 'student', 'schoolClass.students'])
+        $myAppointments = Appointment::with(['course', 'student', 'schoolClass.students', 'responses'])
             ->where(function ($query) use ($teacherId) {
                 // Filtra por professor no curso
                 $query->whereHas('course', function ($q) use ($teacherId) {
@@ -30,9 +30,19 @@ class TeacherPortalController extends Controller
                     $q->where('teacher_id', $teacherId);
                 });
             })
-            ->orderBy('date', 'desc')
+            ->where('date', '>=', now()->toDateString())
+            ->orderBy('date', 'asc')
             ->orderBy('start_time', 'asc')
-            ->get();
+            ->get()
+            ->map(function ($app) {
+                $app->confirmed_count = $app->responses->where('response', 'confirmed')->count();
+                $app->declined_count = $app->responses->where('response', 'declined')->count();
+                // Se for individual
+                if ($app->type === 'individual') {
+                    $app->student_response = $app->responses->first()?->response ?? 'pending';
+                }
+                return $app;
+            });
 
         // Estatísticas rápidas
         $stats = [

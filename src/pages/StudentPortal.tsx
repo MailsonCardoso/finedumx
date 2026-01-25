@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { motion } from "framer-motion";
@@ -12,7 +12,9 @@ import {
     GraduationCap,
     AlertTriangle,
     CreditCard,
-    ExternalLink
+    ExternalLink,
+    ThumbsUp,
+    ThumbsDown
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -42,12 +44,32 @@ interface PortalData {
 }
 
 export default function StudentPortal() {
+    const queryClient = useQueryClient();
     const [isGeneratingLink, setIsGeneratingLink] = useState<number | null>(null);
 
     const { data, isLoading } = useQuery<PortalData>({
         queryKey: ['student-portal'],
         queryFn: () => apiFetch('/student/portal'),
     });
+
+    const respondMutation = useMutation({
+        mutationFn: ({ id, response }: { id: number, response: string }) =>
+            apiFetch(`/student/appointments/${id}/respond`, {
+                method: 'POST',
+                body: JSON.stringify({ response })
+            }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['student-portal'] });
+            toast.success("Resposta enviada com sucesso!");
+        },
+        onError: (error: any) => {
+            toast.error("Erro ao enviar resposta: " + error.message);
+        }
+    });
+
+    const handleRespond = (id: number, response: string) => {
+        respondMutation.mutate({ id, response });
+    };
 
     if (isLoading) {
         return (
@@ -161,7 +183,7 @@ export default function StudentPortal() {
                                                 {new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
                                             </div>
                                             {dayApps.map((app, idx) => (
-                                                <div key={idx} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
+                                                <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-muted/30 transition-colors gap-4">
                                                     <div className="flex items-center gap-4">
                                                         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                                                             <Music className="w-5 h-5" />
@@ -174,6 +196,35 @@ export default function StudentPortal() {
                                                                 {app.start_time.substring(0, 5)} {app.school_class?.name ? `• ${app.school_class.name}` : ''}
                                                             </p>
                                                         </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2 self-end sm:self-center">
+                                                        {app.my_response === 'confirmed' ? (
+                                                            <Badge className="bg-emerald-500/10 text-emerald-600 border-none hover:bg-emerald-500/20 px-3 py-1 font-bold">
+                                                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                                                CONFIRMADO
+                                                            </Badge>
+                                                        ) : app.my_response === 'declined' ? (
+                                                            <Badge variant="outline" className="text-muted-foreground border-border/50 bg-muted/20 px-3 py-1 font-bold">
+                                                                <Clock className="w-3 h-3 mr-1" />
+                                                                NÃO IREI
+                                                            </Badge>
+                                                        ) : (
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() => handleRespond(app.id, 'confirmed')}
+                                                                    className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-[10px] font-bold hover:bg-emerald-600 transition-all shadow-sm"
+                                                                >
+                                                                    CONFIRMAR
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleRespond(app.id, 'declined')}
+                                                                    className="px-3 py-1.5 rounded-lg border border-border text-muted-foreground text-[10px] font-bold hover:bg-muted transition-all"
+                                                                >
+                                                                    NÃO VOU
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             ))}
