@@ -2,14 +2,7 @@ import React, { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import {
     Dialog,
     DialogContent,
@@ -29,7 +22,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, Edit2, Trash2, Loader2, BookOpen, User, Calendar } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Loader2, BookOpen, User, Calendar, DollarSign } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -187,102 +180,118 @@ export default function Courses() {
                     </div>
                 </motion.div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-card rounded-2xl shadow-soft border border-border/50 overflow-hidden"
-                >
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                                    <TableHead className="font-bold h-14 text-foreground">Nome do Curso / Matéria</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Professor Padrão</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Dias Sugeridos</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground text-right">Valor Mensalidade</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-48 text-center">
-                                            <div className="flex flex-col items-center justify-center gap-2">
-                                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                                <p className="text-muted-foreground">Carregando catálogo...</p>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    <AnimatePresence mode="popLayout">
-                                        {filteredCourses.map((course, i) => (
-                                            <motion.tr
-                                                key={course.id}
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                exit={{ opacity: 0, x: -10 }}
-                                                transition={{ delay: i * 0.05 }}
-                                                className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
-                                            >
-                                                <TableCell className="py-4 font-semibold text-foreground">
-                                                    <div className="flex items-center gap-2">
-                                                        <BookOpen className="w-4 h-4 text-primary/70" />
+                {/* Grid of Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {isLoading ? (
+                        Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className="h-[280px] bg-card rounded-[24px] border border-border/50 animate-pulse" />
+                        ))
+                    ) : (
+                        <AnimatePresence mode="popLayout">
+                            {filteredCourses.map((course, i) => (
+                                <motion.div
+                                    key={course.id}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ delay: i * 0.05 }}
+                                    className="bg-card rounded-[24px] shadow-sm hover:shadow-lg transition-all border border-border/40 overflow-hidden relative flex flex-col group h-full"
+                                >
+                                    {/* Top Accent */}
+                                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 to-primary/40" />
+
+                                    <div className="p-5 flex flex-col gap-4 h-full pt-7">
+                                        {/* Header */}
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex items-center gap-3 w-full">
+                                                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 transition-transform group-hover:scale-110 duration-300">
+                                                    <BookOpen className="h-6 w-6" />
+                                                </div>
+                                                <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
+                                                    <h3 className="font-bold text-foreground leading-tight truncate w-full text-lg" title={course.name}>
                                                         {course.name}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="py-4 text-muted-foreground">
-                                                    {course.teacher_name ? (
-                                                        <div className="flex items-center gap-2">
-                                                            <User className="w-3.5 h-3.5" />
-                                                            {course.teacher_name}
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-muted-foreground/50 italic text-xs">Não definido</span>
+                                                    </h3>
+                                                    {course.description && (
+                                                        <p className="text-xs text-muted-foreground line-clamp-1 w-full" title={course.description}>
+                                                            {course.description}
+                                                        </p>
                                                     )}
-                                                </TableCell>
-                                                <TableCell className="py-4 text-muted-foreground">
-                                                    {course.days_of_week ? (
-                                                        <div className="flex items-center gap-2">
-                                                            <Calendar className="w-3.5 h-3.5 text-primary/60" />
-                                                            <span className="text-xs">{course.days_of_week}</span>
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-muted-foreground/30 text-xs">-</span>
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="py-4 text-right font-bold text-foreground">
+                                                </div>
+                                            </div>
+
+                                            {/* Actions Button Group */}
+                                            <div className="flex items-center -mr-2 -mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => openEdit(course)}>
+                                                    <Edit2 className="h-3.5 w-3.5" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={() => openDelete(course)}>
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        {/* Body Information */}
+                                        <div className="space-y-3 mt-2">
+                                            {/* Professor Padrão */}
+                                            <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
+                                                <User className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+                                                <span className="truncate text-xs font-medium">
+                                                    {course.teacher_name || "Sem prof. padrão"}
+                                                </span>
+                                            </div>
+
+                                            {/* Dias Sugeridos */}
+                                            <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
+                                                <Calendar className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+                                                <span className="truncate text-xs">
+                                                    {course.days_of_week || "Horário livre"}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-auto pt-4 space-y-4">
+                                            {/* Divider */}
+                                            <div className="h-px w-full bg-border/40" />
+
+                                            {/* Footer: Price */}
+                                            <div className="flex items-center justify-between px-2">
+                                                <div className="flex items-center gap-2 text-muted-foreground">
+                                                    <DollarSign className="w-4 h-4" />
+                                                    <span className="text-xs font-medium uppercase tracking-wider">Mensalidade</span>
+                                                </div>
+                                                <span className="font-bold text-lg text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                                                     {new Intl.NumberFormat("pt-BR", {
                                                         style: "currency",
                                                         currency: "BRL",
                                                     }).format(course.price)}
-                                                </TableCell>
-                                                <TableCell className="py-4 text-right pr-6">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button variant="ghost" size="icon" onClick={() => openEdit(course)} className="h-8 w-8 text-muted-foreground hover:text-primary">
-                                                            <Edit2 className="w-4 h-4" />
-                                                        </Button>
-                                                        <Button variant="ghost" size="icon" onClick={() => openDelete(course)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </Button>
-                                                    </div>
-                                                </TableCell>
-                                            </motion.tr>
-                                        ))}
-                                        {!isLoading && filteredCourses.length === 0 && (
-                                            <TableRow>
-                                                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground py-12">
-                                                    <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                                                    Nenhum curso encontrado no catálogo.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </AnimatePresence>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </motion.div>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    )}
+                </div>
+
+                {!isLoading && filteredCourses.length === 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="p-16 text-center flex flex-col items-center gap-4 bg-card/50 border border-dashed border-border rounded-xl"
+                    >
+                        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground opacity-50">
+                            <BookOpen className="w-8 h-8" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-semibold text-foreground">Catálogo vazio</h3>
+                            <p className="text-muted-foreground max-w-xs mx-auto mt-2">
+                                Utilize o botão "Novo Curso" para adicionar modalidades.
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
 
                 {/* Add Modal */}
                 <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>

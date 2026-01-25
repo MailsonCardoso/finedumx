@@ -4,14 +4,8 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+
+
 import {
     Select,
     SelectContent,
@@ -29,7 +23,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Filter, Users, Loader2, Pencil, Trash2, GraduationCap, Clock } from "lucide-react";
+import { Plus, Search, Filter, Users, Loader2, Pencil, Trash2, GraduationCap, Clock, User, CalendarDays } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -195,132 +189,144 @@ export default function Classes() {
                 </motion.div>
 
                 {/* Table */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-card rounded-2xl shadow-soft border border-border/50 overflow-hidden"
-                >
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                                    <TableHead className="font-bold h-14 text-foreground">Turma</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Professor</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Turno</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Horário</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Dias</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Sala</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Alunos</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Status</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={9} className="h-48 text-center">
-                                            <div className="flex flex-col items-center justify-center gap-2">
-                                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                                <p className="text-muted-foreground">Carregando turmas...</p>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    <AnimatePresence mode="popLayout">
-                                        {sortedClasses.map((classItem, i) => (
-                                            <motion.tr
-                                                key={classItem.id}
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                exit={{ opacity: 0, x: -10 }}
-                                                transition={{ delay: i * 0.05 }}
-                                                className="group border-b border-border/40 hover:bg-primary/5 transition-colors"
-                                            >
-                                                <TableCell className="py-4 font-semibold text-foreground">
-                                                    <div className="flex flex-col">
-                                                        <span>{classItem.name}</span>
-                                                        <span className="text-xs text-muted-foreground font-normal">{classItem.course_name}</span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="py-4 text-muted-foreground">
-                                                    {classItem.teacher_name || <span className="text-muted-foreground/50 italic">Não atribuído</span>}
-                                                </TableCell>
-                                                <TableCell className="py-4">
-                                                    {getShiftBadge(classItem.shift)}
-                                                </TableCell>
-                                                <TableCell className="py-4 text-muted-foreground">
-                                                    <div className="flex items-center gap-1">
-                                                        <Clock className="w-3.5 h-3.5" />
-                                                        {classItem.start_time} - {classItem.end_time}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="py-4 text-muted-foreground text-sm">
-                                                    {classItem.days_of_week}
-                                                </TableCell>
-                                                <TableCell className="py-4 text-muted-foreground">
-                                                    <Badge variant="outline">{classItem.room}</Badge>
-                                                </TableCell>
-                                                <TableCell className="py-4">
-                                                    <div className="flex flex-col gap-1">
-                                                        <div className="flex items-center gap-2">
-                                                            <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                                                            <span className="font-medium">
-                                                                {classItem.current_students || 0}/{classItem.max_students}
-                                                            </span>
-                                                        </div>
-                                                        <div className="w-full bg-muted rounded-full h-1.5">
-                                                            <div
-                                                                className="bg-primary h-1.5 rounded-full transition-all"
-                                                                style={{ width: `${getOccupancyPercentage(classItem.current_students || 0, classItem.max_students)}%` }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="py-4">{getStatusBadge(classItem.status)}</TableCell>
-                                                <TableCell className="py-4 text-right pr-6">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => handleEditClick(classItem)}>
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteClick(classItem)}>
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </TableCell>
-                                            </motion.tr>
-                                        ))}
-                                    </AnimatePresence>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
+                {/* Grid of Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {isLoading ? (
+                        Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className="h-[320px] bg-card rounded-[24px] border border-border/50 animate-pulse" />
+                        ))
+                    ) : (
+                        <AnimatePresence mode="popLayout">
+                            {sortedClasses.map((classItem, i) => (
+                                <motion.div
+                                    key={classItem.id}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ delay: i * 0.05 }}
+                                    className="bg-card rounded-[24px] shadow-sm hover:shadow-lg transition-all border border-border/40 overflow-hidden relative flex flex-col group"
+                                >
+                                    {/* Top Accent */}
+                                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 to-primary/40" />
 
-                    {!isLoading && sortedClasses.length === 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="p-16 text-center flex flex-col items-center gap-4"
-                        >
-                            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                                <GraduationCap className="w-8 h-8" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-semibold text-foreground">Nenhuma turma encontrada</h3>
-                                <p className="text-muted-foreground max-w-xs mx-auto mt-2">
-                                    Tente ajustar seus filtros ou termos de busca para encontrar o que procura.
-                                </p>
-                            </div>
-                            <Button
-                                variant="outline"
-                                onClick={() => { setSearchTerm(""); setStatusFilter("todos"); }}
-                                className="mt-2"
-                            >
-                                Limpar filtros
-                            </Button>
-                        </motion.div>
+                                    <div className="p-5 flex flex-col gap-4 h-full pt-7">
+                                        {/* Header */}
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex items-center gap-3 w-full">
+                                                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                                                    <GraduationCap className="h-6 w-6" />
+                                                </div>
+                                                <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
+                                                    <h3 className="font-bold text-foreground leading-tight truncate w-full" title={classItem.name}>
+                                                        {classItem.name}
+                                                    </h3>
+                                                    <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground hover:bg-muted px-2 py-0.5 h-auto truncate max-w-full">
+                                                        {classItem.course_name}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+
+                                            {/* Actions Button Group */}
+                                            <div className="flex items-center -mr-2 -mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleEditClick(classItem)}>
+                                                    <Pencil className="h-3.5 w-3.5" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={() => handleDeleteClick(classItem)}>
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        {/* Body Information */}
+                                        <div className="space-y-3 mt-2">
+                                            {/* Professor */}
+                                            <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
+                                                <User className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+                                                <span className="truncate text-xs font-medium">
+                                                    {classItem.teacher_name || "Sem professor"}
+                                                </span>
+                                            </div>
+
+                                            {/* Time */}
+                                            <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
+                                                <Clock className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+                                                <div className="flex flex-col leading-none gap-0.5 min-w-0">
+                                                    <span className="truncate text-xs font-semibold">{classItem.days_of_week}</span>
+                                                    <span className="text-[10px] text-muted-foreground">{classItem.start_time.substring(0, 5)} - {classItem.end_time.substring(0, 5)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-auto pt-4 space-y-4">
+                                            {/* Students Progress */}
+                                            <div className="space-y-1.5 px-1">
+                                                <div className="flex justify-between text-xs text-muted-foreground">
+                                                    <span className="flex items-center gap-1.5">
+                                                        <Users className="w-3 h-3" />
+                                                        Alunos
+                                                    </span>
+                                                    <span className="font-medium text-foreground">
+                                                        {classItem.current_students}/{classItem.max_students}
+                                                    </span>
+                                                </div>
+                                                <div className="w-full bg-muted/50 rounded-full h-1.5 overflow-hidden">
+                                                    <div
+                                                        className="bg-primary h-1.5 rounded-full transition-all duration-500"
+                                                        style={{ width: `${getOccupancyPercentage(classItem.current_students || 0, classItem.max_students)}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Divider */}
+                                            <div className="h-px w-full bg-border/40" />
+
+                                            {/* Footer: Status & Shift/Room */}
+                                            <div className="flex items-center justify-between text-xs px-2">
+                                                <div className="scale-90 origin-left">
+                                                    {getStatusBadge(classItem.status)}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal border-border/60 text-muted-foreground">
+                                                        {classItem.room}
+                                                    </Badge>
+                                                    <div className="scale-90 origin-right">
+                                                        {getShiftBadge(classItem.shift)}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
                     )}
-                </motion.div>
+                </div>
+
+                {!isLoading && sortedClasses.length === 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="p-16 text-center flex flex-col items-center gap-4 bg-card/50 border border-dashed border-border rounded-xl"
+                    >
+                        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                            <GraduationCap className="w-8 h-8" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-semibold text-foreground">Nenhuma turma encontrada</h3>
+                            <p className="text-muted-foreground max-w-xs mx-auto mt-2">
+                                Tente ajustar seus filtros ou termos de busca para encontrar o que procura.
+                            </p>
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => { setSearchTerm(""); setStatusFilter("todos"); }}
+                            className="mt-2"
+                        >
+                            Limpar filtros
+                        </Button>
+                    </motion.div>
+                )}
 
                 <ClassModal
                     isOpen={isModalOpen}
