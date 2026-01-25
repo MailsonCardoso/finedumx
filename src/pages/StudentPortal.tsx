@@ -147,21 +147,36 @@ export default function StudentPortal() {
                         <CardContent className="p-0">
                             <div className="divide-y divide-border/50">
                                 {data?.appointments && data.appointments.length > 0 ? (
-                                    data.appointments.map((app, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                                    <Music className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-bold text-foreground uppercase">
-                                                        Prof. {app.course?.teacher?.name || app.school_class?.teacher?.name || "A definir"}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground uppercase mt-0.5">
-                                                        {new Date(app.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long' })} • {app.start_time.substring(0, 5)}
-                                                    </p>
-                                                </div>
+                                    Object.entries(
+                                        data.appointments.reduce((acc: any, app) => {
+                                            const date = app.date;
+                                            if (!acc[date]) acc[date] = [];
+                                            acc[date].push(app);
+                                            return acc;
+                                        }, {})
+                                    ).sort(([dateA], [dateB]) => dateA.localeCompare(dateB)).map(([date, dayApps]: [string, any[]]) => (
+                                        <div key={date}>
+                                            <div className="bg-muted/30 px-4 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                                                <Calendar className="w-3 h-3" />
+                                                {new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
                                             </div>
+                                            {dayApps.map((app, idx) => (
+                                                <div key={idx} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                                            <Music className="w-5 h-5" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-bold text-foreground uppercase">
+                                                                Prof. {app.course?.teacher?.name || app.school_class?.teacher?.name || "A definir"}
+                                                            </p>
+                                                            <p className="text-xs text-muted-foreground uppercase mt-0.5">
+                                                                {app.start_time.substring(0, 5)} {app.school_class?.name ? `• ${app.school_class.name}` : ''}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     ))
                                 ) : (

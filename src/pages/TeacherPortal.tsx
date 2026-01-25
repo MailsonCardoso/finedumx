@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -18,7 +19,6 @@ import { Badge } from "@/components/ui/badge";
 import { KPICard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 
 interface TeacherData {
     teacher: {
@@ -132,54 +132,71 @@ export default function TeacherPortal() {
                                 </thead>
                                 <tbody className="divide-y divide-border/50">
                                     {filteredAppointments.length > 0 ? (
-                                        filteredAppointments.map((app, idx) => (
-                                            <tr key={idx} className="hover:bg-muted/30 transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-bold text-foreground">
-                                                            {new Date(app.date + 'T12:00:00').toLocaleDateString('pt-BR')}
-                                                        </span>
-                                                        <span className="text-xs text-muted-foreground">
-                                                            {app.start_time.substring(0, 5)}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <BookOpen className="w-4 h-4 text-primary/60" />
-                                                        <span className="font-bold text-foreground uppercase tracking-tight">
-                                                            {app.school_class?.name || app.course?.name || "Aula"}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    {app.type === 'individual' ? (
+                                        Object.entries(
+                                            filteredAppointments.reduce((acc: any, app) => {
+                                                const date = app.date;
+                                                if (!acc[date]) acc[date] = [];
+                                                acc[date].push(app);
+                                                return acc;
+                                            }, {})
+                                        ).sort(([dateA], [dateB]) => dateA.localeCompare(dateB)).map(([date, dayApps]: [string, any[]]) => (
+                                            <React.Fragment key={date}>
+                                                <tr className="bg-muted/10 border-b border-border/50">
+                                                    <td colSpan={5} className="px-6 py-2 text-[10px] font-bold text-primary uppercase tracking-wider">
                                                         <div className="flex items-center gap-2">
-                                                            <GraduationCap className="w-4 h-4 text-muted-foreground" />
-                                                            <span>{app.student?.name || "Não informado"}</span>
+                                                            <Calendar className="w-3 h-3" />
+                                                            {new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
                                                         </div>
-                                                    ) : (
-                                                        <div className="flex items-center gap-2">
-                                                            <Users className="w-4 h-4 text-muted-foreground" />
-                                                            <span>{app.school_class?.students?.length || 0} Alunos</span>
-                                                        </div>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <Badge variant="outline" className="font-medium border-border/50">
-                                                        {app.duration} min
-                                                    </Badge>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    {app.status === 'realizado' ? (
-                                                        <StatusBadge status="success">Realizado</StatusBadge>
-                                                    ) : app.status === 'falta' ? (
-                                                        <StatusBadge status="danger">Falta</StatusBadge>
-                                                    ) : (
-                                                        <StatusBadge status="warning">Pendente</StatusBadge>
-                                                    )}
-                                                </td>
-                                            </tr>
+                                                    </td>
+                                                </tr>
+                                                {dayApps.map((app, idx) => (
+                                                    <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex items-center gap-2">
+                                                                <Clock className="w-4 h-4 text-muted-foreground" />
+                                                                <span className="font-bold text-foreground">
+                                                                    {app.start_time.substring(0, 5)}
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex items-center gap-2">
+                                                                <BookOpen className="w-4 h-4 text-primary/60" />
+                                                                <span className="font-bold text-foreground uppercase tracking-tight">
+                                                                    {app.school_class?.name || app.course?.name || "Aula"}
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {app.type === 'individual' ? (
+                                                                <div className="flex items-center gap-2">
+                                                                    <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                                                                    <span>{app.student?.name || "Não informado"}</span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex items-center gap-2">
+                                                                    <Users className="w-4 h-4 text-muted-foreground" />
+                                                                    <span>{app.school_class?.students?.length || 0} Alunos</span>
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <Badge variant="outline" className="font-medium border-border/50">
+                                                                {app.duration}
+                                                            </Badge>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {app.status === 'realizado' ? (
+                                                                <StatusBadge status="success">Realizado</StatusBadge>
+                                                            ) : app.status === 'falta' ? (
+                                                                <StatusBadge status="danger">Falta</StatusBadge>
+                                                            ) : (
+                                                                <StatusBadge status="warning">Pendente</StatusBadge>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </React.Fragment>
                                         ))
                                     ) : (
                                         <tr>
