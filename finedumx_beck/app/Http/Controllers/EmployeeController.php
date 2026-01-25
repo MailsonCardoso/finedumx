@@ -47,6 +47,30 @@ class EmployeeController extends Controller
 
         $employee = Employee::create($validated);
 
+        // Criar usuário de acesso para o portal (CPF limpo ou Email)
+        $login = null;
+        if ($employee->cpf) {
+            $login = preg_replace('/\D/', '', $employee->cpf);
+        }
+
+        if ($login) {
+            // Verificar se já existe usuário com esse login
+            $userExists = \App\Models\User::where('email', $login)
+                ->orWhere('cpf', $login)
+                ->exists();
+
+            if (!$userExists) {
+                \App\Models\User::create([
+                    'name' => $employee->name,
+                    'email' => $login,
+                    'cpf' => $login,
+                    'password' => \Illuminate\Support\Facades\Hash::make($login),
+                    'role' => $employee->is_teacher ? 'teacher' : 'staff', // staff como default se não for teacher
+                    'employee_id' => $employee->id
+                ]);
+            }
+        }
+
         return response()->json($employee, 201);
     }
 
@@ -76,6 +100,39 @@ class EmployeeController extends Controller
         ]);
 
         $employee->update($validated);
+
+        // Sincronizar usuário
+        if ($employee->cpf) {
+            $login = preg_replace('/\D/', '', $employee->cpf);
+            if ($login) {
+                $user = \App\Models\User::where('employee_id', $employee->id)->first();
+                
+                if ($user) {
+                    $user->update([
+                        'name' => $employee->name,
+                        'email' => $login,
+                        'cpf' => $login,
+                        'role' => $employee->is_teacher ? 'teacher' : 'staff',
+                    ]);
+                } else {
+                    // Criar se não existir
+                    $userExists = \App\Models\User::where('email', $login)
+                        ->orWhere('cpf', $login)
+                        ->exists();
+                    
+                    if (!$userExists) {
+                        \App\Models\User::create([
+                            'name' => $employee->name,
+                            'email' => $login,
+                            'cpf' => $login,
+                            'password' => \Illuminate\Support\Facades\Hash::make($login),
+                            'role' => $employee->is_teacher ? 'teacher' : 'staff',
+                            'employee_id' => $employee->id
+                        ]);
+                    }
+                }
+            }
+        }
 
         return response()->json($employee);
     }
