@@ -21,8 +21,16 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, Edit2, Trash2, Loader2, BookOpen, User, Calendar, DollarSign } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Loader2, BookOpen, User, Calendar, DollarSign, MoreVertical } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -201,6 +209,29 @@ export default function Courses() {
                                     {/* Top Accent */}
                                     <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 to-primary/40" />
 
+                                    {/* Actions Menu Absolute */}
+                                    <div className="absolute top-3 right-3 z-10">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-[160px]">
+                                                <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                                                <DropdownMenuItem onClick={() => openEdit(course)}>
+                                                    <Edit2 className="mr-2 h-4 w-4" />
+                                                    Editar
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => openDelete(course)}>
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Excluir
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+
                                     <div className="p-5 flex flex-col gap-4 h-full pt-7">
                                         {/* Header */}
                                         <div className="flex items-start justify-between gap-3">
@@ -209,7 +240,7 @@ export default function Courses() {
                                                     <BookOpen className="h-6 w-6" />
                                                 </div>
                                                 <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
-                                                    <h3 className="font-bold text-foreground leading-tight truncate w-full text-lg" title={course.name}>
+                                                    <h3 className="font-bold text-foreground leading-tight truncate w-full pr-6 text-lg" title={course.name}>
                                                         {course.name}
                                                     </h3>
                                                     {course.description && (
@@ -218,16 +249,6 @@ export default function Courses() {
                                                         </p>
                                                     )}
                                                 </div>
-                                            </div>
-
-                                            {/* Actions Button Group */}
-                                            <div className="flex items-center -mr-2 -mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => openEdit(course)}>
-                                                    <Edit2 className="h-3.5 w-3.5" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={() => openDelete(course)}>
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                </Button>
                                             </div>
                                         </div>
 
