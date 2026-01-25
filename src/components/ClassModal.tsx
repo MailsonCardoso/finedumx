@@ -21,6 +21,7 @@ import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
 import { Loader2, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ClassModalProps {
     isOpen: boolean;
@@ -41,6 +42,7 @@ const initialFormData = {
     room: "",
     status: "ativo",
     student_ids: [],
+    generate_appointments: false,
 };
 
 export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }: ClassModalProps) {
@@ -297,21 +299,63 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Dias e Sala</Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <Input
-                                        placeholder="Dias: Seg, Qua"
-                                        value={formData.days_of_week}
-                                        onChange={(e) => setFormData({ ...formData, days_of_week: e.target.value })}
-                                    />
-                                    <Input
-                                        placeholder="Sala"
-                                        value={formData.room}
-                                        onChange={(e) => setFormData({ ...formData, room: e.target.value })}
-                                    />
+                            <div className="space-y-3">
+                                <Label>Dias da Semana</Label>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-muted/20 p-3 rounded-xl border border-border/50">
+                                    {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'].map((day) => {
+                                        const days = formData.days_of_week ? formData.days_of_week.split(', ') : [];
+                                        const isChecked = days.includes(day);
+                                        return (
+                                            <div key={day} className="flex items-center gap-2">
+                                                <Checkbox
+                                                    id={`day-${day}`}
+                                                    checked={isChecked}
+                                                    onCheckedChange={(checked) => {
+                                                        let newDays;
+                                                        if (checked) {
+                                                            newDays = [...days, day];
+                                                        } else {
+                                                            newDays = days.filter(d => d !== day);
+                                                        }
+                                                        // Sort by typical week order
+                                                        const weekOrder = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+                                                        newDays.sort((a, b) => weekOrder.indexOf(a) - weekOrder.indexOf(b));
+                                                        setFormData({ ...formData, days_of_week: newDays.join(', ') });
+                                                    }}
+                                                />
+                                                <Label htmlFor={`day-${day}`} className="text-xs font-medium cursor-pointer">{day}</Label>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
+
+                            <div className="space-y-2">
+                                <Label>Sala</Label>
+                                <Input
+                                    placeholder="Ex: Sala 01, Auditório..."
+                                    value={formData.room}
+                                    onChange={(e) => setFormData({ ...formData, room: e.target.value })}
+                                />
+                            </div>
+
+                            {!isEditing && (
+                                <div className="flex items-center gap-2 bg-primary/5 p-3 rounded-xl border border-primary/10">
+                                    <Checkbox
+                                        id="generate_appointments"
+                                        checked={formData.generate_appointments}
+                                        onCheckedChange={(checked) => setFormData({ ...formData, generate_appointments: !!checked })}
+                                    />
+                                    <div className="grid gap-1 leading-none">
+                                        <Label htmlFor="generate_appointments" className="text-xs font-bold text-primary cursor-pointer">
+                                            Gerar agenda automaticamente
+                                        </Label>
+                                        <p className="text-[10px] text-muted-foreground">
+                                            Cria as aulas na agenda para todos os dias selecionados até 31/12/2026.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="space-y-2">
                                 <Label>Horário</Label>

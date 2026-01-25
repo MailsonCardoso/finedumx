@@ -7,6 +7,23 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [0.6.0] - 2026-01-25
+
+### ✨ Adicionado
+- **📅 Automação de Agenda**: Implementada geração automática de aulas para turmas.
+  - Seleção de dias da semana via Checkboxes (Segunda a Domingo).
+  - Opção "Gerar agenda automaticamente" ao criar ou editar uma turma.
+  - O sistema gera automaticamente todos os compromissos na agenda até 31/12/2026 para os dias selecionados.
+  - Cálculo automático de duração baseado no horário de início e fim.
+
+### 🔧 Melhorado
+- Substituído campo de texto livre de "Dias da Semana" por seletores fixos para evitar erros humanos.
+
+### 📦 Build
+- Build de produção gerado com as melhorias de automação (v0.6.0).
+
+---
+
 ## [0.5.0] - 2026-01-25
 
 ### ✨ Adicionado
@@ -121,5 +138,5 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
-**Versão Atual**: 0.5.0  
+**Versão Atual**: 0.6.0  
 **Data**: 25 de Janeiro de 2026

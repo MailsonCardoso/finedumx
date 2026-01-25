@@ -66,16 +66,21 @@ class SchoolClassController extends Controller
             'student_ids.*' => 'exists:students,id',
         ]);
 
-        $class = SchoolClass::create($validated);
+        $class = \App\Models\SchoolClass::create($validated);
 
         if (isset($validated['student_ids'])) {
             $class->students()->sync($validated['student_ids']);
         }
 
+        // Gerar agenda automática se solicitado
+        if ($request->input('generate_appointments') === true && $class->days_of_week) {
+            $this->generateAppointments($class);
+        }
+
         return response()->json($class->load(['course', 'teacher', 'students']), 201);
     }
 
-    public function show(SchoolClass $class)
+    public function show(\App\Models\SchoolClass $class)
     {
         return response()->json([
             'id' => $class->id,
@@ -102,7 +107,7 @@ class SchoolClassController extends Controller
         ]);
     }
 
-    public function update(Request $request, SchoolClass $class)
+    public function update(Request $request, \App\Models\SchoolClass $class)
     {
         $validated = $request->validate([
             'name' => 'required|string',
@@ -125,10 +130,80 @@ class SchoolClassController extends Controller
             $class->students()->sync($validated['student_ids']);
         }
 
+        // Gerar agenda automática se solicitado (em edição)
+        if ($request->input('generate_appointments') === true && $class->days_of_week) {
+            // Opcional: Remover agendamentos futuros antes de gerar novos para evitar duplicidade
+            \App\Models\Appointment::where('school_class_id', $class->id)
+                ->where('date', '>=', now()->toDateString())
+                ->where('status', 'agendado')
+                ->delete();
+
+            $this->generateAppointments($class);
+        }
+
         return response()->json($class->load(['course', 'teacher', 'students']));
     }
 
-    public function destroy(SchoolClass $class)
+    private function generateAppointments(\App\Models\SchoolClass $class)
+    {
+        $daysMap = [
+            'Segunda' => 1,
+            'Terça' => 2,
+            'Quarta' => 3,
+            'Quinta' => 4,
+            'Sexta' => 5,
+            'Sábado' => 6,
+            'Domingo' => 0,
+        ];
+
+        $selectedDays = explode(', ', $class->days_of_week);
+        $carbonDays = [];
+        foreach ($selectedDays as $day) {
+            if (isset($daysMap[$day])) {
+                $carbonDays[] = $daysMap[$day];
+            }
+        }
+
+        if (empty($carbonDays))
+            return;
+
+        $startDate = \Carbon\Carbon::today();
+        $endDate = \Carbon\Carbon::parse('2026-12-31');
+
+        $duration = "1h";
+        if ($class->start_time && $class->end_time) {
+            try {
+                $start = \Carbon\Carbon::parse($class->start_time);
+                $end = \Carbon\Carbon::parse($class->end_time);
+                $diff = $start->diff($end);
+                $duration = $diff->format('%Hh %Im');
+                $duration = str_replace(' 00m', '', $duration);
+                $duration = ltrim($duration, '0');
+                if (empty($duration))
+                    $duration = "1h";
+            } catch (\Exception $e) {
+                // Silently fallback to default duration
+            }
+        }
+
+        while ($startDate->lte($endDate)) {
+            if (in_array($startDate->dayOfWeek, $carbonDays)) {
+                \App\Models\Appointment::updateOrCreate([
+                    'school_class_id' => $class->id,
+                    'date' => $startDate->toDateString(),
+                    'type' => 'grupo',
+                ], [
+                    'course_id' => $class->course_id,
+                    'start_time' => $class->start_time,
+                    'duration' => $duration,
+                    'status' => 'agendado',
+                ]);
+            }
+            $startDate->addDay();
+        }
+    }
+
+    public function destroy(\App\Models\SchoolClass $class)
     {
         $class->delete();
         return response()->json(null, 204);
