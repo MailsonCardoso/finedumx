@@ -86,7 +86,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             <span className="font-bold text-lg text-foreground">FinEdu</span>
           )}
         </div>
-        {!collapsed && user?.role !== 'teacher' && <NotificationBell />}
+        {!collapsed && user?.role === 'admin' && <NotificationBell />}
       </div>
 
       {/* Menu */}

@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api-client";
+
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -28,6 +31,12 @@ export function MobileHeader() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { data: user } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => apiFetch<any>('/me'),
+  });
+
+
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 lg:hidden">
       <div className="flex items-center gap-3">
@@ -38,8 +47,9 @@ export function MobileHeader() {
       </div>
 
       <div className="flex items-center gap-2">
-        <NotificationBell />
+        {user?.role === 'admin' && <NotificationBell />}
         <ThemeToggle />
+
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon">
