@@ -33,11 +33,11 @@ interface AppSidebarProps {
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", roles: ["admin"] },
-  { icon: Users, label: "Alunos", path: "/alunos", roles: ["admin"] },
-  { icon: Briefcase, label: "Funcionários", path: "/funcionarios", roles: ["admin"] },
-  { icon: GraduationCap, label: "Turmas", path: "/turmas", roles: ["admin"] },
-  { icon: BookOpen, label: "Cursos", path: "/cursos", roles: ["admin"] },
   { icon: CalendarDays, label: "Agenda", path: "/agenda", roles: ["admin"] },
+  { icon: Users, label: "Alunos", path: "/alunos", roles: ["admin"] },
+  { icon: BookOpen, label: "Cursos", path: "/cursos", roles: ["admin"] },
+  { icon: GraduationCap, label: "Turmas", path: "/turmas", roles: ["admin"] },
+  { icon: Briefcase, label: "Funcionários", path: "/funcionarios", roles: ["admin"] },
   { icon: Calendar, label: "Mensalidades", path: "/mensalidades", roles: ["admin"] },
   { icon: CreditCard, label: "Pagamentos", path: "/pagamentos", roles: ["admin"] },
   { icon: Receipt, label: "Recibos", path: "/recibos", roles: ["admin"] },
