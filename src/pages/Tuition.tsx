@@ -4,6 +4,15 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -37,7 +46,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { AlertTriangle, Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle, Trash2 } from "lucide-react";
+import { AlertTriangle, Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle, Trash2, MoreVertical, Pencil, GraduationCap, FileText, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
@@ -609,7 +618,7 @@ export default function Tuition() {
                     {/* Header: Student & Status */}
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary shrink-0 border border-primary/10">
-                        {tuition.student?.name.charAt(0).toUpperCase()}
+                        {tuition.student?.name?.charAt(0).toUpperCase() || "A"}
                       </div>
                       <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
                         <h3 className="font-bold text-foreground leading-tight truncate w-full pr-6" title={tuition.student?.name}>
