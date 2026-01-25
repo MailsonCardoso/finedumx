@@ -277,16 +277,19 @@ export default function Courses() {
 
                                             {/* Footer: Price */}
                                             <div className="flex items-center justify-between px-2">
-                                                <div className="flex items-center gap-2 text-muted-foreground">
-                                                    <DollarSign className="w-4 h-4" />
-                                                    <span className="text-xs font-medium uppercase tracking-wider">Mensalidade</span>
+                                                <div className="flex items-center gap-2 text-muted-foreground/60">
+                                                    <DollarSign className="w-3.5 h-3.5" />
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Investimento</span>
                                                 </div>
-                                                <span className="font-bold text-lg text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                                                    {new Intl.NumberFormat("pt-BR", {
-                                                        style: "currency",
-                                                        currency: "BRL",
-                                                    }).format(course.price)}
-                                                </span>
+                                                <div className="flex items-center bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                                                    <span className="font-bold text-lg text-emerald-600">
+                                                        {new Intl.NumberFormat("pt-BR", {
+                                                            style: "currency",
+                                                            currency: "BRL",
+                                                        }).format(course.price)}
+                                                    </span>
+                                                    <span className="text-[11px] font-medium text-emerald-600/70 ml-0.5">/mês</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -313,190 +316,190 @@ export default function Courses() {
                         </div>
                     </motion.div>
                 )}
-
-                {/* Add Modal */}
-                <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Novo Curso / Matéria</DialogTitle>
-                            <DialogDescription>Defina as características básicas desta disciplina.</DialogDescription>
-                        </DialogHeader>
-                        <form onSubmit={(e) => handleSubmit(e, false)}>
-                            <div className="space-y-4 py-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Nome da Matéria</Label>
-                                    <Input
-                                        id="name"
-                                        placeholder="Ex: Violão, Piano, Canto Kids"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="price">Valor Mensalidade (R$)</Label>
-                                        <Input
-                                            id="price"
-                                            type="number"
-                                            step="0.01"
-                                            placeholder="0,00"
-                                            value={formData.price}
-                                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="days">Dias Sugeridos</Label>
-                                        <Input
-                                            id="days"
-                                            placeholder="Ex: Seg, Qua"
-                                            value={formData.days_of_week}
-                                            onChange={(e) => setFormData({ ...formData, days_of_week: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="teacher">Professor Sugerido</Label>
-                                    <Select
-                                        value={formData.teacher_id}
-                                        onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
-                                    >
-                                        <SelectTrigger id="teacher">
-                                            <SelectValue placeholder="Selecione um professor padrão" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="none">Nenhum (Livre)</SelectItem>
-                                            {teachers.map((teacher) => (
-                                                <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                                    {teacher.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="desc">Descrição / Requisitos (Opcional)</Label>
-                                    <Input
-                                        id="desc"
-                                        placeholder="Ex: Necessário instrumento próprio"
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button variant="outline" type="button" onClick={() => setIsAddOpen(false)}>Cancelar</Button>
-                                <Button type="submit" disabled={createMutation.isPending}>
-                                    {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                                    Salvar no Catálogo
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
-
-                {/* Edit Modal */}
-                <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Editar Matéria</DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={(e) => handleSubmit(e, true)}>
-                            <div className="space-y-4 py-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="edit-name">Nome da Matéria</Label>
-                                    <Input
-                                        id="edit-name"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="edit-price">Valor Mensalidade (R$)</Label>
-                                        <Input
-                                            id="edit-price"
-                                            type="number"
-                                            step="0.01"
-                                            value={formData.price}
-                                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="edit-days">Dias Sugeridos</Label>
-                                        <Input
-                                            id="edit-days"
-                                            placeholder="Ex: Seg, Qua"
-                                            value={formData.days_of_week}
-                                            onChange={(e) => setFormData({ ...formData, days_of_week: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="edit-teacher">Professor Sugerido</Label>
-                                    <Select
-                                        value={formData.teacher_id}
-                                        onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
-                                    >
-                                        <SelectTrigger id="edit-teacher">
-                                            <SelectValue placeholder="Selecione um professor padrão" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="none">Nenhum (Livre)</SelectItem>
-                                            {teachers.map((teacher) => (
-                                                <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                                    {teacher.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="edit-desc">Descrição</Label>
-                                    <Input
-                                        id="edit-desc"
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button variant="outline" type="button" onClick={() => setIsEditOpen(false)}>Cancelar</Button>
-                                <Button type="submit" disabled={updateMutation.isPending}>
-                                    {updateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                                    Salvar Alterações
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
-
-                {/* Delete Dialog */}
-                <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Excluir do Catálogo?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Isso removerá a matéria do catálogo de ofertas. Alunos já vinculados continuarão matriculados, mas não será possível criar novas execuções (Turmas/Agenda) para este curso.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                                onClick={() => deleteMutation.mutate()}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                disabled={deleteMutation.isPending}
-                            >
-                                {deleteMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                                Confirmar Exclusão
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
             </div>
+
+            {/* Add Modal */}
+            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Novo Curso / Matéria</DialogTitle>
+                        <DialogDescription>Defina as características básicas desta disciplina.</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={(e) => handleSubmit(e, false)}>
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Nome da Matéria</Label>
+                                <Input
+                                    id="name"
+                                    placeholder="Ex: Violão, Piano, Canto Kids"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="price">Valor Mensalidade (R$)</Label>
+                                    <Input
+                                        id="price"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0,00"
+                                        value={formData.price}
+                                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="days">Dias Sugeridos</Label>
+                                    <Input
+                                        id="days"
+                                        placeholder="Ex: Seg, Qua"
+                                        value={formData.days_of_week}
+                                        onChange={(e) => setFormData({ ...formData, days_of_week: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="teacher">Professor Sugerido</Label>
+                                <Select
+                                    value={formData.teacher_id}
+                                    onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
+                                >
+                                    <SelectTrigger id="teacher">
+                                        <SelectValue placeholder="Selecione um professor padrão" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">Nenhum (Livre)</SelectItem>
+                                        {teachers.map((teacher) => (
+                                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                                {teacher.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="desc">Descrição / Requisitos (Opcional)</Label>
+                                <Input
+                                    id="desc"
+                                    placeholder="Ex: Necessário instrumento próprio"
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" type="button" onClick={() => setIsAddOpen(false)}>Cancelar</Button>
+                            <Button type="submit" disabled={createMutation.isPending}>
+                                {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                                Salvar no Catálogo
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Modal */}
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Editar Matéria</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={(e) => handleSubmit(e, true)}>
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="edit-name">Nome da Matéria</Label>
+                                <Input
+                                    id="edit-name"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="edit-price">Valor Mensalidade (R$)</Label>
+                                    <Input
+                                        id="edit-price"
+                                        type="number"
+                                        step="0.01"
+                                        value={formData.price}
+                                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="edit-days">Dias Sugeridos</Label>
+                                    <Input
+                                        id="edit-days"
+                                        placeholder="Ex: Seg, Qua"
+                                        value={formData.days_of_week}
+                                        onChange={(e) => setFormData({ ...formData, days_of_week: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="edit-teacher">Professor Sugerido</Label>
+                                <Select
+                                    value={formData.teacher_id}
+                                    onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
+                                >
+                                    <SelectTrigger id="edit-teacher">
+                                        <SelectValue placeholder="Selecione um professor padrão" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">Nenhum (Livre)</SelectItem>
+                                        {teachers.map((teacher) => (
+                                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                                {teacher.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="edit-desc">Descrição</Label>
+                                <Input
+                                    id="edit-desc"
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" type="button" onClick={() => setIsEditOpen(false)}>Cancelar</Button>
+                            <Button type="submit" disabled={updateMutation.isPending}>
+                                {updateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                                Salvar Alterações
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Dialog */}
+            <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir do Catálogo?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Isso removerá a matéria do catálogo de ofertas. Alunos já vinculados continuarão matriculados, mas não será possível criar novas execuções (Turmas/Agenda) para este curso.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => deleteMutation.mutate()}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            disabled={deleteMutation.isPending}
+                        >
+                            {deleteMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                            Confirmar Exclusão
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </MainLayout >
     );
 }
