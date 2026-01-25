@@ -291,7 +291,7 @@ export default function Tuition() {
     });
   };
 
-  const handleWhatsAppClick = (tuition: Tuition) => {
+  const sendWhatsAppMessage = (tuition: Tuition) => {
     // Check if notified recently (within last 5 days)
     if (tuition.last_notification_at) {
       const lastNotify = new Date(tuition.last_notification_at);
@@ -611,7 +611,7 @@ export default function Tuition() {
                           </DropdownMenuItem>
                         )}
 
-                        <DropdownMenuItem onClick={() => handleWhatsAppClick(tuition)}>
+                        <DropdownMenuItem onClick={() => sendWhatsAppMessage(tuition)}>
                           <MessageCircle className="mr-2 h-4 w-4" />
                           Enviar WhatsApp
                         </DropdownMenuItem>

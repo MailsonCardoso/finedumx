@@ -192,28 +192,6 @@ export default function Payments() {
                   {/* Top Accent based on status */}
                   <div className={`absolute top-0 left-0 right-0 h-1.5 ${payment.status === 'confirmado' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
 
-                  {/* Actions Menu Absolute */}
-                  <div className="absolute top-3 right-3 z-10">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground bg-background/50 backdrop-blur-sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[160px]">
-                        <DropdownMenuLabel>Opções</DropdownMenuLabel>
-                        <DropdownMenuItem disabled>
-                          <FileText className="mr-2 h-4 w-4" />
-                          Gerar Recibo
-                        </DropdownMenuItem>
-                        <DropdownMenuItem disabled>
-                          <Eye className="mr-2 h-4 w-4" />
-                          Ver Detalhes
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-
                   <div className="p-6 flex flex-col gap-5 h-full pt-8">
                     {/* Header: Student & Status */}
                     <div className="flex items-center gap-3">
