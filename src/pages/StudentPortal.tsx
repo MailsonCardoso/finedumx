@@ -25,7 +25,7 @@ interface PortalData {
     student: {
         name: string;
         student: {
-            course: string;
+            course: string | { name: string };
             monthly_fee: string;
         }
     };
@@ -108,7 +108,7 @@ export default function StudentPortal() {
                     <KPICard
                         index={0}
                         title="Meu Curso"
-                        value={data?.student?.student?.course || "Nenhum"}
+                        value={data?.student?.student?.course?.name || data?.student?.student?.course || "Nenhum"}
                         icon={<GraduationCap className="w-5 h-5" />}
                         className="border-primary/20 bg-primary/5"
                     />

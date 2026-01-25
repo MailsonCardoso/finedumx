@@ -80,7 +80,7 @@ class StudentPortalController extends Controller
         })->with('course')->get();
 
         return response()->json([
-            'student' => $user->load('student'),
+            'student' => $user->load('student.course'),
             'appointments' => $appointments,
             'tuitions' => $tuitions,
             'presences' => $presences,
