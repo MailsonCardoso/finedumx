@@ -318,8 +318,6 @@ export default function Employees() {
                                 <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
                                     <TableHead className="font-bold h-14 text-foreground">Nome</TableHead>
                                     <TableHead className="font-bold h-14 text-foreground">Cargo</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Departamento</TableHead>
-                                    <TableHead className="font-bold h-14 text-foreground">Admissão</TableHead>
                                     <TableHead className="font-bold h-14 text-foreground">Salário</TableHead>
                                     <TableHead className="font-bold h-14 text-foreground">Status</TableHead>
                                     <TableHead className="font-bold h-14 text-foreground text-right pr-6">Ações</TableHead>
@@ -328,7 +326,7 @@ export default function Employees() {
                             <TableBody>
                                 {isLoading ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="h-48 text-center">
+                                        <TableCell colSpan={5} className="h-48 text-center">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                                 <p className="text-muted-foreground">Carregando funcionários...</p>
@@ -354,12 +352,6 @@ export default function Employees() {
                                                 </TableCell>
                                                 <TableCell className="py-4 text-muted-foreground">
                                                     {employee.role}
-                                                </TableCell>
-                                                <TableCell className="py-4 text-muted-foreground">
-                                                    {employee.department}
-                                                </TableCell>
-                                                <TableCell className="py-4 text-muted-foreground">
-                                                    {formatDate(employee.hire_date)}
                                                 </TableCell>
                                                 <TableCell className="py-4 font-bold text-foreground">
                                                     {formatCurrency(employee.salary)}
