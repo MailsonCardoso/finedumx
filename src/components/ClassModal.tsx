@@ -300,31 +300,45 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                             </div>
 
                             <div className="space-y-3">
-                                <Label>Dias da Semana</Label>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-muted/20 p-3 rounded-xl border border-border/50">
-                                    {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'].map((day) => {
+                                <Label className="text-sm font-semibold">Dias de Aula</Label>
+                                <div className="flex flex-wrap gap-2 py-1">
+                                    {[
+                                        { full: 'Segunda', short: 'S' },
+                                        { full: 'Terça', short: 'T' },
+                                        { full: 'Quarta', short: 'Q' },
+                                        { full: 'Quinta', short: 'Q' },
+                                        { full: 'Sexta', short: 'S' },
+                                        { full: 'Sábado', short: 'S' },
+                                        { full: 'Domingo', short: 'D' }
+                                    ].map((day) => {
                                         const days = formData.days_of_week ? formData.days_of_week.split(', ') : [];
-                                        const isChecked = days.includes(day);
+                                        const isChecked = days.includes(day.full);
                                         return (
-                                            <div key={day} className="flex items-center gap-2">
-                                                <Checkbox
-                                                    id={`day-${day}`}
-                                                    checked={isChecked}
-                                                    onCheckedChange={(checked) => {
-                                                        let newDays;
-                                                        if (checked) {
-                                                            newDays = [...days, day];
-                                                        } else {
-                                                            newDays = days.filter(d => d !== day);
-                                                        }
-                                                        // Sort by typical week order
-                                                        const weekOrder = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-                                                        newDays.sort((a, b) => weekOrder.indexOf(a) - weekOrder.indexOf(b));
-                                                        setFormData({ ...formData, days_of_week: newDays.join(', ') });
-                                                    }}
-                                                />
-                                                <Label htmlFor={`day-${day}`} className="text-xs font-medium cursor-pointer">{day}</Label>
-                                            </div>
+                                            <button
+                                                key={day.full}
+                                                type="button"
+                                                title={day.full}
+                                                onClick={() => {
+                                                    let newDays;
+                                                    if (!isChecked) {
+                                                        newDays = [...days, day.full];
+                                                    } else {
+                                                        newDays = days.filter(d => d !== day.full);
+                                                    }
+                                                    const weekOrder = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+                                                    newDays.sort((a, b) => weekOrder.indexOf(a) - weekOrder.indexOf(b));
+                                                    setFormData({ ...formData, days_of_week: newDays.join(', ') });
+                                                }}
+                                                className={`
+                                                    w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200
+                                                    ${isChecked
+                                                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105 border-transparent"
+                                                        : "bg-transparent text-muted-foreground border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 hover:text-primary"
+                                                    }
+                                                `}
+                                            >
+                                                {day.short}
+                                            </button>
                                         );
                                     })}
                                 </div>
