@@ -281,14 +281,14 @@ export default function Courses() {
                                                     <DollarSign className="w-3.5 h-3.5" />
                                                     <span className="text-[10px] font-bold uppercase tracking-widest">Mensalidade</span>
                                                 </div>
-                                                <div className="flex items-center bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-                                                    <span className="font-bold text-lg text-emerald-600">
+                                                <div className="text-right">
+                                                    <span className="font-bold text-foreground text-lg">
                                                         {new Intl.NumberFormat("pt-BR", {
                                                             style: "currency",
                                                             currency: "BRL",
                                                         }).format(course.price)}
                                                     </span>
-                                                    <span className="text-[11px] font-medium text-emerald-600/70 ml-0.5">/mês</span>
+                                                    <span className="text-xs font-medium text-muted-foreground ml-1">/mês</span>
                                                 </div>
                                             </div>
                                         </div>
