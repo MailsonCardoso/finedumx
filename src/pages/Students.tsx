@@ -34,7 +34,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Filter, UserX, Loader2, Pencil, Trash2, Eye, DollarSign, User, Mail, FileText, Phone, Users, Calendar, GraduationCap } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Plus, Search, Filter, UserX, Loader2, Pencil, Trash2, Eye, DollarSign, User, Mail, FileText, Phone, Users, Calendar, GraduationCap, MoreVertical } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -352,18 +360,29 @@ export default function Students() {
                         </div>
                       </div>
 
-                      {/* Actions Button Group */}
-                      <div className="flex items-center -mr-2 -mt-1 opacity-0 group-hover:opacity-100 transition-opacity scale-90 origin-top-right">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => { setSheetStudentId(student.id); setIsSheetOpen(true); }}>
-                          <Eye className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleEditClick(student)}>
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={() => handleDeleteClick(student)}>
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="-mr-2 -mt-1 h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px]">
+                          <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => { setSheetStudentId(student.id); setIsSheetOpen(true); }}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Detalhes
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditClick(student)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDeleteClick(student)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
 
                     {/* Body Information */}
