@@ -423,11 +423,11 @@ export default function Students() {
                             Dia {student.due_day}
                           </div>
                         </div>
-                        <div className="flex items-center bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-                          <span className="font-bold text-lg text-emerald-600">
+                        <div className="text-right">
+                          <span className="font-bold text-foreground text-lg">
                             {formatCurrency(student.monthly_fee)}
                           </span>
-                          <span className="text-[11px] font-medium text-emerald-600/70 ml-0.5">/mês</span>
+                          <span className="text-xs font-medium text-muted-foreground ml-1">/mês</span>
                         </div>
                       </div>
                     </div>
