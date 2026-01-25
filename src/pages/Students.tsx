@@ -425,23 +425,27 @@ export default function Students() {
 
         {/* Add/Edit Modal */}
         <Dialog open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-4xl">
             <DialogHeader>
               <DialogTitle>{isEditOpen ? "Editar Aluno" : "Novo Aluno"}</DialogTitle>
               <DialogDescription>
                 Preencha os dados abaixo para {isEditOpen ? "atualizar" : "cadastrar"} o aluno.
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-6 py-2">
-                {/* Seção Pessoal */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-muted-foreground border-b border-border/50 pb-2 flex items-center gap-2">
-                    <User className="w-4 h-4" /> Dados Pessoais
-                  </h4>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                  <div className="grid gap-4">
-                    {/* Linha 1: Nome */}
+                {/* Coluna Esquerda: Dados Pessoais */}
+                <div className="space-y-5">
+                  <div className="flex items-center gap-2 pb-2 border-b border-border/50">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <h4 className="font-semibold text-foreground">Dados Pessoais</h4>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* Nome */}
                     <div className="space-y-2">
                       <Label htmlFor="name">Nome Completo</Label>
                       <div className="relative">
@@ -452,12 +456,12 @@ export default function Students() {
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           placeholder="Ex: João da Silva"
                           required
-                          className="pl-9"
+                          className="pl-9 h-11"
                         />
                       </div>
                     </div>
 
-                    {/* Linha 2: Responsável */}
+                    {/* Responsável */}
                     <div className="space-y-2">
                       <Label htmlFor="responsible">Responsável (opcional)</Label>
                       <div className="relative">
@@ -467,13 +471,13 @@ export default function Students() {
                           value={formData.active_responsible}
                           onChange={(e) => setFormData({ ...formData, active_responsible: e.target.value })}
                           placeholder="Nome do pai/mãe"
-                          className="pl-9"
+                          className="pl-9 h-11"
                         />
                       </div>
                     </div>
 
-                    {/* Linha 3: CPF e Telefone */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* CPF e Telefone (agora em linha na coluna) */}
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
                         <Label htmlFor="cpf">CPF</Label>
                         <div className="relative">
@@ -490,9 +494,9 @@ export default function Students() {
                               if (value.length >= 10) masked += '-' + value.substring(9, 11);
                               setFormData({ ...formData, cpf: masked });
                             }}
-                            placeholder="000.000.000-00"
+                            placeholder="000.000..."
                             maxLength={14}
-                            className="pl-9"
+                            className="pl-9 h-11"
                           />
                         </div>
                       </div>
@@ -511,15 +515,15 @@ export default function Students() {
                               if (value.length >= 8) masked += '-' + value.substring(7, 11);
                               setFormData({ ...formData, phone: masked });
                             }}
-                            placeholder="(00) 00000-0000"
+                            placeholder="(00) 00..."
                             maxLength={15}
-                            className="pl-9"
+                            className="pl-9 h-11"
                           />
                         </div>
                       </div>
                     </div>
 
-                    {/* Linha 4: Email */}
+                    {/* Email */}
                     <div className="space-y-2">
                       <Label htmlFor="email">E-mail</Label>
                       <div className="relative">
@@ -531,23 +535,26 @@ export default function Students() {
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                           placeholder="joao@email.com"
                           required
-                          className="pl-9"
+                          className="pl-9 h-11"
                         />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Seção Financeira */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-muted-foreground border-b border-border/50 pb-2 flex items-center gap-2">
-                    <DollarSign className="w-4 h-4" /> Informações Financeiras
-                  </h4>
+                {/* Coluna Direita: Financeiro */}
+                <div className="space-y-5">
+                  <div className="flex items-center gap-2 pb-2 border-b border-border/50">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                      <DollarSign className="w-4 h-4" />
+                    </div>
+                    <h4 className="font-semibold text-foreground">Financeiro</h4>
+                  </div>
 
-                  <div className="grid gap-4">
-                    {/* Linha 1: Curso e Data */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="sm:col-span-2 space-y-2">
+                  <div className="space-y-4">
+                    {/* Curso e Status */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2 col-span-2 sm:col-span-1">
                         <Label htmlFor="course">Curso / Modalidade</Label>
                         <Select
                           value={formData.course_id}
@@ -560,7 +567,7 @@ export default function Students() {
                             });
                           }}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="h-11">
                             <SelectValue placeholder="Selecione..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -579,49 +586,13 @@ export default function Students() {
                           </div>
                         )}
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="due_day">Vencimento (Dia)</Label>
-                        <div className="relative">
-                          <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="due_day"
-                            type="number"
-                            min="1"
-                            max="31"
-                            value={formData.due_day}
-                            onChange={(e) => setFormData({ ...formData, due_day: parseInt(e.target.value) })}
-                            required
-                            className="pl-9"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Linha 2: Valor e Status */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="monthly_fee">Valor Mensal (R$)</Label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-2.5 text-sm font-bold text-muted-foreground">R$</span>
-                          <Input
-                            id="monthly_fee"
-                            type="number"
-                            step="0.01"
-                            value={formData.monthly_fee}
-                            onChange={(e) => setFormData({ ...formData, monthly_fee: e.target.value })}
-                            placeholder="0.00"
-                            required
-                            className="pl-9"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 col-span-2 sm:col-span-1">
                         <Label htmlFor="status">Status</Label>
                         <Select
                           value={formData.status || "ativo"}
                           onValueChange={(value) => setFormData({ ...formData, status: value })}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="h-11">
                             <SelectValue placeholder="Selecione..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -631,60 +602,89 @@ export default function Students() {
                         </Select>
                       </div>
                     </div>
+
+                    {/* Valor e Vencimento */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="monthly_fee">Valor Mensal (R$)</Label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-3 text-sm font-bold text-muted-foreground">R$</span>
+                          <Input
+                            id="monthly_fee"
+                            type="number"
+                            step="0.01"
+                            value={formData.monthly_fee}
+                            onChange={(e) => setFormData({ ...formData, monthly_fee: e.target.value })}
+                            placeholder="0.00"
+                            required
+                            className="pl-9 h-11 font-medium"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="due_day">Vencimento (Dia)</Label>
+                        <div className="relative">
+                          <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="due_day"
+                            type="number"
+                            min="1"
+                            max="31"
+                            value={formData.due_day}
+                            onChange={(e) => setFormData({ ...formData, due_day: parseInt(e.target.value) })}
+                            required
+                            className="pl-9 h-11"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Cobranças Iniciais (Apenas na Criação) */}
+                    {isAddOpen && (
+                      <div className="bg-muted/30 border border-border/50 p-4 rounded-xl space-y-3 mt-2">
+                        <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Cobranças Iniciais</h5>
+
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <Checkbox
+                              id="gen_mat"
+                              checked={formData.generate_matricula}
+                              onCheckedChange={(checked) => setFormData({ ...formData, generate_matricula: checked as boolean })}
+                            />
+                            <div className="flex-1">
+                              <Label htmlFor="gen_mat" className="text-sm font-medium cursor-pointer block">Taxa de Matrícula</Label>
+                              <span className="text-[10px] text-muted-foreground block">Gera cobrança pra hoje.</span>
+                            </div>
+                            {formData.generate_matricula && (
+                              <Input
+                                type="number"
+                                value={formData.matricula_value}
+                                onChange={(e) => setFormData({ ...formData, matricula_value: parseFloat(e.target.value) })}
+                                className="h-8 w-20 text-right"
+                                placeholder="Valor"
+                              />
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <Checkbox
+                              id="gen_tui"
+                              checked={formData.generate_tuition}
+                              onCheckedChange={(checked) => setFormData({ ...formData, generate_tuition: checked as boolean })}
+                            />
+                            <div>
+                              <Label htmlFor="gen_tui" className="text-sm font-medium cursor-pointer block">1ª Mensalidade</Label>
+                              <span className="text-[10px] text-muted-foreground block">Para o mês que vem.</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {isAddOpen && (
-                  <div className="bg-muted/20 border border-border/50 p-4 rounded-xl space-y-3 mt-4">
-                    <h3 className="font-medium text-sm text-foreground/80">
-                      Cobranças Iniciais
-                    </h3>
-
-                    <div className="flex items-center justify-between p-3 bg-background rounded-lg border border-border/40 shadow-sm">
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          id="gen_mat"
-                          checked={formData.generate_matricula}
-                          onCheckedChange={(checked) => setFormData({ ...formData, generate_matricula: checked as boolean })}
-                        />
-                        <div className="grid gap-0.5">
-                          <Label htmlFor="gen_mat" className="font-medium text-sm cursor-pointer">
-                            Gerar Matrícula Agora
-                          </Label>
-                          <span className="text-[11px] text-muted-foreground">Cobrança avulsa para pagamento hoje.</span>
-                        </div>
-                      </div>
-                      {formData.generate_matricula && (
-                        <div className="w-24">
-                          <Input
-                            type="number"
-                            value={formData.matricula_value}
-                            onChange={(e) => setFormData({ ...formData, matricula_value: parseFloat(e.target.value) })}
-                            className="h-8 text-right pr-2"
-                            placeholder="Value"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center p-3 bg-background rounded-lg border border-border/40 shadow-sm">
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          id="gen_tui"
-                          checked={formData.generate_tuition}
-                          onCheckedChange={(checked) => setFormData({ ...formData, generate_tuition: checked as boolean })}
-                        />
-                        <div className="grid gap-0.5">
-                          <Label htmlFor="gen_tui" className="font-medium text-sm cursor-pointer">
-                            Gerar 1ª Mensalidade
-                          </Label>
-                          <span className="text-[11px] text-muted-foreground">Lança a primeira mensalidade para o mês que vem.</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
+
 
 
               <DialogFooter>
