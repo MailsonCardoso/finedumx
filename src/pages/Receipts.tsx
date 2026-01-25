@@ -84,8 +84,8 @@ export default function Receipts() {
                     <div className="p-2 rounded-lg bg-primary/10">
                       <ReceiptIcon className="w-5 h-5 text-primary" />
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
-                      #{receipt.id.toString().padStart(6, '0')}
+                    <span className="text-xs font-bold text-muted-foreground bg-muted px-2 py-1 rounded">
+                      RECIBO Nº {receipt.id.toString().padStart(6, '0')}
                     </span>
                   </div>
 

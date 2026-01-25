@@ -72,6 +72,15 @@ interface Tuition {
   type?: 'mensalidade' | 'matricula' | 'rematricula';
   student: Student;
   last_notification_at?: string;
+  payment_id?: number;
+}
+
+interface Payment {
+  id: number;
+  tuition_id?: number;
+  student_id: number;
+  amount: number;
+  payment_date: string;
 }
 
 export default function Tuition() {
@@ -195,6 +204,21 @@ export default function Tuition() {
     queryKey: ['students'],
     queryFn: () => apiFetch('/students'),
   });
+
+  const { data: payments = [] } = useQuery<Payment[]>({
+    queryKey: ['payments'],
+    queryFn: () => apiFetch('/payments'),
+  });
+
+  // Helper to find the payment ID for a given tuition
+  const getTuitionPaymentId = (tuition: Tuition) => {
+    // 1. Check if the tuition object already has payment_id (best case)
+    if (tuition.payment_id) return tuition.payment_id;
+
+    // 2. Lookup in the payments list (fallback)
+    const payment = payments.find(p => p.tuition_id === tuition.id);
+    return payment ? payment.id : tuition.id; // fallback to tuition id if not found
+  };
 
   // Mutations
   const payMutation = useMutation({
@@ -987,7 +1011,7 @@ export default function Tuition() {
 
               <div className="flex justify-between items-center mb-8">
                 <div className="text-xl font-bold border-2 border-black p-2 px-4 rounded">
-                  RECIBO Nº {selectedTuition?.id.toString().padStart(6, '0')}
+                  RECIBO Nº {selectedTuition ? getTuitionPaymentId(selectedTuition).toString().padStart(6, '0') : "000000"}
                 </div>
                 <div className="text-xl font-bold">
                   VALOR: {selectedTuition && formatCurrency(Number(selectedTuition.amount))}
