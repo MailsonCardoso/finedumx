@@ -337,7 +337,35 @@ export default function Students() {
                   className="bg-card rounded-[24px] shadow-sm hover:shadow-lg transition-all border border-border/40 overflow-hidden relative flex flex-col group h-full"
                 >
                   {/* Top Accent */}
+                  {/* Top Accent */}
                   <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 to-primary/40" />
+
+                  {/* Actions Menu Absolute */}
+                  <div className="absolute top-3 right-3 z-10">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[160px]">
+                        <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => { setSheetStudentId(student.id); setIsSheetOpen(true); }}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          Detalhes
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEditClick(student)}>
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDeleteClick(student)}>
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
 
                   <div className="p-5 flex flex-col gap-4 h-full pt-7">
                     {/* Header */}
@@ -347,7 +375,7 @@ export default function Students() {
                           {student.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
-                          <h3 className="font-bold text-foreground leading-tight truncate w-full" title={student.name}>
+                          <h3 className="font-bold text-foreground leading-tight truncate w-full pr-6" title={student.name}>
                             {student.name}
                           </h3>
                           {student.active_responsible ? (
@@ -359,30 +387,6 @@ export default function Students() {
                           )}
                         </div>
                       </div>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[160px]">
-                          <DropdownMenuLabel>Opções</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => { setSheetStudentId(student.id); setIsSheetOpen(true); }}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            Detalhes
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEditClick(student)}>
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDeleteClick(student)}>
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
 
                     {/* Body Information */}
