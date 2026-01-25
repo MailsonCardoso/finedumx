@@ -279,7 +279,7 @@ export default function Courses() {
                                             <div className="flex items-center justify-between px-2">
                                                 <div className="flex items-center gap-2 text-muted-foreground/60">
                                                     <DollarSign className="w-3.5 h-3.5" />
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Investimento</span>
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Mensalidade</span>
                                                 </div>
                                                 <div className="flex items-center bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
                                                     <span className="font-bold text-lg text-emerald-600">
@@ -339,7 +339,7 @@ export default function Courses() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="price">Valor Mensalidade (R$)</Label>
+                                    <Label htmlFor="price">Mensalidade (R$/mês)</Label>
                                     <Input
                                         id="price"
                                         type="number"
@@ -419,7 +419,7 @@ export default function Courses() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-price">Valor Mensalidade (R$)</Label>
+                                    <Label htmlFor="edit-price">Mensalidade (R$/mês)</Label>
                                     <Input
                                         id="edit-price"
                                         type="number"

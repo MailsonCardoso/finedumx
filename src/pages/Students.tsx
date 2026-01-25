@@ -423,9 +423,12 @@ export default function Students() {
                             Dia {student.due_day}
                           </div>
                         </div>
-                        <span className="font-bold text-foreground">
-                          {formatCurrency(student.monthly_fee)}
-                        </span>
+                        <div className="flex items-center bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                          <span className="font-bold text-lg text-emerald-600">
+                            {formatCurrency(student.monthly_fee)}
+                          </span>
+                          <span className="text-[11px] font-medium text-emerald-600/70 ml-0.5">/mês</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -643,7 +646,7 @@ export default function Students() {
                     {/* Valor e Vencimento */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <Label htmlFor="monthly_fee">Valor Mensal (R$)</Label>
+                        <Label htmlFor="monthly_fee">Mensalidade (R$/mês)</Label>
                         <div className="relative">
                           <span className="absolute left-3 top-3 text-sm font-bold text-muted-foreground">R$</span>
                           <Input
