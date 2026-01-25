@@ -40,7 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Filter, UserX, Loader2, Pencil, Trash2, Eye, DollarSign } from "lucide-react";
+import { Plus, Search, Filter, UserX, Loader2, Pencil, Trash2, Eye, DollarSign, User, Mail, FileText, Phone, Users, Calendar } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -433,228 +433,259 @@ export default function Students() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nome do Aluno</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Ex: João da Silva"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="responsible">Responsável</Label>
-                    <Input
-                      id="responsible"
-                      value={formData.active_responsible}
-                      onChange={(e) => setFormData({ ...formData, active_responsible: e.target.value })}
-                      placeholder="Nome do pai/mãe"
-                    />
+              <div className="space-y-6 py-2">
+                {/* Seção Pessoal */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-muted-foreground border-b border-border/50 pb-2 flex items-center gap-2">
+                    <User className="w-4 h-4" /> Dados Pessoais
+                  </h4>
+
+                  <div className="grid gap-4">
+                    {/* Linha 1: Nome */}
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nome Completo</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="name"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          placeholder="Ex: João da Silva"
+                          required
+                          className="pl-9"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Linha 2: Responsável */}
+                    <div className="space-y-2">
+                      <Label htmlFor="responsible">Responsável (opcional)</Label>
+                      <div className="relative">
+                        <Users className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="responsible"
+                          value={formData.active_responsible}
+                          onChange={(e) => setFormData({ ...formData, active_responsible: e.target.value })}
+                          placeholder="Nome do pai/mãe"
+                          className="pl-9"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Linha 3: CPF e Telefone */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="cpf">CPF</Label>
+                        <div className="relative">
+                          <FileText className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="cpf"
+                            value={formData.cpf || ""}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, '');
+                              let masked = value;
+                              if (value.length > 0) masked = value.substring(0, 3);
+                              if (value.length >= 4) masked += '.' + value.substring(3, 6);
+                              if (value.length >= 7) masked += '.' + value.substring(6, 9);
+                              if (value.length >= 10) masked += '-' + value.substring(9, 11);
+                              setFormData({ ...formData, cpf: masked });
+                            }}
+                            placeholder="000.000.000-00"
+                            maxLength={14}
+                            className="pl-9"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Telefone</Label>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="phone"
+                            value={formData.phone}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, '');
+                              let masked = value;
+                              if (value.length > 0) masked = '(' + value.substring(0, 2);
+                              if (value.length >= 3) masked += ') ' + value.substring(2, 7);
+                              if (value.length >= 8) masked += '-' + value.substring(7, 11);
+                              setFormData({ ...formData, phone: masked });
+                            }}
+                            placeholder="(00) 00000-0000"
+                            maxLength={15}
+                            className="pl-9"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Linha 4: Email */}
+                    <div className="space-y-2">
+                      <Label htmlFor="email">E-mail</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          placeholder="joao@email.com"
+                          required
+                          className="pl-9"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">E-mail</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="joao@email.com"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cpf">CPF</Label>
-                    <Input
-                      id="cpf"
-                      value={formData.cpf || ""}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '');
-                        let masked = value;
+                {/* Seção Financeira */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-muted-foreground border-b border-border/50 pb-2 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" /> Informações Financeiras
+                  </h4>
 
-                        if (value.length > 0) {
-                          masked = value.substring(0, 3);
-                        }
-                        if (value.length >= 4) {
-                          masked += '.' + value.substring(3, 6);
-                        }
-                        if (value.length >= 7) {
-                          masked += '.' + value.substring(6, 9);
-                        }
-                        if (value.length >= 10) {
-                          masked += '-' + value.substring(9, 11);
-                        }
-
-                        setFormData({ ...formData, cpf: masked });
-                      }}
-                      placeholder="000.000.000-00"
-                      maxLength={14}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Telefone</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '');
-                      let masked = value;
-
-                      if (value.length > 0) {
-                        masked = '(' + value.substring(0, 2);
-                      }
-                      if (value.length >= 3) {
-                        masked += ') ' + value.substring(2, 7);
-                      }
-                      if (value.length >= 8) {
-                        masked += '-' + value.substring(7, 11);
-                      }
-
-                      setFormData({ ...formData, phone: masked });
-                    }}
-                    placeholder="(00) 00000-0000"
-                    maxLength={15}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="course">Modalidade (Curso)</Label>
-                    <Select
-                      value={formData.course_id}
-                      onValueChange={(value) => {
-                        const course = coursesData?.find((c: any) => c.id.toString() === value);
-                        setFormData({
-                          ...formData,
-                          course_id: value,
-                          monthly_fee: course ? course.price : formData.monthly_fee
-                        });
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {coursesData?.map((course: any) => (
-                          <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {formData.course_id && (
-                      <div className="mt-2 text-xs text-muted-foreground p-2 bg-muted/50 rounded-lg border border-border/50">
-                        {getCourseShifts(formData.course_id).length > 0 ? (
-                          <p><span className="font-semibold text-primary">Turnos disponíveis:</span> {getCourseShifts(formData.course_id).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ')}</p>
-                        ) : (
-                          <p className="italic text-muted-foreground/70">Nenhuma turma cadastrada para este curso ainda.</p>
+                  <div className="grid gap-4">
+                    {/* Linha 1: Curso e Data */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="sm:col-span-2 space-y-2">
+                        <Label htmlFor="course">Curso / Modalidade</Label>
+                        <Select
+                          value={formData.course_id}
+                          onValueChange={(value) => {
+                            const course = coursesData?.find((c: any) => c.id.toString() === value);
+                            setFormData({
+                              ...formData,
+                              course_id: value,
+                              monthly_fee: course ? course.price : formData.monthly_fee
+                            });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {coursesData?.map((course: any) => (
+                              <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {formData.course_id && (
+                          <div className="mt-1 text-[11px] text-muted-foreground px-2 py-1 bg-muted/30 rounded border border-border/30">
+                            {getCourseShifts(formData.course_id).length > 0 ? (
+                              <p><span className="font-semibold text-primary">Turnos:</span> {getCourseShifts(formData.course_id).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ')}</p>
+                            ) : (
+                              <p className="italic opacity-70">Sem turmas cadastradas.</p>
+                            )}
+                          </div>
                         )}
                       </div>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="due_day">Dia Vencimento</Label>
-                    <Input
-                      id="due_day"
-                      type="number"
-                      min="1"
-                      max="31"
-                      value={formData.due_day}
-                      onChange={(e) => setFormData({ ...formData, due_day: parseInt(e.target.value) })}
-                      required
-                    />
-                  </div>
-                </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="due_day">Vencimento (Dia)</Label>
+                        <div className="relative">
+                          <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="due_day"
+                            type="number"
+                            min="1"
+                            max="31"
+                            value={formData.due_day}
+                            onChange={(e) => setFormData({ ...formData, due_day: parseInt(e.target.value) })}
+                            required
+                            className="pl-9"
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="monthly_fee">Valor da Mensalidade (R$)</Label>
-                    <Input
-                      id="monthly_fee"
-                      type="number"
-                      step="0.01"
-                      value={formData.monthly_fee}
-                      onChange={(e) => setFormData({ ...formData, monthly_fee: e.target.value })}
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Status</Label>
-                    <Select
-                      value={formData.status || "ativo"}
-                      onValueChange={(value) => setFormData({ ...formData, status: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ativo">Ativo</SelectItem>
-                        <SelectItem value="inativo">Inativo</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {/* Linha 2: Valor e Status */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="monthly_fee">Valor Mensal (R$)</Label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2.5 text-sm font-bold text-muted-foreground">R$</span>
+                          <Input
+                            id="monthly_fee"
+                            type="number"
+                            step="0.01"
+                            value={formData.monthly_fee}
+                            onChange={(e) => setFormData({ ...formData, monthly_fee: e.target.value })}
+                            placeholder="0.00"
+                            required
+                            className="pl-9"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="status">Status</Label>
+                        <Select
+                          value={formData.status || "ativo"}
+                          onValueChange={(value) => setFormData({ ...formData, status: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ativo">Ativo</SelectItem>
+                            <SelectItem value="inativo">Inativo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {isAddOpen && (
-                  <div className="bg-emerald-500/5 border-emerald-500/20 p-4 rounded-lg border space-y-4 mt-4">
-                    <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-primary" />
-                      Financeiro Inicial
+                  <div className="bg-muted/20 border border-border/50 p-4 rounded-xl space-y-3 mt-4">
+                    <h3 className="font-medium text-sm text-foreground/80">
+                      Cobranças Iniciais
                     </h3>
 
-                    <div className="flex items-start space-x-3">
-                      <Checkbox
-                        id="gen_mat"
-                        checked={formData.generate_matricula}
-                        onCheckedChange={(checked) => setFormData({ ...formData, generate_matricula: checked as boolean })}
-                      />
-                      <div className="grid gap-1.5 leading-none">
-                        <Label htmlFor="gen_mat" className="font-medium cursor-pointer">
-                          Gerar Taxa de Matrícula
-                        </Label>
-                        <p className="text-xs text-muted-foreground">
-                          Cria uma cobrança avulsa de matrícula para hoje.
-                        </p>
+                    <div className="flex items-center justify-between p-3 bg-background rounded-lg border border-border/40 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id="gen_mat"
+                          checked={formData.generate_matricula}
+                          onCheckedChange={(checked) => setFormData({ ...formData, generate_matricula: checked as boolean })}
+                        />
+                        <div className="grid gap-0.5">
+                          <Label htmlFor="gen_mat" className="font-medium text-sm cursor-pointer">
+                            Gerar Matrícula Agora
+                          </Label>
+                          <span className="text-[11px] text-muted-foreground">Cobrança avulsa para pagamento hoje.</span>
+                        </div>
                       </div>
+                      {formData.generate_matricula && (
+                        <div className="w-24">
+                          <Input
+                            type="number"
+                            value={formData.matricula_value}
+                            onChange={(e) => setFormData({ ...formData, matricula_value: parseFloat(e.target.value) })}
+                            className="h-8 text-right pr-2"
+                            placeholder="Value"
+                          />
+                        </div>
+                      )}
                     </div>
 
-                    {formData.generate_matricula && (
-                      <div className="pl-7 w-1/2">
-                        <Label htmlFor="mat_val" className="text-xs">Valor da Matrícula</Label>
-                        <Input
-                          id="mat_val"
-                          type="number"
-                          value={formData.matricula_value}
-                          onChange={(e) => setFormData({ ...formData, matricula_value: parseFloat(e.target.value) })}
-                          className="h-8 mt-1"
+                    <div className="flex items-center p-3 bg-background rounded-lg border border-border/40 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id="gen_tui"
+                          checked={formData.generate_tuition}
+                          onCheckedChange={(checked) => setFormData({ ...formData, generate_tuition: checked as boolean })}
                         />
-                      </div>
-                    )}
-
-                    <div className="flex items-start space-x-3 pt-2">
-                      <Checkbox
-                        id="gen_tui"
-                        checked={formData.generate_tuition}
-                        onCheckedChange={(checked) => setFormData({ ...formData, generate_tuition: checked as boolean })}
-                      />
-                      <div className="grid gap-1.5 leading-none">
-                        <Label htmlFor="gen_tui" className="font-medium cursor-pointer">
-                          Gerar 1ª Mensalidade (Mês Seguinte)
-                        </Label>
-                        <p className="text-xs text-muted-foreground">
-                          Já lança a mensalidade para vencer no mês que vem.
-                        </p>
+                        <div className="grid gap-0.5">
+                          <Label htmlFor="gen_tui" className="font-medium text-sm cursor-pointer">
+                            Gerar 1ª Mensalidade
+                          </Label>
+                          <span className="text-[11px] text-muted-foreground">Lança a primeira mensalidade para o mês que vem.</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
               </div>
+
 
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}>Cancelar</Button>
