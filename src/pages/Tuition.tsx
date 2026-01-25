@@ -624,8 +624,23 @@ export default function Tuition() {
                         <h3 className="font-bold text-foreground leading-tight truncate w-full pr-6" title={tuition.student?.name}>
                           {tuition.student?.name}
                         </h3>
-                        <div className="scale-90 origin-left">
-                          {getStatusBadge(tuition)}
+                        <div className="flex items-center gap-2">
+                          <div className="scale-90 origin-left">
+                            {getStatusBadge(tuition)}
+                          </div>
+                          {tuition.last_notification_at && (() => {
+                            const lastNotify = new Date(tuition.last_notification_at);
+                            const diffDays = (new Date().getTime() - lastNotify.getTime()) / (1000 * 60 * 60 * 24);
+                            if (diffDays < 7) {
+                              return (
+                                <div className="flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded border border-emerald-500/20" title={`Notificado em: ${lastNotify.toLocaleString('pt-BR')}`}>
+                                  <MessageCircle className="w-3 h-3" />
+                                  <span>Notificado</span>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })()}
                         </div>
                       </div>
                     </div>
