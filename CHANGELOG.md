@@ -7,6 +7,22 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [0.5.0] - 2026-01-25
+
+### ✨ Adicionado
+- **🔐 Portal do Professor/Funcionário**: Implementada criação automática de usuários de acesso.
+  - Ao cadastrar um funcionário com CPF, um usuário é criado automaticamente.
+  - Login e Senha padrão baseados no CPF (apenas números).
+  - Atribuição automática de perfis (`teacher` ou `staff`).
+
+### 🐛 Corrigido
+- Falha no login de novos professores/funcionários por falta de conta de usuário vinculada.
+
+### 📦 Build
+- Build de produção gerado com as correções de acesso (v0.5.0).
+
+---
+
 ## [0.4.0] - 2026-01-22
 
 ### ✨ Adicionado
@@ -105,5 +121,5 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
-**Versão Atual**: 0.3.0  
-**Data**: 22 de Janeiro de 2026
+**Versão Atual**: 0.5.0  
+**Data**: 25 de Janeiro de 2026
