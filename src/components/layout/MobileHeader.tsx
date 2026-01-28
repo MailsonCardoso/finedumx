@@ -43,7 +43,7 @@ export function MobileHeader() {
         <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
           <Wallet className="w-5 h-5 text-primary-foreground" />
         </div>
-        <span className="font-bold text-lg">FinEdu</span>
+        <span className="font-bold text-lg">PlatFormX</span>
       </div>
 
       <div className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export function MobileHeader() {
                 <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
                   <Wallet className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="font-bold text-lg">FinEdu</span>
+                <span className="font-bold text-lg">PlatFormX</span>
               </div>
             </div>
             <nav className="p-4">

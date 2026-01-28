@@ -83,7 +83,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             <Wallet className="w-5 h-5 text-primary-foreground" />
           </div>
           {!collapsed && (
-            <span className="font-bold text-lg text-foreground">FinEdu</span>
+            <span className="font-bold text-lg text-foreground">PlatFormX</span>
           )}
         </div>
         {!collapsed && user?.role === 'admin' && <NotificationBell />}

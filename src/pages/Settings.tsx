@@ -112,7 +112,7 @@ export default function Settings() {
                 <div>
                   <CardTitle className="text-xl">Interface e Visual</CardTitle>
                   <CardDescription>
-                    Escolha como o FinEdu deve aparecer para você
+                    Escolha como o PlatFormX deve aparecer para você
                   </CardDescription>
                 </div>
               </div>

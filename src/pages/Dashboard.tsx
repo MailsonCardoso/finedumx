@@ -138,7 +138,7 @@ export default function Dashboard() {
           <div>
             <h1 className="text-3xl font-bold text-foreground tracking-tight">Dashboard</h1>
             <p className="text-muted-foreground mt-1 text-lg">
-              Bem-vindo ao centro de controle financeiro da FinEdu.
+              Bem-vindo ao centro de controle financeiro da PlatFormX.
             </p>
           </div>
           <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-xl border border-border/50 shadow-sm self-start md:self-center">

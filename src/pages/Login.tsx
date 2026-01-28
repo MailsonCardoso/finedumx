@@ -110,7 +110,7 @@ export default function Login() {
           className="bg-card/70 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-border/50 p-10 relative"
         >
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">FinEdu</h1>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">PlatFormX</h1>
             <p className="text-muted-foreground mt-2 font-medium">
               Gestão Financeira
             </p>
@@ -189,7 +189,7 @@ export default function Login() {
           transition={{ delay: 0.8 }}
           className="text-xs text-center text-muted-foreground mt-10 font-medium"
         >
-          © 2026 FinEdu • Software de Alto Desempenho
+          © 2026 PlatFormX • Software de Alto Desempenho
         </motion.p>
       </div>
     </div>
