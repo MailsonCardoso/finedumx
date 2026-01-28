@@ -130,8 +130,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
           </Avatar>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user?.name || "Admin"}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email || "admin@finedu.com"}</p>
+              <p className="text-sm font-medium text-foreground truncate">{user?.name || "Admin PlatFormX"}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email || "admin@platformx.com"}</p>
             </div>
           )}
         </div>
