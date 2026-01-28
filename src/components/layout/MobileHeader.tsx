@@ -1,4 +1,4 @@
-import { Menu, GraduationCap } from "lucide-react";
+import { Menu, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -41,7 +41,7 @@ export function MobileHeader() {
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 lg:hidden">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-          <GraduationCap className="w-5 h-5 text-primary-foreground" />
+          <Wallet className="w-5 h-5 text-primary-foreground" />
         </div>
         <span className="font-bold text-lg">FinEdu</span>
       </div>
@@ -60,7 +60,7 @@ export function MobileHeader() {
             <div className="h-16 flex items-center px-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-                  <GraduationCap className="w-5 h-5 text-primary-foreground" />
+                  <Wallet className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <span className="font-bold text-lg">FinEdu</span>
               </div>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, GraduationCap } from "lucide-react";
+import { Loader2, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 import { apiFetch, setAuthToken } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -97,7 +97,7 @@ export default function Login() {
           <div className="relative group">
             <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-xl group-hover:bg-primary/30 transition-colors" />
             <div className="relative w-20 h-20 rounded-3xl bg-primary flex items-center justify-center shadow-2xl transition-transform hover:scale-105 duration-300">
-              <GraduationCap className="w-10 h-10 text-primary-foreground" />
+              <Wallet className="w-10 h-10 text-primary-foreground" />
             </div>
           </div>
         </motion.div>

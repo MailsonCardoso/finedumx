@@ -13,7 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  GraduationCap,
+  Wallet,
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,7 +36,7 @@ const menuItems = [
   { icon: CalendarDays, label: "Agenda", path: "/agenda", roles: ["admin"] },
   { icon: Users, label: "Alunos", path: "/alunos", roles: ["admin"] },
   { icon: BookOpen, label: "Cursos", path: "/cursos", roles: ["admin"] },
-  { icon: GraduationCap, label: "Turmas", path: "/turmas", roles: ["admin"] },
+  { icon: Wallet, label: "Turmas", path: "/turmas", roles: ["admin"] },
   { icon: Briefcase, label: "Funcionários", path: "/funcionarios", roles: ["admin"] },
   { icon: Calendar, label: "Mensalidades", path: "/mensalidades", roles: ["admin"] },
   { icon: CreditCard, label: "Pagamentos", path: "/pagamentos", roles: ["admin"] },
@@ -80,7 +80,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
       <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
-            <GraduationCap className="w-5 h-5 text-primary-foreground" />
+            <Wallet className="w-5 h-5 text-primary-foreground" />
           </div>
           {!collapsed && (
             <span className="font-bold text-lg text-foreground">FinEdu</span>
