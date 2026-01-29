@@ -32,16 +32,16 @@ interface AppSidebarProps {
 }
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", roles: ["admin"] },
-  { icon: CalendarDays, label: "Agenda", path: "/agenda", roles: ["admin"] },
-  { icon: Users, label: "Alunos", path: "/alunos", roles: ["admin"] },
-  { icon: BookOpen, label: "Cursos", path: "/cursos", roles: ["admin"] },
-  { icon: Wallet, label: "Turmas", path: "/turmas", roles: ["admin"] },
-  { icon: Briefcase, label: "Funcionários", path: "/funcionarios", roles: ["admin"] },
-  { icon: Calendar, label: "Mensalidades", path: "/mensalidades", roles: ["admin"] },
-  { icon: CreditCard, label: "Pagamentos", path: "/pagamentos", roles: ["admin"] },
-  { icon: Receipt, label: "Recibos", path: "/recibos", roles: ["admin"] },
-  { icon: Settings, label: "Configurações", path: "/configuracoes", roles: ["admin"] },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", roles: ["admin", "Financeiro", "Administrativo"] },
+  { icon: CalendarDays, label: "Agenda", path: "/agenda", roles: ["admin", "Administrativo"] },
+  { icon: Users, label: "Alunos", path: "/alunos", roles: ["admin", "Administrativo"] },
+  { icon: BookOpen, label: "Cursos", path: "/cursos", roles: ["admin", "Administrativo"] },
+  { icon: Wallet, label: "Turmas", path: "/turmas", roles: ["admin", "Administrativo"] },
+  { icon: Briefcase, label: "Funcionários", path: "/funcionarios", roles: ["admin", "Administrativo"] },
+  { icon: Calendar, label: "Mensalidades", path: "/mensalidades", roles: ["admin", "Financeiro"] },
+  { icon: CreditCard, label: "Pagamentos", path: "/pagamentos", roles: ["admin", "Financeiro"] },
+  { icon: Receipt, label: "Recibos", path: "/recibos", roles: ["admin", "Financeiro"] },
+  { icon: Settings, label: "Configurações", path: "/configuracoes", roles: ["admin", "Financeiro", "Administrativo"] },
   { icon: LayoutDashboard, label: "Meu Portal", path: "/portal", roles: ["student"] },
   { icon: LayoutDashboard, label: "Meu Portal", path: "/professor", roles: ["teacher"] },
 ];

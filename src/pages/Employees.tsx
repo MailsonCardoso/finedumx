@@ -613,6 +613,8 @@ export default function Employees() {
                                                 <SelectValue placeholder="Selecione o cargo" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                                <SelectItem value="Administrativo">Administrativo</SelectItem>
+                                                <SelectItem value="Financeiro">Financeiro</SelectItem>
                                                 <SelectItem value="Secretaria">Secretaria</SelectItem>
                                                 <SelectItem value="Professor">Professor</SelectItem>
                                                 <SelectItem value="Professora">Professora</SelectItem>
