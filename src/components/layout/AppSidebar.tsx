@@ -32,16 +32,16 @@ interface AppSidebarProps {
 }
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", roles: ["admin", "Financeiro", "Administrativo"] },
-  { icon: CalendarDays, label: "Agenda", path: "/agenda", roles: ["admin", "Administrativo"] },
-  { icon: Users, label: "Alunos", path: "/alunos", roles: ["admin", "Administrativo"] },
-  { icon: BookOpen, label: "Cursos", path: "/cursos", roles: ["admin", "Administrativo"] },
-  { icon: Wallet, label: "Turmas", path: "/turmas", roles: ["admin", "Administrativo"] },
-  { icon: Briefcase, label: "Funcionários", path: "/funcionarios", roles: ["admin", "Administrativo"] },
-  { icon: Calendar, label: "Mensalidades", path: "/mensalidades", roles: ["admin", "Financeiro"] },
-  { icon: CreditCard, label: "Pagamentos", path: "/pagamentos", roles: ["admin", "Financeiro"] },
-  { icon: Receipt, label: "Recibos", path: "/recibos", roles: ["admin", "Financeiro"] },
-  { icon: Settings, label: "Configurações", path: "/configuracoes", roles: ["admin", "Financeiro", "Administrativo"] },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", roles: ["admin", "financeiro", "administrativo"] },
+  { icon: CalendarDays, label: "Agenda", path: "/agenda", roles: ["admin", "administrativo"] },
+  { icon: Users, label: "Alunos", path: "/alunos", roles: ["admin", "administrativo"] },
+  { icon: BookOpen, label: "Cursos", path: "/cursos", roles: ["admin", "administrativo"] },
+  { icon: Wallet, label: "Turmas", path: "/turmas", roles: ["admin", "administrativo"] },
+  { icon: Briefcase, label: "Funcionários", path: "/funcionarios", roles: ["admin", "administrativo"] },
+  { icon: Calendar, label: "Mensalidades", path: "/mensalidades", roles: ["admin", "financeiro"] },
+  { icon: CreditCard, label: "Pagamentos", path: "/pagamentos", roles: ["admin", "financeiro"] },
+  { icon: Receipt, label: "Recibos", path: "/recibos", roles: ["admin", "financeiro"] },
+  { icon: Settings, label: "Configurações", path: "/configuracoes", roles: ["admin", "financeiro", "administrativo"] },
   { icon: LayoutDashboard, label: "Meu Portal", path: "/portal", roles: ["student"] },
   { icon: LayoutDashboard, label: "Meu Portal", path: "/professor", roles: ["teacher"] },
 ];
@@ -93,7 +93,10 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
       <nav className="flex-1 py-4 px-3 overflow-y-auto">
         <ul className="space-y-1">
           {menuItems
-            .filter(item => item.roles.includes(user?.role || "admin"))
+            .filter(item => {
+              const userRole = (user?.role || "admin").toLowerCase();
+              return item.roles.some(role => role.toLowerCase() === userRole);
+            })
             .map((item) => {
               const isActive = location.pathname === item.path;
               return (

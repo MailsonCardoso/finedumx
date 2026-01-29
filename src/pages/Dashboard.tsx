@@ -131,9 +131,10 @@ export default function Dashboard() {
     );
   }
 
-  const isFinanceiro = user?.role === 'Financeiro';
-  const isAdministrativo = user?.role === 'Administrativo';
-  const isAdmin = user?.role === 'admin';
+  const role = (user?.role || "").toLowerCase();
+  const isFinanceiro = role === 'financeiro';
+  const isAdministrativo = role === 'administrativo';
+  const isAdmin = role === 'admin';
 
   return (
     <MainLayout>
