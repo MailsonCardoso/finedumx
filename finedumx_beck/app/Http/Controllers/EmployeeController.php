@@ -65,7 +65,7 @@ class EmployeeController extends Controller
                     'email' => $login,
                     'cpf' => $login,
                     'password' => \Illuminate\Support\Facades\Hash::make($login),
-                    'role' => $employee->is_teacher ? 'teacher' : 'staff', // staff como default se não for teacher
+                    'role' => $employee->is_teacher ? 'teacher' : ($employee->role ?: 'staff'), // Usa o cargo do funcionário se disponível
                     'employee_id' => $employee->id
                 ]);
             }
@@ -106,27 +106,27 @@ class EmployeeController extends Controller
             $login = preg_replace('/\D/', '', $employee->cpf);
             if ($login) {
                 $user = \App\Models\User::where('employee_id', $employee->id)->first();
-                
+
                 if ($user) {
                     $user->update([
                         'name' => $employee->name,
                         'email' => $login,
                         'cpf' => $login,
-                        'role' => $employee->is_teacher ? 'teacher' : 'staff',
+                        'role' => $employee->is_teacher ? 'teacher' : ($employee->role ?: 'staff'),
                     ]);
                 } else {
                     // Criar se não existir
                     $userExists = \App\Models\User::where('email', $login)
                         ->orWhere('cpf', $login)
                         ->exists();
-                    
+
                     if (!$userExists) {
                         \App\Models\User::create([
                             'name' => $employee->name,
                             'email' => $login,
                             'cpf' => $login,
                             'password' => \Illuminate\Support\Facades\Hash::make($login),
-                            'role' => $employee->is_teacher ? 'teacher' : 'staff',
+                            'role' => $employee->is_teacher ? 'teacher' : ($employee->role ?: 'staff'),
                             'employee_id' => $employee->id
                         ]);
                     }
