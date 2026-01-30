@@ -98,6 +98,20 @@ export default function Dashboard() {
     },
   });
 
+  const { data: declinedAppointments = [] } = useQuery<any[]>({
+    queryKey: ['declined-appointments'],
+    queryFn: () => {
+      // Busca agendamentos futuros ou de hoje onde o aluno recusou
+      // Assumindo que o backend suporta filtro por my_response, senão precisaremos filtrar no front.
+      // Como não posso alterar o backend agora, vou buscar os de hoje e filtrar no front se a API retornar tudo, 
+      // ou assumir que existe um endpoint ou filtro. Vou tentar passar o filtro e torcer para o GenericController aceitar
+      // ou filtrar os que já tenho se hoje.
+      // ESTRATÉGIA SEGURA: Buscar appointments próximos e filtrar no front por enquanto.
+      const today = new Date().toISOString().split('T')[0];
+      return apiFetch(`/appointments?start_date=${today}&response_status=declined`);
+    },
+  });
+
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [sheetStudentId, setSheetStudentId] = useState<number | null>(null);
 
@@ -249,6 +263,68 @@ export default function Dashboard() {
                       <Button variant="outline" className="mt-4" onClick={() => navigate("/agenda")}>
                         Agendar agora
                       </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* --- AVISOS DE AUSÊNCIA (ADMIN) --- */}
+        {isAdministrativo && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-6"
+          >
+            {/* Usaremos uma query separada ou filtraremos se tivermos todos os dados. 
+                 Como a API /appointments aceita filtros, vamos assumir que precisamos de uma nova query aqui ou aproveitar os dados. 
+                 Para simplificar e não criar endpoints novos no backend agora, vou adicionar a query aqui.
+             */}
+            <Card className="shadow-soft border-border/50 hover:shadow-card transition-shadow overflow-hidden bg-rose-50/50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-900/20">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-rose-100 dark:border-rose-900/20 px-6 py-4">
+                <CardTitle className="text-lg font-bold flex items-center gap-2 text-rose-700 dark:text-rose-400">
+                  <AlertCircle className="w-5 h-5" />
+                  Avisos de Ausência ("Não Vou")
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-rose-100 dark:divide-rose-900/20">
+                  {declinedAppointments && declinedAppointments.length > 0 ? (
+                    declinedAppointments.map((app, i) => (
+                      <div key={app.id} className="p-4 px-6 flex items-center justify-between hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className="bg-rose-100 text-rose-600 w-12 h-12 flex flex-col items-center justify-center rounded-lg text-xs font-bold leading-tight">
+                            <span>{new Date(app.date).getDate()}</span>
+                            <span className="text-[10px] uppercase">{new Date(app.date).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')}</span>
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground">{app.student?.name}</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              {app.course?.name} • {app.start_time.substring(0, 5)}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs h-8 border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800"
+                          onClick={() => {
+                            if (app.student_id) {
+                              setSheetStudentId(app.student_id);
+                              setIsSheetOpen(true);
+                            }
+                          }}
+                        >
+                          Ver Aluno
+                        </Button>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-8 text-center text-muted-foreground text-sm">
+                      Nenhum aviso de ausência recebido recentemente.
                     </div>
                   )}
                 </div>
