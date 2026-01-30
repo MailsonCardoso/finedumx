@@ -618,8 +618,6 @@ export default function Employees() {
                                                 <SelectItem value="Secretaria">Secretaria</SelectItem>
                                                 <SelectItem value="Professor">Professor</SelectItem>
                                                 <SelectItem value="Professora">Professora</SelectItem>
-                                                <SelectItem value="Diretor">Diretor</SelectItem>
-                                                <SelectItem value="Outro">Outro</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
