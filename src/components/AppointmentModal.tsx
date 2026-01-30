@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, Calendar, Clock, User, BookOpen, GraduationCap, FileText, Pencil, X } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -35,6 +35,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 
 const appointmentSchema = z.object({
     type: z.enum(["individual", "grupo"]),
@@ -68,6 +69,9 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
     const isEditing = !!appointment && appointment.id !== undefined;
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+    // Default to view mode if editing an existing appointment, otherwise edit mode
+    const [isViewMode, setIsViewMode] = useState(false);
+
     const {
         register,
         handleSubmit,
@@ -89,6 +93,10 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
 
     useEffect(() => {
         if (appointment) {
+            // Se appointment existe, é visualização
+            if (appointment.id) setIsViewMode(true);
+            else setIsViewMode(false); // Novo agendamento (clique na data vazia)
+
             reset({
                 type: appointment.type,
                 student_id: appointment.student_id?.toString(),
@@ -101,6 +109,7 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                 notes: appointment.notes || "",
             });
         } else {
+            setIsViewMode(false);
             reset({
                 type: "individual",
                 status: "agendado",
@@ -165,211 +174,312 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
         mutation.mutate(data);
     };
 
+    // Helper functions for view mode
+    const getStudentName = () => {
+        const id = watch("student_id");
+        return students.find(s => s.id.toString() === id)?.name || "N/A";
+    };
+
+    const getClassName = () => {
+        const id = watch("school_class_id");
+        return classes.find(c => c.id.toString() === id)?.name || "N/A";
+    };
+
+    const getCourseName = () => {
+        const id = watch("course_id");
+        return courses.find(c => c.id.toString() === id)?.name || "N/A";
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-md">
                 <DialogHeader>
-                    <DialogTitle>{isEditing ? "Editar Agendamento" : "Novo Agendamento"}</DialogTitle>
+                    <DialogTitle>
+                        {isViewMode ? "Detalhes do Agendamento" : (isEditing ? "Editar Agendamento" : "Novo Agendamento")}
+                    </DialogTitle>
                     <DialogDescription>
-                        Preencha os detalhes da aula ou reunião abaixo.
+                        {isViewMode ? "Visualize as informações abaixo." : "Preencha os detalhes da aula ou reunião abaixo."}
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-1 gap-4">
-                        <div className="space-y-2">
-                            <Label>Tipo</Label>
-                            <Select
-                                value={selectedType}
-                                onValueChange={(val: any) => setValue("type", val)}
+                {isViewMode ? (
+                    // VIEW MODE
+                    <div className="space-y-6 py-2">
+                        <div className="flex items-center justify-between">
+                            <Badge
+                                variant={watch("status") === "realizado" ? "default" : (watch("status") === "falta" ? "destructive" : "secondary")}
+                                className="px-3 py-1 capitalize"
                             >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Selecione o tipo" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="individual">Individual</SelectItem>
-                                    <SelectItem value="grupo">Em Grupo</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                {watch("status")}
+                            </Badge>
+                            <Badge variant="outline" className="capitalize">{watch("type")}</Badge>
                         </div>
-                    </div>
 
-                    {selectedType === "individual" ? (
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>Aluno</Label>
-                                <Select
-                                    value={watch("student_id")}
-                                    onValueChange={(val) => {
-                                        setValue("student_id", val);
-                                        const student = students.find(s => s.id.toString() === val);
-                                        if (student && student.course_id) {
-                                            setValue("course_id", student.course_id.toString());
-                                        }
-                                    }}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selecione o aluno" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {students.map((student) => (
-                                            <SelectItem key={student.id} value={student.id.toString()}>
-                                                {student.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.student_id && (
-                                    <p className="text-xs text-destructive">{errors.student_id.message}</p>
-                                )}
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                    <Calendar className="w-3.5 h-3.5" /> Data
+                                </Label>
+                                <p className="font-medium text-sm">
+                                    {new Date(watch("date")).toLocaleDateString('pt-BR', { dateStyle: 'long' })}
+                                </p>
                             </div>
-
-                            <div className="space-y-2">
-                                <Label>Matéria / Disciplina</Label>
-                                <Select
-                                    value={watch("course_id")}
-                                    onValueChange={(val) => setValue("course_id", val)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selecione a matéria" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {courses.map((course) => (
-                                            <SelectItem key={course.id} value={course.id.toString()}>
-                                                {course.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                            <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                    <Clock className="w-3.5 h-3.5" /> Horário
+                                </Label>
+                                <p className="font-medium text-sm">
+                                    {watch("start_time")} ({watch("duration")} min)
+                                </p>
                             </div>
                         </div>
-                    ) : (
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>Turma</Label>
-                                <Select
-                                    value={watch("school_class_id")}
-                                    onValueChange={(val) => {
-                                        setValue("school_class_id", val);
-                                        const cls = classes.find(c => c.id.toString() === val);
-                                        if (cls && cls.course_id) {
-                                            setValue("course_id", cls.course_id.toString());
-                                        }
-                                    }}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selecione a turma" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {classes.map((cls) => (
-                                            <SelectItem key={cls.id} value={cls.id.toString()}>
-                                                {cls.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+
+                        <div className="space-y-4 pt-4 border-t border-border/50">
+                            {watch("type") === "individual" ? (
+                                <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                        <User className="w-3.5 h-3.5" /> Aluno
+                                    </Label>
+                                    <p className="font-medium">{getStudentName()}</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                        <GraduationCap className="w-3.5 h-3.5" /> Turma
+                                    </Label>
+                                    <p className="font-medium">{getClassName()}</p>
+                                </div>
+                            )}
+
+                            <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                    <BookOpen className="w-3.5 h-3.5" /> Matéria
+                                </Label>
+                                <p className="font-medium">{getCourseName()}</p>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Matéria (Vinculada à Turma)</Label>
-                                <Select
-                                    value={watch("course_id")}
-                                    disabled={true}
-                                >
-                                    <SelectTrigger className="bg-muted">
-                                        <SelectValue placeholder="Matéria da turma" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {courses.map((course) => (
-                                            <SelectItem key={course.id} value={course.id.toString()}>
-                                                {course.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label>Data</Label>
-                            <Input type="date" {...register("date")} />
-                            {errors.date && (
-                                <p className="text-xs text-destructive">{errors.date.message}</p>
+                            {watch("notes") && (
+                                <div className="space-y-1 bg-muted/20 p-3 rounded-md">
+                                    <Label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-1">
+                                        <FileText className="w-3.5 h-3.5" /> Observações
+                                    </Label>
+                                    <p className="text-sm italic text-foreground/80">{watch("notes")}</p>
+                                </div>
                             )}
                         </div>
-                        <div className="space-y-2">
-                            <Label>Hora Início</Label>
-                            <Input type="time" {...register("start_time")} />
-                            {errors.start_time && (
-                                <p className="text-xs text-destructive">{errors.start_time.message}</p>
-                            )}
-                        </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label>Duração (minutos)</Label>
-                            <Input type="number" {...register("duration")} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Status</Label>
-                            <Select
-                                value={watch("status")}
-                                onValueChange={(val: any) => setValue("status", val)}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="agendado">Agendado</SelectItem>
-                                    <SelectItem value="realizado">Realizado</SelectItem>
-                                    <SelectItem value="falta">Falta</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>Notas/Observações</Label>
-                        <Textarea
-                            placeholder="Detalhes adicionais..."
-                            {...register("notes")}
-                            className="resize-none"
-                        />
-                    </div>
-
-                    <DialogFooter className="flex-row justify-between items-center sm:justify-between">
-                        {isEditing ? (
+                        <DialogFooter className="flex-row justify-between sm:justify-between pt-4">
                             <Button
-                                type="button"
-                                variant="ghost"
-                                className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 px-2"
+                                variant="outline"
+                                className="text-destructive hover:text-destructive border-destructive/20 hover:bg-destructive/5"
                                 onClick={() => setIsDeleteDialogOpen(true)}
-                                disabled={deleteMutation.isPending}
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-4 h-4 mr-2" />
                                 Excluir
                             </Button>
-                        ) : (
-                            <div /> /* Spacer */
-                        )}
-                        <div className="flex gap-2">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => onOpenChange(false)}
-                            >
-                                Cancelar
-                            </Button>
-                            <Button type="submit" disabled={mutation.isPending}>
-                                {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {isEditing ? "Salvar Alterações" : "Agendar"}
-                            </Button>
+
+                            <div className="flex gap-2">
+                                <Button variant="ghost" onClick={() => onOpenChange(false)}>
+                                    Fechar
+                                </Button>
+                                <Button onClick={() => setIsViewMode(false)}>
+                                    <Pencil className="w-4 h-4 mr-2" />
+                                    Editar
+                                </Button>
+                            </div>
+                        </DialogFooter>
+                    </div>
+                ) : (
+                    // EDIT MODE (Original Form)
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-1 gap-4">
+                            <div className="space-y-2">
+                                <Label>Tipo</Label>
+                                <Select
+                                    value={selectedType}
+                                    onValueChange={(val: any) => setValue("type", val)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecione o tipo" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="individual">Individual</SelectItem>
+                                        <SelectItem value="grupo">Em Grupo</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
-                    </DialogFooter>
-                </form>
+
+                        {selectedType === "individual" ? (
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label>Aluno</Label>
+                                    <Select
+                                        value={watch("student_id")}
+                                        onValueChange={(val) => {
+                                            setValue("student_id", val);
+                                            const student = students.find(s => s.id.toString() === val);
+                                            if (student && student.course_id) {
+                                                setValue("course_id", student.course_id.toString());
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Selecione o aluno" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {students.map((student) => (
+                                                <SelectItem key={student.id} value={student.id.toString()}>
+                                                    {student.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.student_id && (
+                                        <p className="text-xs text-destructive">{errors.student_id.message}</p>
+                                    )}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Matéria / Disciplina</Label>
+                                    <Select
+                                        value={watch("course_id")}
+                                        onValueChange={(val) => setValue("course_id", val)}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Selecione a matéria" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {courses.map((course) => (
+                                                <SelectItem key={course.id} value={course.id.toString()}>
+                                                    {course.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label>Turma</Label>
+                                    <Select
+                                        value={watch("school_class_id")}
+                                        onValueChange={(val) => {
+                                            setValue("school_class_id", val);
+                                            const cls = classes.find(c => c.id.toString() === val);
+                                            if (cls && cls.course_id) {
+                                                setValue("course_id", cls.course_id.toString());
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Selecione a turma" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {classes.map((cls) => (
+                                                <SelectItem key={cls.id} value={cls.id.toString()}>
+                                                    {cls.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Matéria (Vinculada à Turma)</Label>
+                                    <Select
+                                        value={watch("course_id")}
+                                        disabled={true}
+                                    >
+                                        <SelectTrigger className="bg-muted">
+                                            <SelectValue placeholder="Matéria da turma" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {courses.map((course) => (
+                                                <SelectItem key={course.id} value={course.id.toString()}>
+                                                    {course.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Data</Label>
+                                <Input type="date" {...register("date")} />
+                                {errors.date && (
+                                    <p className="text-xs text-destructive">{errors.date.message}</p>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Hora Início</Label>
+                                <Input type="time" {...register("start_time")} />
+                                {errors.start_time && (
+                                    <p className="text-xs text-destructive">{errors.start_time.message}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Duração (minutos)</Label>
+                                <Input type="number" {...register("duration")} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Status</Label>
+                                <Select
+                                    value={watch("status")}
+                                    onValueChange={(val: any) => setValue("status", val)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="agendado">Agendado</SelectItem>
+                                        <SelectItem value="realizado">Realizado</SelectItem>
+                                        <SelectItem value="falta">Falta</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Notas/Observações</Label>
+                            <Textarea
+                                placeholder="Detalhes adicionais..."
+                                {...register("notes")}
+                                className="resize-none"
+                            />
+                        </div>
+
+                        <DialogFooter className="flex-row justify-between items-center sm:justify-between">
+                            <div />
+                            <div className="flex gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        if (appointment?.id) {
+                                            setIsViewMode(true); // Return to view mode
+                                        } else {
+                                            onOpenChange(false); // Close
+                                        }
+                                    }}
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button type="submit" disabled={mutation.isPending}>
+                                    {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    {isEditing ? "Salvar Alterações" : "Agendar"}
+                                </Button>
+                            </div>
+                        </DialogFooter>
+                    </form>
+                )}
             </DialogContent>
 
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -377,7 +487,7 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                     <AlertDialogHeader>
                         <AlertDialogTitle>Excluir Agendamento?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Esta ação não pode ser desfeita. O agendamento será removido permanentemente da agenda.
+                            Esta ação não pode ser desfeita.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
