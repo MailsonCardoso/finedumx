@@ -149,194 +149,138 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>{isEditing ? "Editar Turma" : "Nova Turma"}</DialogTitle>
-                    <DialogDescription>Configure os detalhes da aula coletiva.</DialogDescription>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader className="pb-2 border-b">
+                    <DialogTitle className="text-xl font-bold">{isEditing ? "Editar Turma" : "Nova Turma"}</DialogTitle>
+                    <DialogDescription>Configure os detalhes e horários da aula coletiva.</DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Nome da Turma</Label>
-                                <Input
-                                    id="name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Ex: Teoria Musical I"
-                                    required
-                                />
-                            </div>
+                <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-4">
+                        {/* Coluna da Esquerda: Informações Básicas e Horário (7 colunas) */}
+                        <div className="md:col-span-7 space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nome da Turma</Label>
+                                    <Input
+                                        id="name"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder="Ex: Teoria Musical I"
+                                        className="h-9"
+                                        required
+                                    />
+                                </div>
 
-                            <div className="space-y-2">
-                                <Label>Instrumento / Matéria</Label>
-                                <Select
-                                    value={formData.course_id}
-                                    onValueChange={(value) => {
-                                        const filteredStudents = students.filter(s => s.course_id?.toString() === value);
-                                        const newStudentIds = formData.student_ids.filter((id: number) =>
-                                            filteredStudents.some(s => s.id === id)
-                                        );
-                                        setFormData({
-                                            ...formData,
-                                            course_id: value,
-                                            student_ids: newStudentIds
-                                        });
-                                    }}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selecione o curso" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {courses.map((course) => (
-                                            <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Professor Responsável</Label>
-                                <Select
-                                    value={formData.teacher_id}
-                                    onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selecione o professor" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {teachers.map((teacher) => (
-                                            <SelectItem key={teacher.id} value={teacher.id.toString()}>{teacher.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Instrumento / Matéria</Label>
+                                    <Select
+                                        value={formData.course_id}
+                                        onValueChange={(value) => {
+                                            const filteredStudents = students.filter(s => s.course_id?.toString() === value);
+                                            const newStudentIds = formData.student_ids.filter((id: number) =>
+                                                filteredStudents.some(s => s.id === id)
+                                            );
+                                            setFormData({
+                                                ...formData,
+                                                course_id: value,
+                                                student_ids: newStudentIds
+                                            });
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-9">
+                                            <SelectValue placeholder="Selecione o curso" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {courses.map((course) => (
+                                                <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label>Turno</Label>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Professor Responsável</Label>
                                     <Select
-                                        value={formData.shift}
-                                        onValueChange={(value) => setFormData({ ...formData, shift: value })}
+                                        value={formData.teacher_id}
+                                        onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
                                     >
-                                        <SelectTrigger>
-                                            <SelectValue />
+                                        <SelectTrigger className="h-9">
+                                            <SelectValue placeholder="Selecione o professor" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="manha">Manhã</SelectItem>
-                                            <SelectItem value="tarde">Tarde</SelectItem>
-                                            <SelectItem value="noite">Noite</SelectItem>
+                                            {teachers.map((teacher) => (
+                                                <SelectItem key={teacher.id} value={teacher.id.toString()}>{teacher.name}</SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>Capacidade</Label>
-                                    <Input
-                                        type="number"
-                                        value={formData.max_students}
-                                        onChange={(e) => setFormData({ ...formData, max_students: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                        </div>
 
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>Alunos Integrantes</Label>
-                                <div className="space-y-3">
-                                    <Select
-                                        onValueChange={(val) => {
-                                            const id = parseInt(val);
-                                            if (!formData.student_ids.includes(id)) {
-                                                setFormData({ ...formData, student_ids: [...formData.student_ids, id] });
-                                            }
-                                        }}
-                                        disabled={!formData.course_id}
-                                    >
-                                        <SelectTrigger className="bg-background">
-                                            <SelectValue placeholder={formData.course_id ? "Adicionar aluno matriculado..." : "Selecione um curso primeiro"} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {students
-                                                .filter(s => s.course_id?.toString() === formData.course_id && !formData.student_ids.includes(s.id))
-                                                .map(s => (
-                                                    <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>
-                                                ))
-                                            }
-                                            {students.filter(s => s.course_id?.toString() === formData.course_id && !formData.student_ids.includes(s.id)).length === 0 && (
-                                                <div className="p-2 text-xs text-muted-foreground text-center">Nenhum aluno disponível para este curso.</div>
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-
-                                    {formData.course_id && (
-                                        <div className="flex justify-end">
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-xs h-7 text-primary hover:text-primary hover:bg-primary/10"
-                                                onClick={() => {
-                                                    const courseStudents = students.filter(s => s.course_id?.toString() === formData.course_id);
-                                                    const allIds = courseStudents.map(s => s.id);
-                                                    // Merge unique IDs
-                                                    const newIds = Array.from(new Set([...formData.student_ids, ...allIds]));
-                                                    setFormData({ ...formData, student_ids: newIds });
-                                                }}
-                                            >
-                                                + Adicionar todos os {students.filter(s => s.course_id?.toString() === formData.course_id).length} alunos
-                                            </Button>
-                                        </div>
-                                    )}
-
-                                    <div className="h-[140px] p-3 rounded-xl bg-muted/10 border border-border flex flex-col gap-2 overflow-y-auto">
-                                        <div className="flex flex-wrap gap-1.5">
-                                            <AnimatePresence>
-                                                {formData.student_ids.map((id: number) => {
-                                                    const student = students.find(s => s.id === id);
-                                                    return (
-                                                        <motion.div
-                                                            key={id}
-                                                            initial={{ scale: 0.9, opacity: 0 }}
-                                                            animate={{ scale: 1, opacity: 1 }}
-                                                            exit={{ scale: 0.9, opacity: 0 }}
-                                                            className="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full flex items-center gap-1.5 text-[10px] font-bold"
-                                                        >
-                                                            {student?.name}
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => setFormData({
-                                                                    ...formData,
-                                                                    student_ids: formData.student_ids.filter((sid: number) => sid !== id)
-                                                                })}
-                                                                className="hover:bg-primary/20 rounded-full p-0.5"
-                                                            >
-                                                                <Trash2 className="w-2.5 h-2.5" />
-                                                            </button>
-                                                        </motion.div>
-                                                    );
-                                                })}
-                                            </AnimatePresence>
-                                            {formData.student_ids.length === 0 && (
-                                                <p className="text-muted-foreground/50 text-xs italic">Nenhum integrante selecionado.</p>
-                                            )}
-                                        </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Turno</Label>
+                                        <Select
+                                            value={formData.shift}
+                                            onValueChange={(value) => setFormData({ ...formData, shift: value })}
+                                        >
+                                            <SelectTrigger className="h-9 px-2">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="manha">Manhã</SelectItem>
+                                                <SelectItem value="tarde">Tarde</SelectItem>
+                                                <SelectItem value="noite">Noite</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Capacidade</Label>
+                                        <Input
+                                            type="number"
+                                            value={formData.max_students}
+                                            onChange={(e) => setFormData({ ...formData, max_students: e.target.value })}
+                                            className="h-9"
+                                        />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="space-y-3">
-                                <Label className="text-sm font-semibold">Dias de Aula</Label>
-                                <div className="flex flex-wrap gap-2 py-1">
+                            <div className="bg-muted/30 p-4 rounded-xl space-y-4 border border-border/50">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-sm font-bold flex items-center gap-2">
+                                        <CalendarRange className="w-4 h-4 text-primary" />
+                                        Agenda e Horário
+                                    </Label>
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <Input
+                                                type="time"
+                                                value={formData.start_time}
+                                                onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                                                className="h-8 w-24 text-center text-xs p-1"
+                                            />
+                                            <span className="text-muted-foreground">às</span>
+                                            <Input
+                                                type="time"
+                                                value={formData.end_time}
+                                                onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                                                className="h-8 w-24 text-center text-xs p-1"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 pt-1">
                                     {[
-                                        { full: 'Segunda', short: 'S' },
-                                        { full: 'Terça', short: 'T' },
-                                        { full: 'Quarta', short: 'Q' },
-                                        { full: 'Quinta', short: 'Q' },
-                                        { full: 'Sexta', short: 'S' },
-                                        { full: 'Sábado', short: 'S' },
-                                        { full: 'Domingo', short: 'D' }
+                                        { full: 'Segunda', short: 'Seg' },
+                                        { full: 'Terça', short: 'Ter' },
+                                        { full: 'Quarta', short: 'Qua' },
+                                        { full: 'Quinta', short: 'Qui' },
+                                        { full: 'Sexta', short: 'Sex' },
+                                        { full: 'Sábado', short: 'Sab' },
+                                        { full: 'Domingo', short: 'Dom' }
                                     ].map((day) => {
                                         const days = formData.days_of_week ? formData.days_of_week.split(', ') : [];
                                         const isChecked = days.includes(day.full);
@@ -344,7 +288,6 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                             <button
                                                 key={day.full}
                                                 type="button"
-                                                title={day.full}
                                                 onClick={() => {
                                                     let newDays;
                                                     if (!isChecked) {
@@ -357,10 +300,10 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                                     setFormData({ ...formData, days_of_week: newDays.join(', ') });
                                                 }}
                                                 className={`
-                                                    w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200
+                                                    flex-1 h-8 rounded-md flex items-center justify-center text-[11px] font-bold transition-all duration-200 border
                                                     ${isChecked
-                                                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105 border-transparent"
-                                                        : "bg-transparent text-muted-foreground border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 hover:text-primary"
+                                                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                                        : "bg-background text-muted-foreground border-input hover:border-primary/50"
                                                     }
                                                 `}
                                             >
@@ -372,7 +315,7 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                             </div>
 
                             {!isEditing ? (
-                                <div className="flex items-center gap-2 bg-primary/5 p-3 rounded-xl border border-primary/10">
+                                <div className="flex items-center gap-3 bg-primary/5 p-3 rounded-xl border border-primary/10">
                                     <Checkbox
                                         id="generate_appointments"
                                         checked={formData.generate_appointments}
@@ -388,7 +331,7 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                     </div>
                                 </div>
                             ) : (
-                                <div className="space-y-3 bg-muted/20 p-3 rounded-xl border border-border/50">
+                                <div className="space-y-2 bg-muted/20 p-3 rounded-xl border border-border/50">
                                     <div className="flex items-center gap-2">
                                         <Checkbox
                                             id="generate_appointments"
@@ -401,25 +344,22 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                     </div>
 
                                     {formData.generate_appointments && (
-                                        <div className="pl-6 space-y-2">
-                                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Modo de Atualização</p>
+                                        <div className="pl-6 space-y-2 pt-1">
                                             <RadioGroup
                                                 value={formData.generate_type}
                                                 onValueChange={(val) => setFormData({ ...formData, generate_type: val })}
-                                                className="flex flex-col gap-2"
+                                                className="flex gap-4"
                                             >
                                                 <div className="flex items-center space-x-2">
                                                     <RadioGroupItem value="future" id="r-future" />
-                                                    <Label htmlFor="r-future" className="text-xs font-medium cursor-pointer flex items-center gap-2">
-                                                        <CalendarRange className="w-3 h-3 text-primary" />
-                                                        Apenas aulas futuras (Hoje em diante)
+                                                    <Label htmlFor="r-future" className="text-[10px] font-medium cursor-pointer flex items-center gap-1.5">
+                                                        Somente Futuras
                                                     </Label>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
                                                     <RadioGroupItem value="all" id="r-all" />
-                                                    <Label htmlFor="r-all" className="text-xs font-medium cursor-pointer flex items-center gap-2">
-                                                        <Trash2 className="w-3 h-3 text-destructive" />
-                                                        Refazer tudo (Apagar anteriores e gerar novas)
+                                                    <Label htmlFor="r-all" className="text-[10px] font-medium cursor-pointer flex items-center gap-1.5 text-destructive">
+                                                        Refazer Tudo
                                                     </Label>
                                                 </div>
                                             </RadioGroup>
@@ -429,44 +369,116 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                             )}
 
                             {conflictData?.has_conflicts && (
-                                <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive py-3">
-                                    <AlertTriangle className="h-4 w-4" />
-                                    <AlertTitle className="text-xs font-bold">Conflito de Professor</AlertTitle>
-                                    <AlertDescription className="text-[10px] leading-tight mt-1 opacity-90">
+                                <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive py-2 px-3">
+                                    <AlertTriangle className="h-3 w-3" />
+                                    <AlertTitle className="text-[10px] font-bold">Conflito detectado!</AlertTitle>
+                                    <AlertDescription className="text-[9px] leading-tight opacity-90">
                                         {conflictData.conflicts.map((c: any, i: number) => (
-                                            <div key={i}>• Já possui a turma <b>{c.class_name}</b> em <b>{c.days}</b> às <b>{c.time}</b>.</div>
+                                            <div key={i}>• Já possui a turma <b>{c.class_name}</b> às <b>{c.time}</b>.</div>
                                         ))}
                                     </AlertDescription>
                                 </Alert>
                             )}
+                        </div>
 
-                            <div className="space-y-2">
-                                <Label>Horário</Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <Input
-                                        type="time"
-                                        value={formData.start_time}
-                                        onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                                    />
-                                    <Input
-                                        type="time"
-                                        value={formData.end_time}
-                                        onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                                    />
+                        {/* Coluna da Direita: Alunos (5 colunas) */}
+                        <div className="md:col-span-5 flex flex-col h-full">
+                            <div className="space-y-4 flex flex-col h-full">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                                        <Users className="w-4 h-4" />
+                                        Alunos Integrantes ({formData.student_ids.length})
+                                    </Label>
+                                    {formData.course_id && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-[10px] h-6 px-2 text-primary hover:bg-primary/10"
+                                            onClick={() => {
+                                                const courseStudents = students.filter(s => s.course_id?.toString() === formData.course_id);
+                                                const allIds = courseStudents.map(s => s.id);
+                                                const newIds = Array.from(new Set([...formData.student_ids, ...allIds]));
+                                                setFormData({ ...formData, student_ids: newIds });
+                                            }}
+                                        >
+                                            + Todos
+                                        </Button>
+                                    )}
+                                </div>
+
+                                <Select
+                                    onValueChange={(val) => {
+                                        const id = parseInt(val);
+                                        if (!formData.student_ids.includes(id)) {
+                                            setFormData({ ...formData, student_ids: [...formData.student_ids, id] });
+                                        }
+                                    }}
+                                    disabled={!formData.course_id}
+                                >
+                                    <SelectTrigger className="h-9 bg-background">
+                                        <SelectValue placeholder={formData.course_id ? "Adicionar aluno..." : "Selecione o curso"} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {students
+                                            .filter(s => s.course_id?.toString() === formData.course_id && !formData.student_ids.includes(s.id))
+                                            .map(s => (
+                                                <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>
+                                            ))
+                                        }
+                                    </SelectContent>
+                                </Select>
+
+                                <div className="flex-1 min-h-[180px] md:min-h-0 md:h-[calc(100%-80px)] p-3 rounded-xl bg-muted/20 border border-border/50 overflow-y-auto">
+                                    <div className="grid grid-cols-1 gap-2">
+                                        <AnimatePresence>
+                                            {formData.student_ids.map((id: number) => {
+                                                const student = students.find(s => s.id === id);
+                                                return (
+                                                    <motion.div
+                                                        key={id}
+                                                        initial={{ opacity: 0, x: -10 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        exit={{ opacity: 0, scale: 0.9 }}
+                                                        className="group bg-background border border-border/50 px-3 py-1.5 rounded-lg flex items-center justify-between text-xs"
+                                                    >
+                                                        <span className="font-medium truncate pr-2">{student?.name}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setFormData({
+                                                                ...formData,
+                                                                student_ids: formData.student_ids.filter((sid: number) => sid !== id)
+                                                            })}
+                                                            className="text-muted-foreground hover:text-destructive transition-colors"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </motion.div>
+                                                );
+                                            })}
+                                        </AnimatePresence>
+                                        {formData.student_ids.length === 0 && (
+                                            <div className="h-full flex flex-col items-center justify-center py-8 text-muted-foreground/40 italic text-[11px] gap-2">
+                                                <Users className="w-8 h-8 opacity-20" />
+                                                Nenhum aluno selecionado
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-4 border-t">
-                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-                        <Button type="submit" disabled={mutation.isPending}>
+                    <div className="flex justify-end gap-3 pt-4 border-t mt-2">
+                        <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="h-9">Cancelar</Button>
+                        <Button type="submit" disabled={mutation.isPending} className="h-9 px-8 shadow-sm">
                             {mutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                            Salvar Turma
+                            {isEditing ? "Salvar Alterações" : "Criar Turma"}
                         </Button>
                     </div>
                 </form>
             </DialogContent>
-        </Dialog>
+        </DialogContent>
+        </Dialog >
     );
 }
