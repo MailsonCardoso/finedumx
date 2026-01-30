@@ -142,6 +142,16 @@ export default function Agenda() {
                                         slotMinTime="07:00:00"
                                         slotMaxTime="22:00:00"
                                         allDaySlot={false}
+                                        eventContent={(eventInfo) => (
+                                            <div className="flex flex-col h-full w-full overflow-hidden px-1 py-0.5 leading-tight">
+                                                <div className="font-bold text-[10px] md:text-xs opacity-95 whitespace-nowrap">
+                                                    {eventInfo.timeText}
+                                                </div>
+                                                <div className="font-semibold text-[10px] md:text-sm truncate opacity-90">
+                                                    {eventInfo.event.title}
+                                                </div>
+                                            </div>
+                                        )}
                                     />
                                 </div>
                             )}
@@ -208,11 +218,11 @@ export default function Agenda() {
         }
 
         .full-calendar-container .fc-event {
-          border-radius: 4px !important;
-          padding: 2px 4px !important;
+          border-radius: 6px !important;
+          padding: 0 !important;
           border: none !important;
-          font-weight: 500 !important;
-          font-size: 0.75rem !important;
+          font-weight: normal !important;
+          font-size: 1rem !important;
           cursor: pointer !important;
           transition: transform 0.1s ease !important;
         }
