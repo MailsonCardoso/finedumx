@@ -142,6 +142,7 @@ export default function Agenda() {
                                         slotMinTime="07:00:00"
                                         slotMaxTime="22:00:00"
                                         allDaySlot={false}
+                                        eventMinHeight={45}
                                     />
                                 </div>
                             )}
