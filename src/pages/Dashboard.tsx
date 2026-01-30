@@ -426,32 +426,34 @@ export default function Dashboard() {
               </motion.div>
             </div>
 
-            {/* Agenda (menor no financeiro) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Card className="shadow-soft border-border/50 overflow-hidden bg-card/50">
-                <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 px-6 py-3">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-primary" />
-                    Resumo da Agenda Escolar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="divide-y divide-border/50 text-sm">
-                    {todayAppointments.slice(0, 3).map((app) => (
-                      <div key={app.id} className="p-3 px-6 flex justify-between items-center">
-                        <span className="font-bold text-primary">{app.start_time.substring(0, 5)}</span>
-                        <span className="font-medium">{app.course?.name} - {app.student?.name || app.school_class?.name}</span>
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground">{app.status}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+            {/* Agenda (escondida para o financeiro) */}
+            {!isFinanceiro && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <Card className="shadow-soft border-border/50 overflow-hidden bg-card/50">
+                  <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 px-6 py-3">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-primary" />
+                      Resumo da Agenda Escolar
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="divide-y divide-border/50 text-sm">
+                      {todayAppointments.slice(0, 3).map((app) => (
+                        <div key={app.id} className="p-3 px-6 flex justify-between items-center">
+                          <span className="font-bold text-primary">{app.start_time.substring(0, 5)}</span>
+                          <span className="font-medium">{app.course?.name} - {app.student?.name || app.school_class?.name}</span>
+                          <span className="text-[10px] font-bold uppercase text-muted-foreground">{app.status}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
           </>
         )}
       </div>
