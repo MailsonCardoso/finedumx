@@ -4,7 +4,6 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +18,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
-import { Loader2, Trash2, AlertTriangle, GraduationCap, CalendarDays, Users } from "lucide-react";
+import { Loader2, Trash2, AlertTriangle, GraduationCap, CalendarDays, Users, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -103,7 +102,6 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
         enabled: isOpen,
     });
 
-    // Conflict Check
     const { data: conflictData } = useQuery({
         queryKey: ['conflicts', formData.teacher_id, formData.days_of_week, formData.start_time, formData.end_time],
         queryFn: () => apiFetch<any>('/classes/check-conflicts', {
@@ -151,43 +149,40 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto p-0 border-none shadow-2xl">
-                <DialogHeader className="p-6 pb-2">
-                    <DialogTitle className="text-2xl font-bold">{isEditing ? "Editar Turma" : "Nova Turma"}</DialogTitle>
-                    <DialogDescription>Preencha os dados abaixo para configurar a turma.</DialogDescription>
+            <DialogContent className="max-w-4xl p-0 border-none shadow-2xl overflow-hidden overflow-y-visible">
+                <DialogHeader className="p-4 pb-1">
+                    <DialogTitle className="text-xl font-bold">{isEditing ? "Editar Turma" : "Nova Turma"}</DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="p-6 pt-0 space-y-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Coluna 1: Dados da Turma */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 font-bold text-foreground">
-                                <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-                                    <GraduationCap className="h-5 w-5" />
-                                </div>
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 font-bold text-foreground text-sm">
+                                <GraduationCap className="h-4 w-4 text-blue-600" />
                                 Dados da Turma
                             </div>
 
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-muted-foreground">Nome da Turma</Label>
+                            <div className="space-y-3">
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-semibold text-muted-foreground">Nome da Turma</Label>
                                     <Input
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                         placeholder="Ex: Teclado Manhã"
-                                        className="h-11 bg-muted/20 border-border/50"
+                                        className="h-10 bg-muted/20 border-border/50"
                                         required
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-muted-foreground">Instrumento / Matéria</Label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-semibold text-muted-foreground">Instrumento / Matéria</Label>
                                         <Select
                                             value={formData.course_id}
                                             onValueChange={(value) => setFormData({ ...formData, course_id: value })}
                                         >
-                                            <SelectTrigger className="h-11 bg-muted/20 border-border/50">
+                                            <SelectTrigger className="h-10 bg-muted/20 border-border/50">
                                                 <SelectValue placeholder="Selecione..." />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -197,13 +192,13 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-muted-foreground">Professor</Label>
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-semibold text-muted-foreground">Professor</Label>
                                         <Select
                                             value={formData.teacher_id}
                                             onValueChange={(value) => setFormData({ ...formData, teacher_id: value })}
                                         >
-                                            <SelectTrigger className="h-11 bg-muted/20 border-border/50">
+                                            <SelectTrigger className="h-10 bg-muted/20 border-border/50">
                                                 <SelectValue placeholder="Selecione..." />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -215,14 +210,14 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-muted-foreground">Turno</Label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-semibold text-muted-foreground">Turno</Label>
                                         <Select
                                             value={formData.shift}
                                             onValueChange={(value) => setFormData({ ...formData, shift: value })}
                                         >
-                                            <SelectTrigger className="h-11 bg-muted/20 border-border/50">
+                                            <SelectTrigger className="h-10 bg-muted/20 border-border/50">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -232,21 +227,21 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-muted-foreground">Capacidade</Label>
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-semibold text-muted-foreground">Capacidade</Label>
                                         <Input
                                             type="number"
                                             value={formData.max_students}
                                             onChange={(e) => setFormData({ ...formData, max_students: e.target.value })}
-                                            className="h-11 bg-muted/20 border-border/50"
+                                            className="h-10 bg-muted/20 border-border/50"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-border/50 space-y-4">
-                                <Label className="text-sm font-bold text-muted-foreground flex items-center gap-2">
-                                    <Users className="w-4 h-4" />
+                            <div className="pt-3 border-t border-border/30 space-y-3">
+                                <Label className="text-xs font-bold text-muted-foreground flex items-center gap-2">
+                                    <Users className="w-3.5 h-3.5" />
                                     Alunos Integrantes ({formData.student_ids.length})
                                 </Label>
 
@@ -259,8 +254,8 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                     }}
                                     disabled={!formData.course_id}
                                 >
-                                    <SelectTrigger className="h-11 bg-muted/20 border-border/50">
-                                        <SelectValue placeholder={formData.course_id ? "Adicionar aluno..." : "Selecione o curso"} />
+                                    <SelectTrigger className="h-9 bg-muted/10 border-border/50">
+                                        <SelectValue placeholder={formData.course_id ? "Adicionar aluno..." : "Selecione o instrumento"} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {students
@@ -272,8 +267,8 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                     </SelectContent>
                                 </Select>
 
-                                <div className="h-32 p-3 rounded-xl bg-muted/10 border border-border/50 overflow-y-auto">
-                                    <div className="flex flex-wrap gap-2">
+                                <div className="h-24 p-2 rounded-lg bg-muted/5 border border-border/30 overflow-y-auto">
+                                    <div className="flex flex-wrap gap-1.5">
                                         <AnimatePresence>
                                             {formData.student_ids.map((id: number) => {
                                                 const student = students.find((s: any) => s.id === id);
@@ -283,7 +278,7 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                                         initial={{ scale: 0.9, opacity: 0 }}
                                                         animate={{ scale: 1, opacity: 1 }}
                                                         exit={{ scale: 0.9, opacity: 0 }}
-                                                        className="bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-full flex items-center gap-2 text-xs font-semibold"
+                                                        className="bg-primary/5 text-primary border border-primary/10 px-2 py-0.5 rounded-full flex items-center gap-1.5 text-[10px] font-bold"
                                                     >
                                                         {student?.name}
                                                         <button
@@ -292,16 +287,16 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                                                 ...formData,
                                                                 student_ids: formData.student_ids.filter((sid: number) => sid !== id)
                                                             })}
-                                                            className="hover:bg-primary/20 rounded-full p-0.5"
+                                                            className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
                                                         >
-                                                            <Trash2 className="w-3 h-3" />
+                                                            <Trash2 className="w-2.5 h-2.5" />
                                                         </button>
                                                     </motion.div>
                                                 );
                                             })}
                                         </AnimatePresence>
                                         {formData.student_ids.length === 0 && (
-                                            <p className="text-muted-foreground/40 text-xs italic">Nenhum aluno selecionado.</p>
+                                            <p className="text-muted-foreground/30 text-[10px] italic p-1">Nenhum aluno no grupo.</p>
                                         )}
                                     </div>
                                 </div>
@@ -309,18 +304,16 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                         </div>
 
                         {/* Coluna 2: Agenda */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 font-bold text-foreground">
-                                <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                    <CalendarDays className="h-5 w-5" />
-                                </div>
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 font-bold text-foreground text-sm">
+                                <CalendarDays className="h-4 w-4 text-emerald-600" />
                                 Agenda e Horário
                             </div>
 
-                            <div className="space-y-6">
-                                <div className="space-y-3">
-                                    <Label className="text-sm font-medium text-muted-foreground italic">Dias de Aula</Label>
-                                    <div className="flex flex-wrap gap-2">
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-semibold text-muted-foreground italic">Dias de Aula</Label>
+                                    <div className="flex flex-wrap gap-1.5">
                                         {[
                                             { full: 'Segunda', short: 'S' },
                                             { full: 'Terça', short: 'T' },
@@ -348,9 +341,9 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                                         setFormData({ ...formData, days_of_week: newDays.join(', ') });
                                                     }}
                                                     className={`
-                                                        w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all
+                                                        w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all
                                                         ${isChecked
-                                                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
+                                                            ? "bg-primary text-primary-foreground shadow-md shadow-primary/10"
                                                             : "bg-muted/10 text-muted-foreground border-2 border-dashed border-border"
                                                         }
                                                     `}
@@ -362,65 +355,65 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-muted-foreground">Início</Label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-semibold text-muted-foreground">Horário de Início</Label>
                                         <Input
                                             type="time"
                                             value={formData.start_time}
                                             onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                                            className="h-11 bg-muted/20 border-border/50"
+                                            className="h-10 bg-muted/20 border-border/50"
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-muted-foreground">Fim</Label>
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-semibold text-muted-foreground">Horário de Término</Label>
                                         <Input
                                             type="time"
                                             value={formData.end_time}
                                             onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                                            className="h-11 bg-muted/20 border-border/50"
+                                            className="h-10 bg-muted/20 border-border/50"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <Checkbox
-                                            id="generate_appointments"
-                                            checked={formData.generate_appointments}
-                                            onCheckedChange={(checked) => setFormData({ ...formData, generate_appointments: !!checked })}
-                                        />
-                                        <Label htmlFor="generate_appointments" className="font-bold text-sm text-primary cursor-pointer">
+                                {/* Sync Block Styled like the reference image */}
+                                <div className="bg-primary/[0.03] p-4 rounded-2xl border border-primary/10 space-y-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-0.5 rounded-full bg-primary/10">
+                                            <CheckCircle2 className="h-5 w-5 text-primary" />
+                                        </div>
+                                        <Label className="font-bold text-sm text-primary">
                                             Sincronizar e Replicar para Agenda
                                         </Label>
                                     </div>
 
-                                    {formData.generate_appointments && (
-                                        <div className="pl-8 space-y-3">
-                                            <RadioGroup
-                                                value={formData.generate_type}
-                                                onValueChange={(val) => setFormData({ ...formData, generate_type: val })}
-                                                className="flex flex-col gap-3"
-                                            >
-                                                <div className="flex items-center space-x-2">
-                                                    <RadioGroupItem value="future" id="r-future" />
-                                                    <Label htmlFor="r-future" className="text-sm cursor-pointer">Hoje em diante</Label>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <RadioGroupItem value="all" id="r-all" className="border-destructive" />
-                                                    <Label htmlFor="r-all" className="text-sm cursor-pointer text-destructive">Refazer tudo</Label>
-                                                </div>
-                                            </RadioGroup>
+                                    <RadioGroup
+                                        value={formData.generate_type}
+                                        onValueChange={(val) => {
+                                            setFormData({
+                                                ...formData,
+                                                generate_type: val,
+                                                generate_appointments: true // Check it automatically if user clicks options
+                                            });
+                                        }}
+                                        className="pl-8 flex flex-col gap-3"
+                                    >
+                                        <div className="flex items-center space-x-2.5">
+                                            <RadioGroupItem value="future" id="r-future" className="text-primary border-primary/50" />
+                                            <Label htmlFor="r-future" className="text-xs font-medium cursor-pointer text-foreground/80">Hoje em diante</Label>
                                         </div>
-                                    )}
+                                        <div className="flex items-center space-x-2.5">
+                                            <RadioGroupItem value="all" id="r-all" className="text-destructive border-destructive/50" />
+                                            <Label htmlFor="r-all" className="text-xs font-medium cursor-pointer text-destructive">Refazer tudo</Label>
+                                        </div>
+                                    </RadioGroup>
                                 </div>
 
                                 {conflictData?.has_conflicts && (
-                                    <Alert variant="destructive" className="bg-destructive/5 text-xs">
-                                        <AlertTriangle className="h-4 w-4" />
-                                        <AlertTitle className="font-bold">Conflito</AlertTitle>
-                                        <AlertDescription>
-                                            Professor já tem turma nesse horário.
+                                    <Alert variant="destructive" className="bg-destructive/5 text-[10px] py-1.5 h-auto">
+                                        <AlertTriangle className="h-3 w-3" />
+                                        <AlertDescription className="font-medium leading-none">
+                                            Conflitos de horário detectados para este professor.
                                         </AlertDescription>
                                     </Alert>
                                 )}
@@ -428,11 +421,11 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                         </div>
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-6 border-t border-border/50">
-                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 px-8">Cancelar</Button>
-                        <Button type="submit" disabled={mutation.isPending} className="h-11 px-10 font-bold shadow-lg shadow-primary/20">
+                    <div className="flex justify-end gap-3 pt-4 border-t border-border/30">
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-10 px-6 text-sm font-medium">Cancelar</Button>
+                        <Button type="submit" disabled={mutation.isPending} className="h-10 px-8 font-bold shadow-lg shadow-primary/20 bg-primary text-primary-foreground">
                             {mutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                            Salvar
+                            Salvar Turma
                         </Button>
                     </div>
                 </form>
