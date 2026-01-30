@@ -100,15 +100,22 @@ export default function Dashboard() {
 
   const { data: declinedAppointments = [] } = useQuery<any[]>({
     queryKey: ['declined-appointments'],
-    queryFn: () => {
-      // Busca agendamentos futuros ou de hoje onde o aluno recusou
-      // Assumindo que o backend suporta filtro por my_response, senão precisaremos filtrar no front.
-      // Como não posso alterar o backend agora, vou buscar os de hoje e filtrar no front se a API retornar tudo, 
-      // ou assumir que existe um endpoint ou filtro. Vou tentar passar o filtro e torcer para o GenericController aceitar
-      // ou filtrar os que já tenho se hoje.
-      // ESTRATÉGIA SEGURA: Buscar appointments próximos e filtrar no front por enquanto.
+    queryFn: async () => {
       const today = new Date().toISOString().split('T')[0];
-      return apiFetch(`/appointments?start_date=${today}&response_status=declined`);
+      // Busca todos os agendamentos (ou tenta filtrar no back se possível)
+      const data = await apiFetch<any[]>(`/appointments?start_date=${today}`);
+
+      // Filtragem robusta no Frontend
+      return data.filter((app: any) => {
+        // 1. Garantir que é data futura ou hoje
+        if (app.date < today) return false;
+
+        // 2. Verificar se há sinalização de recusa ("Não Vou")
+        // Verifica múltiplas possibilidades de nome de campo que o backend possa estar retornando
+        const response = app.response || app.student_response || app.my_response || (app.extendedProps && app.extendedProps.response);
+
+        return response === 'declined';
+      }).sort((a: any, b: any) => a.date.localeCompare(b.date)); // Ordena por data (mais próximo primeiro)
     },
   });
 
