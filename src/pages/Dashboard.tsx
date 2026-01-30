@@ -102,20 +102,30 @@ export default function Dashboard() {
     queryKey: ['declined-appointments'],
     queryFn: async () => {
       const today = new Date().toISOString().split('T')[0];
-      // Busca todos os agendamentos (ou tenta filtrar no back se possível)
-      const data = await apiFetch<any[]>(`/appointments?start_date=${today}`);
+      // Agora o backend suporta esses filtros nativamente!
+      // Mas para garantir, vamos manter uma verificação leve no front também.
+      try {
+        const data = await apiFetch<any[]>(`/appointments?start_date=${today}&response_status=declined`);
 
-      // Filtragem robusta no Frontend
-      return data.filter((app: any) => {
-        // 1. Garantir que é data futura ou hoje
-        if (app.date < today) return false;
+        // O backend agora retorna os appointments que TÊM respostas "declined".
+        // Vamos garantir que a exibição mostre corretamente.
+        return data.filter((app: any) => {
+          // Filtro de segurança extra
+          if (app.date < today) return false;
 
-        // 2. Verificar se há sinalização de recusa ("Não Vou")
-        // Verifica múltiplas possibilidades de nome de campo que o backend possa estar retornando
-        const response = app.response || app.student_response || app.my_response || (app.extendedProps && app.extendedProps.response);
+          // Se o backend já filtrou, ótimo. Se não, verificamos:
+          // O appointment deve ter pelo menos uma resposta 'declined'
+          // ou ser um appointment individual com resposta direta (se houver lógica mista).
+          if (app.responses && Array.isArray(app.responses)) {
+            return app.responses.some((r: any) => r.response === 'declined');
+          }
 
-        return response === 'declined';
-      }).sort((a: any, b: any) => a.date.localeCompare(b.date)); // Ordena por data (mais próximo primeiro)
+          return false;
+        }).sort((a: any, b: any) => a.date.localeCompare(b.date));
+      } catch (e) {
+        console.error("Erro ao buscar avisos:", e);
+        return [];
+      }
     },
   });
 

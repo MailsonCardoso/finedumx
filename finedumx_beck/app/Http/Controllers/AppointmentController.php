@@ -13,7 +13,8 @@ class AppointmentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Appointment::with(['student', 'schoolClass.teacher', 'course.teacher']);
+        // Sempre carregar as respostas para visualização no front
+        $query = Appointment::with(['student', 'schoolClass.teacher', 'course.teacher', 'responses.student']);
 
         if ($request->has('student_id')) {
             $query->where('student_id', $request->student_id);
@@ -26,8 +27,21 @@ class AppointmentController extends Controller
         if ($request->has('date')) {
             $query->where('date', $request->date);
         }
+        
+        // Novo filtro de data inicial
+        if ($request->has('start_date')) {
+            $query->where('date', '>=', $request->start_date);
+        }
 
-        return $query->orderBy('date', 'desc')->orderBy('start_time', 'asc')->get();
+        // Novo filtro por status de resposta (ex: declined)
+        if ($request->has('response_status')) {
+            $status = $request->response_status;
+            $query->whereHas('responses', function($q) use ($status) {
+                $q->where('response', $status);
+            });
+        }
+
+        return $query->orderBy('date', 'asc')->orderBy('start_time', 'asc')->get();
     }
 
     public function store(Request $request)
