@@ -310,17 +310,29 @@ export default function Dashboard() {
               <CardContent className="p-0">
                 <div className="divide-y divide-rose-100 dark:divide-rose-900/20">
                   {declinedAppointments && declinedAppointments.length > 0 ? (
-                    declinedAppointments.map((app, i) => (
-                      <div key={app.id} className="p-4 px-6 flex items-center justify-between hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
+                    declinedAppointments.flatMap(app =>
+                      // Extrai apenas as respostas "declined" de cada agendamento
+                      (app.responses || [])
+                        .filter((r: any) => r.response === 'declined')
+                        .map((r: any) => ({
+                          uniqueKey: `${app.id}-${r.id}`,
+                          appointmentDate: app.date,
+                          startTime: app.start_time,
+                          courseName: app.course?.name || app.school_class?.name || "Aula",
+                          studentName: r.student?.name || app.student?.name || "Aluno",
+                          studentId: r.student_id || app.student_id
+                        }))
+                    ).map((item) => (
+                      <div key={item.uniqueKey} className="p-4 px-6 flex items-center justify-between hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
                         <div className="flex items-center gap-4">
                           <div className="bg-rose-100 text-rose-600 w-12 h-12 flex flex-col items-center justify-center rounded-lg text-xs font-bold leading-tight">
-                            <span>{new Date(app.date).getDate()}</span>
-                            <span className="text-[10px] uppercase">{new Date(app.date).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')}</span>
+                            <span>{new Date(item.appointmentDate).getDate()}</span>
+                            <span className="text-[10px] uppercase">{new Date(item.appointmentDate).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')}</span>
                           </div>
                           <div>
-                            <p className="font-bold text-foreground">{app.student?.name}</p>
+                            <p className="font-bold text-foreground">{item.studentName}</p>
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              {app.course?.name} • {app.start_time.substring(0, 5)}
+                              {item.courseName} • {item.startTime.substring(0, 5)}
                             </p>
                           </div>
                         </div>
@@ -329,8 +341,8 @@ export default function Dashboard() {
                           variant="outline"
                           className="text-xs h-8 border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800"
                           onClick={() => {
-                            if (app.student_id) {
-                              setSheetStudentId(app.student_id);
+                            if (item.studentId) {
+                              setSheetStudentId(Number(item.studentId));
                               setIsSheetOpen(true);
                             }
                           }}
