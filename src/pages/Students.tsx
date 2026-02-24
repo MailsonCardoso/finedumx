@@ -17,13 +17,13 @@ import {
 } from "@/components/ui/select";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -440,14 +440,14 @@ export default function Students() {
         )}
 
         {/* Add/Edit Modal */}
-        <Dialog open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>{isEditOpen ? "Editar Aluno" : "Novo Aluno"}</DialogTitle>
-              <DialogDescription>
+        <Sheet open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
+          <SheetContent className="max-w-4xl sm:max-w-2xl overflow-y-auto" side="right">
+            <SheetHeader className="pb-6">
+              <SheetTitle className="text-2xl font-bold">{isEditOpen ? "Editar Aluno" : "Novo Aluno"}</SheetTitle>
+              <SheetDescription>
                 Preencha os dados abaixo para {isEditOpen ? "atualizar" : "cadastrar"} o aluno.
-              </DialogDescription>
-            </DialogHeader>
+              </SheetDescription>
+            </SheetHeader>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
@@ -703,16 +703,16 @@ export default function Students() {
 
 
 
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}>Cancelar</Button>
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+              <SheetFooter className="pt-6 border-t border-border mt-6 flex justify-end gap-3">
+                <Button type="button" variant="outline" className="h-11 px-6" onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}>Cancelar</Button>
+                <Button type="submit" className="h-11 px-8 font-bold" disabled={createMutation.isPending || updateMutation.isPending}>
                   {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Salvar
+                  Salvar Aluno
                 </Button>
-              </DialogFooter>
+              </SheetFooter>
             </form>
-          </DialogContent>
-        </Dialog>
+          </SheetContent>
+        </Sheet>
 
         {/* Delete Alert */}
         <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>

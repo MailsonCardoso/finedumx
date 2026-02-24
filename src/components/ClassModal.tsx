@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -148,11 +148,11 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl p-0 border-none shadow-2xl overflow-hidden overflow-y-visible">
-                <DialogHeader className="p-4 pb-1">
-                    <DialogTitle className="text-xl font-bold">{isEditing ? "Editar Turma" : "Nova Turma"}</DialogTitle>
-                </DialogHeader>
+        <Sheet open={isOpen} onOpenChange={onOpenChange}>
+            <SheetContent className="w-full sm:max-w-3xl overflow-y-auto" side="right">
+                <SheetHeader className="pb-8">
+                    <SheetTitle className="text-2xl font-bold">{isEditing ? "Editar Turma" : "Nova Turma"}</SheetTitle>
+                </SheetHeader>
 
                 <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -429,7 +429,7 @@ export function ClassModal({ isOpen, onOpenChange, classItem, defaultCourseId }:
                         </Button>
                     </div>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </SheetContent>
+        </Sheet>
     );
 }

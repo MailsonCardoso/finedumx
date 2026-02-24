@@ -3,13 +3,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-    DialogDescription,
-} from "@/components/ui/dialog";
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetFooter,
+    SheetDescription,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -191,16 +191,16 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-md">
-                <DialogHeader>
-                    <DialogTitle>
+        <Sheet open={isOpen} onOpenChange={onOpenChange}>
+            <SheetContent className="w-full sm:max-w-md overflow-y-auto" side="right">
+                <SheetHeader className="pb-6">
+                    <SheetTitle className="text-2xl font-bold">
                         {isViewMode ? "Detalhes do Agendamento" : (isEditing ? "Editar Agendamento" : "Novo Agendamento")}
-                    </DialogTitle>
-                    <DialogDescription>
+                    </SheetTitle>
+                    <SheetDescription>
                         {isViewMode ? "Visualize as informações abaixo." : "Preencha os detalhes da aula ou reunião abaixo."}
-                    </DialogDescription>
-                </DialogHeader>
+                    </SheetDescription>
+                </SheetHeader>
 
                 {isViewMode ? (
                     // VIEW MODE
@@ -268,26 +268,26 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                             )}
                         </div>
 
-                        <DialogFooter className="flex-row justify-between sm:justify-between pt-4">
+                        <SheetFooter className="flex-col sm:flex-row gap-2 pt-6 border-t border-border mt-6">
                             <Button
                                 variant="outline"
-                                className="text-destructive hover:text-destructive border-destructive/20 hover:bg-destructive/5"
+                                className="w-full sm:flex-1 text-destructive hover:text-destructive border-destructive/20 hover:bg-destructive/5 h-11"
                                 onClick={() => setIsDeleteDialogOpen(true)}
                             >
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Excluir
                             </Button>
 
-                            <div className="flex gap-2">
-                                <Button variant="ghost" onClick={() => onOpenChange(false)}>
+                            <div className="flex gap-2 w-full sm:flex-1">
+                                <Button variant="ghost" className="flex-1 h-11" onClick={() => onOpenChange(false)}>
                                     Fechar
                                 </Button>
-                                <Button onClick={() => setIsViewMode(false)}>
+                                <Button className="flex-2 h-11 px-6" onClick={() => setIsViewMode(false)}>
                                     <Pencil className="w-4 h-4 mr-2" />
                                     Editar
                                 </Button>
                             </div>
-                        </DialogFooter>
+                        </SheetFooter>
                     </div>
                 ) : (
                     // EDIT MODE (Original Form)
@@ -456,31 +456,29 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                             />
                         </div>
 
-                        <DialogFooter className="flex-row justify-between items-center sm:justify-between">
-                            <div />
-                            <div className="flex gap-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => {
-                                        if (appointment?.id) {
-                                            setIsViewMode(true); // Return to view mode
-                                        } else {
-                                            onOpenChange(false); // Close
-                                        }
-                                    }}
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button type="submit" disabled={mutation.isPending}>
-                                    {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    {isEditing ? "Salvar Alterações" : "Agendar"}
-                                </Button>
-                            </div>
-                        </DialogFooter>
+                        <SheetFooter className="flex-row justify-end items-center gap-2 pt-6 border-t border-border mt-6">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="h-11 px-6"
+                                onClick={() => {
+                                    if (appointment?.id) {
+                                        setIsViewMode(true); // Return to view mode
+                                    } else {
+                                        onOpenChange(false); // Close
+                                    }
+                                }}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button type="submit" className="h-11 px-8 font-bold" disabled={mutation.isPending}>
+                                {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {isEditing ? "Salvar Alterações" : "Agendar"}
+                            </Button>
+                        </SheetFooter>
                     </form>
                 )}
-            </DialogContent>
+            </SheetContent>
 
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <AlertDialogContent>
@@ -504,6 +502,6 @@ export function AppointmentModal({ isOpen, onOpenChange, appointment }: Appointm
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </Dialog>
+        </Sheet>
     );
 }

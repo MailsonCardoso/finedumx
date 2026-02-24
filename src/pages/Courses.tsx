@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from "@/components/ui/dialog";
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetDescription,
+    SheetFooter,
+} from "@/components/ui/sheet";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -315,12 +315,12 @@ export default function Courses() {
             </div>
 
             {/* Add Modal */}
-            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Novo Curso / Matéria</DialogTitle>
-                        <DialogDescription>Defina as características básicas desta disciplina.</DialogDescription>
-                    </DialogHeader>
+            <Sheet open={isAddOpen} onOpenChange={setIsAddOpen}>
+                <SheetContent className="w-full sm:max-w-md overflow-y-auto" side="right">
+                    <SheetHeader className="pb-6">
+                        <SheetTitle className="text-2xl font-bold">Novo Curso / Matéria</SheetTitle>
+                        <SheetDescription>Defina as características básicas desta disciplina.</SheetDescription>
+                    </SheetHeader>
                     <form onSubmit={(e) => handleSubmit(e, false)}>
                         <div className="space-y-4 py-4">
                             <div className="space-y-2">
@@ -385,23 +385,23 @@ export default function Courses() {
                                 />
                             </div>
                         </div>
-                        <DialogFooter>
-                            <Button variant="outline" type="button" onClick={() => setIsAddOpen(false)}>Cancelar</Button>
-                            <Button type="submit" disabled={createMutation.isPending}>
+                        <SheetFooter className="pt-6 border-t border-border mt-6 flex justify-end gap-2">
+                            <Button variant="outline" type="button" className="h-11 px-6" onClick={() => setIsAddOpen(false)}>Cancelar</Button>
+                            <Button type="submit" className="h-11 px-8 font-bold" disabled={createMutation.isPending}>
                                 {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                                Salvar no Catálogo
+                                Salvar Curso
                             </Button>
-                        </DialogFooter>
+                        </SheetFooter>
                     </form>
-                </DialogContent>
-            </Dialog>
+                </SheetContent>
+            </Sheet>
 
             {/* Edit Modal */}
-            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Editar Matéria</DialogTitle>
-                    </DialogHeader>
+            <Sheet open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <SheetContent className="w-full sm:max-w-md overflow-y-auto" side="right">
+                    <SheetHeader className="pb-6">
+                        <SheetTitle className="text-2xl font-bold">Editar Matéria</SheetTitle>
+                    </SheetHeader>
                     <form onSubmit={(e) => handleSubmit(e, true)}>
                         <div className="space-y-4 py-4">
                             <div className="space-y-2">
@@ -463,16 +463,16 @@ export default function Courses() {
                                 />
                             </div>
                         </div>
-                        <DialogFooter>
-                            <Button variant="outline" type="button" onClick={() => setIsEditOpen(false)}>Cancelar</Button>
-                            <Button type="submit" disabled={updateMutation.isPending}>
+                        <SheetFooter className="pt-6 border-t border-border mt-6 flex justify-end gap-2">
+                            <Button variant="outline" type="button" className="h-11 px-6" onClick={() => setIsEditOpen(false)}>Cancelar</Button>
+                            <Button type="submit" className="h-11 px-8 font-bold" disabled={updateMutation.isPending}>
                                 {updateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                                 Salvar Alterações
                             </Button>
-                        </DialogFooter>
+                        </SheetFooter>
                     </form>
-                </DialogContent>
-            </Dialog>
+                </SheetContent>
+            </Sheet>
 
             {/* Delete Dialog */}
             <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>

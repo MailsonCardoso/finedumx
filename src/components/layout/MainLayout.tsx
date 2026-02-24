@@ -11,10 +11,21 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
-    const savedColor = localStorage.getItem('vem-cantar-color');
-    if (savedColor) {
-      document.documentElement.style.setProperty('--primary', savedColor);
-      document.documentElement.style.setProperty('--ring', savedColor);
+    const savedTheme = localStorage.getItem('vem-cantar-theme');
+    if (savedTheme) {
+      try {
+        const theme = JSON.parse(savedTheme);
+        const root = document.documentElement;
+        root.style.setProperty('--primary', theme.primary);
+        root.style.setProperty('--ring', theme.primary);
+        root.style.setProperty('--sidebar', theme.sidebar);
+        root.style.setProperty('--sidebar-foreground', '0 0% 100%');
+        root.style.setProperty('--sidebar-primary', theme.primary);
+        root.style.setProperty('--sidebar-accent', 'hsl(var(--sidebar) / 0.8)');
+        root.style.setProperty('--sidebar-accent-foreground', '0 0% 100%');
+      } catch (e) {
+        console.error("Erro ao carregar tema:", e);
+      }
     }
   }, []);
 

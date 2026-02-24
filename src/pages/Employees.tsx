@@ -28,13 +28,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-    DialogDescription,
-} from "@/components/ui/dialog";
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetFooter,
+    SheetDescription,
+} from "@/components/ui/sheet";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -444,207 +444,198 @@ export default function Employees() {
                 )}
 
                 {/* Add/Edit Modal */}
-                <Dialog open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
-                    <DialogContent className="max-w-[700px] gap-0 p-0 overflow-hidden rounded-xl border border-border shadow-2xl bg-card">
-                        <DialogHeader className="sr-only">
-                            <DialogTitle>{isEditOpen ? "Editar Membro" : "Novo Membro"}</DialogTitle>
-                            <DialogDescription>Preencha os dados profissionais e de contato abaixo.</DialogDescription>
-                        </DialogHeader>
-                        <div className="p-6">
-                            <div className="space-y-1 mb-6">
-                                <h1 className="text-2xl font-bold text-foreground tracking-tight">
-                                    {isEditOpen ? "Editar Membro" : "Novo Membro"}
-                                </h1>
-                                <p className="text-sm text-muted-foreground">
-                                    Preencha os dados profissionais e de contato abaixo.
-                                </p>
-                            </div>
+                <Sheet open={isAddOpen || isEditOpen} onOpenChange={(open) => { if (!open) { setIsAddOpen(false); setIsEditOpen(false); } }}>
+                    <SheetContent className="w-full sm:max-w-2xl overflow-y-auto" side="right">
+                        <SheetHeader className="pb-8">
+                            <SheetTitle className="text-2xl font-bold">{isEditOpen ? "Editar Funcionário" : "Novo Funcionário"}</SheetTitle>
+                            <SheetDescription>Preencha os dados profissionais e de contato abaixo.</SheetDescription>
+                        </SheetHeader>
 
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                                    {/* Nome e Status */}
-                                    <div className="space-y-2 col-span-1">
-                                        <Label htmlFor="name" className="text-sm font-medium">Nome Completo</Label>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                                {/* Nome e Status */}
+                                <div className="space-y-2 col-span-1">
+                                    <Label htmlFor="name" className="text-sm font-medium">Nome Completo</Label>
+                                    <div className="relative">
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <Input
+                                            id="name"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            placeholder="Nome do funcionário"
+                                            className="h-10 pl-9 bg-background focus:ring-1 focus:ring-primary transition-all"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2 col-span-1">
+                                    <Label htmlFor="status" className="text-sm font-medium">Status</Label>
+                                    <Select
+                                        value={formData.status || "ativo"}
+                                        onValueChange={(value) => setFormData({ ...formData, status: value })}
+                                    >
+                                        <SelectTrigger className="h-10 bg-background focus:ring-1 focus:ring-primary transition-all">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="ativo">Ativo</SelectItem>
+                                            <SelectItem value="inativo">Inativo</SelectItem>
+                                            <SelectItem value="ferias">Férias</SelectItem>
+                                            <SelectItem value="afastado">Afastado</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* CPF, Contato, Salário e Dia Pagto */}
+                                <div className="col-span-2 grid grid-cols-4 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="cpf" className="text-sm font-medium">CPF</Label>
+                                        <Input
+                                            id="cpf"
+                                            value={formData.cpf}
+                                            onChange={(e) => {
+                                                const value = e.target.value.replace(/\D/g, '');
+                                                let masked = value;
+                                                if (value.length > 0) masked = value.substring(0, 3);
+                                                if (value.length >= 4) masked += '.' + value.substring(3, 6);
+                                                if (value.length >= 7) masked += '.' + value.substring(6, 9);
+                                                if (value.length >= 10) masked += '-' + value.substring(9, 11);
+                                                setFormData({ ...formData, cpf: masked });
+                                            }}
+                                            placeholder="000.000.000-00"
+                                            className="h-10 bg-background focus:ring-1 focus:ring-primary transition-all"
+                                            maxLength={14}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="phone" className="text-sm font-medium">Contato</Label>
                                         <div className="relative">
-                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                                             <Input
-                                                id="name"
-                                                value={formData.name}
-                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                placeholder="Nome do funcionário"
-                                                className="h-10 pl-9 bg-background focus:ring-1 focus:ring-primary transition-all"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2 col-span-1">
-                                        <Label htmlFor="status" className="text-sm font-medium">Status</Label>
-                                        <Select
-                                            value={formData.status || "ativo"}
-                                            onValueChange={(value) => setFormData({ ...formData, status: value })}
-                                        >
-                                            <SelectTrigger className="h-10 bg-background focus:ring-1 focus:ring-primary transition-all">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="ativo">Ativo</SelectItem>
-                                                <SelectItem value="inativo">Inativo</SelectItem>
-                                                <SelectItem value="ferias">Férias</SelectItem>
-                                                <SelectItem value="afastado">Afastado</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* CPF, Contato, Salário e Dia Pagto */}
-                                    <div className="col-span-2 grid grid-cols-4 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="cpf" className="text-sm font-medium">CPF</Label>
-                                            <Input
-                                                id="cpf"
-                                                value={formData.cpf}
+                                                id="phone"
+                                                value={formData.phone}
                                                 onChange={(e) => {
                                                     const value = e.target.value.replace(/\D/g, '');
                                                     let masked = value;
-                                                    if (value.length > 0) masked = value.substring(0, 3);
-                                                    if (value.length >= 4) masked += '.' + value.substring(3, 6);
-                                                    if (value.length >= 7) masked += '.' + value.substring(6, 9);
-                                                    if (value.length >= 10) masked += '-' + value.substring(9, 11);
-                                                    setFormData({ ...formData, cpf: masked });
+                                                    if (value.length > 0) masked = '(' + value.substring(0, 2);
+                                                    if (value.length >= 3) masked += ') ' + value.substring(2, 7);
+                                                    if (value.length >= 8) masked += '-' + value.substring(7, 11);
+                                                    setFormData({ ...formData, phone: masked });
                                                 }}
-                                                placeholder="000.000.000-00"
-                                                className="h-10 bg-background focus:ring-1 focus:ring-primary transition-all"
-                                                maxLength={14}
+                                                placeholder="(00) 00000-0000"
+                                                className="h-10 pl-8 bg-background focus:ring-1 focus:ring-primary transition-all"
+                                                maxLength={15}
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="phone" className="text-sm font-medium">Contato</Label>
-                                            <div className="relative">
-                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                                                <Input
-                                                    id="phone"
-                                                    value={formData.phone}
-                                                    onChange={(e) => {
-                                                        const value = e.target.value.replace(/\D/g, '');
-                                                        let masked = value;
-                                                        if (value.length > 0) masked = '(' + value.substring(0, 2);
-                                                        if (value.length >= 3) masked += ') ' + value.substring(2, 7);
-                                                        if (value.length >= 8) masked += '-' + value.substring(7, 11);
-                                                        setFormData({ ...formData, phone: masked });
-                                                    }}
-                                                    placeholder="(00) 00000-0000"
-                                                    className="h-10 pl-8 bg-background focus:ring-1 focus:ring-primary transition-all"
-                                                    maxLength={15}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="salary" className="text-sm font-medium">Salário (R$)</Label>
-                                            <div className="relative">
-                                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                                                <Input
-                                                    id="salary"
-                                                    type="number"
-                                                    value={formData.salary}
-                                                    onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                                                    placeholder="0,00"
-                                                    className="h-10 pl-8 bg-background focus:ring-1 focus:ring-primary transition-all"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="payment_day" className="text-sm font-medium">Dia Pagto.</Label>
-                                            <div className="relative">
-                                                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                                                <Input
-                                                    id="payment_day"
-                                                    type="number"
-                                                    min="1"
-                                                    max="31"
-                                                    value={formData.payment_day}
-                                                    onChange={(e) => setFormData({ ...formData, payment_day: e.target.value })}
-                                                    placeholder="5"
-                                                    className="h-10 pl-8 bg-background focus:ring-1 focus:ring-primary transition-all"
-                                                />
-                                            </div>
-                                        </div>
                                     </div>
-
-                                    {/* Email e Disponibilidade */}
-                                    <div className="col-span-1 space-y-2">
-                                        <Label htmlFor="email" className="text-sm font-medium">Email Acadêmico / Acesso</Label>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="salary" className="text-sm font-medium">Salário (R$)</Label>
                                         <div className="relative">
-                                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                                             <Input
-                                                id="email"
-                                                type="email"
-                                                value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                placeholder="email@escola.com"
-                                                className="h-10 pl-9 bg-background focus:ring-1 focus:ring-primary transition-all"
-                                                required
+                                                id="salary"
+                                                type="number"
+                                                value={formData.salary}
+                                                onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                                                placeholder="0,00"
+                                                className="h-10 pl-8 bg-background focus:ring-1 focus:ring-primary transition-all"
                                             />
                                         </div>
                                     </div>
-
-                                    <div className="col-span-1">
-                                        <div className="bg-muted/30 border border-border rounded-xl p-3 flex items-center justify-between h-[74px] mt-6">
-                                            <div className="flex-1">
-                                                <p className="font-semibold text-sm">Disponível para dar aulas</p>
-                                                <p className="text-[10px] text-muted-foreground leading-tight">Habilita aparecimento na lista de professores.</p>
-                                            </div>
-                                            <Checkbox
-                                                id="is_teacher"
-                                                checked={formData.is_teacher}
-                                                onCheckedChange={(checked) => setFormData({ ...formData, is_teacher: !!checked })}
-                                                className="w-5 h-5 rounded-full border-2"
+                                    <div className="space-y-2">
+                                        <Label htmlFor="payment_day" className="text-sm font-medium">Dia Pagto.</Label>
+                                        <div className="relative">
+                                            <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                                            <Input
+                                                id="payment_day"
+                                                type="number"
+                                                min="1"
+                                                max="31"
+                                                value={formData.payment_day}
+                                                onChange={(e) => setFormData({ ...formData, payment_day: e.target.value })}
+                                                placeholder="5"
+                                                className="h-10 pl-8 bg-background focus:ring-1 focus:ring-primary transition-all"
                                             />
                                         </div>
                                     </div>
+                                </div>
 
-                                    {/* Cargo */}
-                                    <div className="col-span-1 space-y-2 -mt-2">
-                                        <Label htmlFor="role" className="text-sm font-medium">Cargo</Label>
-                                        <Select
-                                            value={formData.role}
-                                            onValueChange={(value) => setFormData({ ...formData, role: value })}
-                                        >
-                                            <SelectTrigger className="h-10 bg-background focus:ring-1 focus:ring-primary transition-all">
-                                                <SelectValue placeholder="Selecione o cargo" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Administrativo">Administrativo</SelectItem>
-                                                <SelectItem value="Financeiro">Financeiro</SelectItem>
-                                                <SelectItem value="Secretaria">Secretaria</SelectItem>
-                                                <SelectItem value="Professor">Professor</SelectItem>
-                                                <SelectItem value="Professora">Professora</SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                {/* Email e Disponibilidade */}
+                                <div className="col-span-1 space-y-2">
+                                    <Label htmlFor="email" className="text-sm font-medium">Email Acadêmico / Acesso</Label>
+                                    <div className="relative">
+                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            placeholder="email@escola.com"
+                                            className="h-10 pl-9 bg-background focus:ring-1 focus:ring-primary transition-all"
+                                            required
+                                        />
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-end gap-3 pt-4 border-t border-border mt-6">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}
-                                        className="h-10 px-6 font-medium"
-                                    >
-                                        Cancelar
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        disabled={createMutation.isPending || updateMutation.isPending}
-                                        className="h-10 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm transition-all"
-                                    >
-                                        {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                        {isEditOpen ? "Salvar Alterações" : "Salvar"}
-                                    </Button>
+                                <div className="col-span-1">
+                                    <div className="bg-muted/30 border border-border rounded-xl p-3 flex items-center justify-between h-[74px] mt-6">
+                                        <div className="flex-1">
+                                            <p className="font-semibold text-sm">Disponível para dar aulas</p>
+                                            <p className="text-[10px] text-muted-foreground leading-tight">Habilita aparecimento na lista de professores.</p>
+                                        </div>
+                                        <Checkbox
+                                            id="is_teacher"
+                                            checked={formData.is_teacher}
+                                            onCheckedChange={(checked) => setFormData({ ...formData, is_teacher: !!checked })}
+                                            className="w-5 h-5 rounded-full border-2"
+                                        />
+                                    </div>
                                 </div>
-                            </form>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+
+                                {/* Cargo */}
+                                <div className="col-span-1 space-y-2 -mt-2">
+                                    <Label htmlFor="role" className="text-sm font-medium">Cargo</Label>
+                                    <Select
+                                        value={formData.role}
+                                        onValueChange={(value) => setFormData({ ...formData, role: value })}
+                                    >
+                                        <SelectTrigger className="h-10 bg-background focus:ring-1 focus:ring-primary transition-all">
+                                            <SelectValue placeholder="Selecione o cargo" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Administrativo">Administrativo</SelectItem>
+                                            <SelectItem value="Financeiro">Financeiro</SelectItem>
+                                            <SelectItem value="Secretaria">Secretaria</SelectItem>
+                                            <SelectItem value="Professor">Professor</SelectItem>
+                                            <SelectItem value="Professora">Professora</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            <SheetFooter className="flex items-center justify-end gap-3 pt-6 border-t border-border mt-8">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => { setIsAddOpen(false); setIsEditOpen(false); }}
+                                    className="h-11 px-6 font-medium"
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={createMutation.isPending || updateMutation.isPending}
+                                    className="h-11 px-8 font-bold"
+                                >
+                                    {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    {isEditOpen ? "Salvar Alterações" : "Cadastrar"}
+                                </Button>
+                            </SheetFooter>
+                        </form>
+                    </SheetContent>
+                </Sheet>
 
                 {/* Delete Alert */}
                 <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>

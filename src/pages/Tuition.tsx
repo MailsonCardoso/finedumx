@@ -29,13 +29,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -725,14 +725,14 @@ export default function Tuition() {
         )}
 
         {/* Payment Confirmation Modal */}
-        <Dialog open={isPayOpen} onOpenChange={setIsPayOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirmar Recebimento</DialogTitle>
-              <DialogDescription>
+        <Sheet open={isPayOpen} onOpenChange={setIsPayOpen}>
+          <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+            <SheetHeader className="pb-8">
+              <SheetTitle className="text-2xl font-bold">Confirmar Recebimento</SheetTitle>
+              <SheetDescription>
                 Confirme os dados do pagamento para dar baixa na mensalidade.
-              </DialogDescription>
-            </DialogHeader>
+              </SheetDescription>
+            </SheetHeader>
 
             {selectedTuition && (
               <div className="space-y-4 py-4">
@@ -769,25 +769,25 @@ export default function Tuition() {
               </div>
             )}
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsPayOpen(false)}>Cancelar</Button>
-              <Button onClick={confirmPayment} className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={payMutation.isPending}>
+            <SheetFooter className="pt-6 border-t border-border mt-8 flex justify-end gap-3">
+              <Button variant="outline" className="h-11 px-6" onClick={() => setIsPayOpen(false)}>Cancelar</Button>
+              <Button onClick={confirmPayment} className="h-11 px-8 font-bold bg-emerald-600 hover:bg-emerald-700 text-white" disabled={payMutation.isPending}>
                 {payMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
                 Confirmar Baixa
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
 
         {/* One-off Charge Modal */}
-        <Dialog open={isChargeOpen} onOpenChange={setIsChargeOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Nova Cobrança Avulsa</DialogTitle>
-              <DialogDescription>
+        <Sheet open={isChargeOpen} onOpenChange={setIsChargeOpen}>
+          <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+            <SheetHeader className="pb-8">
+              <SheetTitle className="text-2xl font-bold">Nova Cobrança Avulsa</SheetTitle>
+              <SheetDescription>
                 Crie uma cobrança individual para um aluno específico.
-              </DialogDescription>
-            </DialogHeader>
+              </SheetDescription>
+            </SheetHeader>
 
             <div className="space-y-4 py-4">
               <div className="space-y-2">
@@ -854,8 +854,8 @@ export default function Tuition() {
               </div>
             </div>
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsChargeOpen(false)}>Cancelar</Button>
+            <SheetFooter className="pt-6 border-t border-border mt-8 flex justify-end gap-3">
+              <Button variant="outline" className="h-11 px-6" onClick={() => setIsChargeOpen(false)}>Cancelar</Button>
               <Button
                 onClick={() => {
                   if (!chargeStudentId || !chargeReference || !chargeDueDate || !chargeAmount) {
@@ -870,18 +870,19 @@ export default function Tuition() {
                     type: chargeType
                   });
                 }}
+                className="h-11 px-8 font-bold"
                 disabled={chargeMutation.isPending}
               >
                 {chargeMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Criar Cobrança
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
 
         {/* Batch Generation Modal */}
-        <Dialog open={isGenerateOpen} onOpenChange={setIsGenerateOpen}>
-          <DialogContent>
+        <Sheet open={isGenerateOpen} onOpenChange={setIsGenerateOpen}>
+          <SheetContent side="right" className="w-full sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Gerar Mensalidades em Lote</DialogTitle>
               <DialogDescription>
@@ -923,15 +924,15 @@ export default function Tuition() {
               </div>
             </div>
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsGenerateOpen(false)}>Cancelar</Button>
-              <Button onClick={handleGenerateClick} disabled={generateMutation.isPending}>
+            <SheetFooter className="pt-6 border-t border-border mt-8 flex justify-end gap-3">
+              <Button variant="outline" className="h-11 px-6" onClick={() => setIsGenerateOpen(false)}>Cancelar</Button>
+              <Button onClick={handleGenerateClick} className="h-11 px-8 font-bold" disabled={generateMutation.isPending}>
                 {generateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Gerar Agora
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
 
         {/* Notification Alert Modal */}
         <Dialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>

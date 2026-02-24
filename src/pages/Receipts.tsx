@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Download, Receipt as ReceiptIcon, Loader2, Printer } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "@/components/ui/sheet";
 
 interface Payment {
   id: number;
@@ -133,14 +140,14 @@ export default function Receipts() {
         )}
 
         {/* Receipt Modal */}
-        <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
-          <DialogContent className="max-w-3xl">
-            <DialogHeader className="no-print">
-              <DialogTitle>Recibo de Pagamento</DialogTitle>
-              <DialogDescription>
+        <Sheet open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
+          <SheetContent side="right" className="w-full sm:max-w-3xl overflow-y-auto">
+            <SheetHeader className="no-print pb-6">
+              <SheetTitle className="text-2xl font-bold">Recibo de Pagamento</SheetTitle>
+              <SheetDescription>
                 Visualize ou imprima o recibo detalhado do pagamento confirmado.
-              </DialogDescription>
-            </DialogHeader>
+              </SheetDescription>
+            </SheetHeader>
             <div id="receipt-area" className="p-8 bg-white text-black border-2 border-dashed border-gray-300 rounded-lg">
               <style>
                 {`
@@ -202,14 +209,14 @@ export default function Receipts() {
               </div>
             </div>
 
-            <DialogFooter className="no-print">
-              <Button variant="outline" onClick={() => setIsReceiptOpen(false)}>Fechar</Button>
-              <Button onClick={handlePrintReceipt} className="gap-2">
-                <Printer className="w-4 h-4" /> Imprimir
+            <SheetFooter className="no-print pt-6 border-t border-border mt-8 flex justify-end gap-3">
+              <Button variant="outline" className="h-11 px-6" onClick={() => setIsReceiptOpen(false)}>Fechar</Button>
+              <Button onClick={handlePrintReceipt} className="h-11 px-8 font-bold gap-2">
+                <Printer className="w-4 h-4" /> Imprimir Recibo
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
       </div>
     </MainLayout>
   );
