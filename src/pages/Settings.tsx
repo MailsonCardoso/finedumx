@@ -112,147 +112,37 @@ export default function Settings() {
                 <div>
                   <CardTitle className="text-xl">Interface e Visual</CardTitle>
                   <CardDescription>
-                    Escolha como o PlatFormX deve aparecer para você
+                    Escolha a cor de destaque do Vem Cantar
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button
-                  onClick={() => setTheme("light")}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 ${theme === "light"
-                    ? "border-primary bg-primary/5 ring-4 ring-primary/10"
-                    : "border-border/50 bg-background/50 hover:border-border hover:bg-muted/50"
-                    }`}
-                >
-                  <div className={`p-3 rounded-full ${theme === "light" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-                    <Sun className="w-6 h-6" />
-                  </div>
-                  <span className="font-semibold">Claro</span>
-                </button>
-
-                <button
-                  onClick={() => setTheme("dark")}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 ${theme === "dark"
-                    ? "border-primary bg-primary/5 ring-4 ring-primary/10"
-                    : "border-border/50 bg-background/50 hover:border-border hover:bg-muted/50"
-                    }`}
-                >
-                  <div className={`p-3 rounded-full ${theme === "dark" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-                    <Moon className="w-6 h-6" />
-                  </div>
-                  <span className="font-semibold">Escuro</span>
-                </button>
-
-                <button
-                  onClick={() => setTheme("system")}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 ${theme === "system"
-                    ? "border-primary bg-primary/5 ring-4 ring-primary/10"
-                    : "border-border/50 bg-background/50 hover:border-border hover:bg-muted/50"
-                    }`}
-                >
-                  <div className={`p-3 rounded-full ${theme === "system" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-                    <Monitor className="w-6 h-6" />
-                  </div>
-                  <span className="font-semibold">Sistema</span>
-                </button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Notifications */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card className="shadow-soft border-border/50 bg-card overflow-hidden">
-            <CardHeader className="bg-muted/10 border-b border-border/50">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-sm">
-                  <Bell className="w-5 h-5" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Notificações Automáticas</CardTitle>
-                  <CardDescription>
-                    Configure os alertas e lembretes enviados pelo sistema
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <Label htmlFor="emailReminder" className="font-medium">
-                    Lembrete por E-mail
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Envia lembrete 3 dias antes do vencimento
-                  </p>
-                </div>
-                <Switch
-                  id="emailReminder"
-                  checked={notifications.emailReminder}
-                  onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, emailReminder: checked })
-                  }
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <Label htmlFor="smsReminder" className="font-medium">
-                    Lembrete por SMS
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Envia SMS no dia do vencimento
-                  </p>
-                </div>
-                <Switch
-                  id="smsReminder"
-                  checked={notifications.smsReminder}
-                  onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, smsReminder: checked })
-                  }
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <Label htmlFor="overdueAlert" className="font-medium">
-                    Alerta de Atraso
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Notifica quando há mensalidades atrasadas
-                  </p>
-                </div>
-                <Switch
-                  id="overdueAlert"
-                  checked={notifications.overdueAlert}
-                  onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, overdueAlert: checked })
-                  }
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <Label htmlFor="paymentConfirmation" className="font-medium">
-                    Confirmação de Pagamento
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Envia comprovante ao confirmar pagamento
-                  </p>
-                </div>
-                <Switch
-                  id="paymentConfirmation"
-                  checked={notifications.paymentConfirmation}
-                  onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, paymentConfirmation: checked })
-                  }
-                />
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {[
+                  { name: "Vem Cantar", color: "262 83% 58%", label: "Roxo" },
+                  { name: "Oceano", color: "221.2 83.2% 53.3%", label: "Azul" },
+                  { name: "Energia", color: "24 95% 53%", label: "Laranja" },
+                  { name: "Natureza", color: "142 76% 36%", label: "Verde" },
+                  { name: "Soft", color: "322 81% 60%", label: "Rosa" },
+                ].map((c) => (
+                  <button
+                    key={c.name}
+                    onClick={() => {
+                      document.documentElement.style.setProperty('--primary', c.color);
+                      document.documentElement.style.setProperty('--ring', c.color);
+                      localStorage.setItem('vem-cantar-color', c.color);
+                      toast.success(`Tema ${c.name} aplicado!`);
+                    }}
+                    className="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 border-border/50 bg-background/50 hover:border-primary/50 hover:bg-muted/50"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full shadow-inner"
+                      style={{ backgroundColor: `hsl(${c.color})` }}
+                    />
+                    <span className="font-semibold text-xs">{c.name}</span>
+                  </button>
+                ))}
               </div>
             </CardContent>
           </Card>

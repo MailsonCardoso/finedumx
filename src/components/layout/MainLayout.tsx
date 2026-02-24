@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { MobileHeader } from "./MobileHeader";
 import { cn } from "@/lib/utils";
@@ -10,13 +10,21 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  useEffect(() => {
+    const savedColor = localStorage.getItem('vem-cantar-color');
+    if (savedColor) {
+      document.documentElement.style.setProperty('--primary', savedColor);
+      document.documentElement.style.setProperty('--ring', savedColor);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex w-full bg-background">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
-        <AppSidebar 
-          collapsed={sidebarCollapsed} 
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+        <AppSidebar
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
       </div>
 

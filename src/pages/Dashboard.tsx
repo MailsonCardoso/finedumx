@@ -184,7 +184,7 @@ export default function Dashboard() {
             <p className="text-muted-foreground mt-1 text-lg">
               {isAdministrativo
                 ? "Acompanhe a agenda e as atividades escolares de hoje."
-                : "Bem-vindo ao centro de controle financeiro da PlatFormX."}
+                : "Bem-vindo ao centro de controle financeiro da Vem Cantar."}
             </p>
           </div>
           <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-xl border border-border/50 shadow-sm self-start md:self-center">

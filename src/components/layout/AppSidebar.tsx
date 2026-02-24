@@ -83,7 +83,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             <Wallet className="w-5 h-5 text-primary-foreground" />
           </div>
           {!collapsed && (
-            <span className="font-bold text-lg text-foreground">PlatFormX</span>
+            <span className="font-bold text-lg text-foreground">Vem Cantar</span>
           )}
         </div>
         {!collapsed && user?.role === 'admin' && <NotificationBell />}
@@ -133,8 +133,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
           </Avatar>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user?.name || "Admin PlatFormX"}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email || "admin@platformx.com"}</p>
+              <p className="text-sm font-medium text-foreground truncate">{user?.name || "Admin Vem Cantar"}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email || "contato@vemcantar.com"}</p>
             </div>
           )}
         </div>

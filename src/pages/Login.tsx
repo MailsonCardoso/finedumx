@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Wallet } from "lucide-react";
+import { Loader2, Music } from "lucide-react";
 import { motion } from "framer-motion";
 import { apiFetch, setAuthToken } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -97,7 +97,7 @@ export default function Login() {
           <div className="relative group">
             <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-xl group-hover:bg-primary/30 transition-colors" />
             <div className="relative w-20 h-20 rounded-3xl bg-primary flex items-center justify-center shadow-2xl transition-transform hover:scale-105 duration-300">
-              <Wallet className="w-10 h-10 text-primary-foreground" />
+              <Music className="w-10 h-10 text-primary-foreground" />
             </div>
           </div>
         </motion.div>
@@ -110,9 +110,9 @@ export default function Login() {
           className="bg-card/70 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-border/50 p-10 relative"
         >
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">PlatFormX</h1>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">Vem Cantar</h1>
             <p className="text-muted-foreground mt-2 font-medium">
-              Gestão Financeira
+              Gestão Escolar
             </p>
           </div>
 
@@ -189,7 +189,7 @@ export default function Login() {
           transition={{ delay: 0.8 }}
           className="text-xs text-center text-muted-foreground mt-10 font-medium"
         >
-          © 2026 PlatFormX • Software de Alto Desempenho
+          © 2026 Vem Cantar • Software de Alto Desempenho
         </motion.p>
       </div>
     </div>
