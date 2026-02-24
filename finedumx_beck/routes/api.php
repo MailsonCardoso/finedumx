@@ -26,6 +26,7 @@ Route::get('/mp-test', function () {
     ]);
 });
 Route::post('/webhooks/mercadopago', [\App\Http\Controllers\MercadoPagoController::class, 'handleWebhook']);
+Route::get('/settings', [SettingController::class, 'index']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -68,6 +69,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // Teacher Portal
     Route::get('/teacher/portal', [\App\Http\Controllers\TeacherPortalController::class, 'index']);
 
-    Route::get('/settings', [SettingController::class, 'index']);
     Route::put('/settings', [SettingController::class, 'update']);
 });
