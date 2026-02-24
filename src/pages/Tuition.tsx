@@ -46,6 +46,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { AlertTriangle, Bell, Printer, Plus, Filter, Search, CheckCircle2, Loader2, DollarSign, MessageCircle, Trash2, MoreVertical, Pencil, GraduationCap, FileText, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -883,13 +891,13 @@ export default function Tuition() {
         {/* Batch Generation Modal */}
         <Sheet open={isGenerateOpen} onOpenChange={setIsGenerateOpen}>
           <SheetContent side="right" className="w-full sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Gerar Mensalidades em Lote</DialogTitle>
-              <DialogDescription>
+            <SheetHeader className="pb-8">
+              <SheetTitle className="text-2xl font-bold">Gerar Mensalidades em Lote</SheetTitle>
+              <SheetDescription>
                 Isso irá gerar mensalidades para <b>todos os alunos ativos</b> para o mês selecionado.
                 Mensalidades que já existem não serão duplicadas.
-              </DialogDescription>
-            </DialogHeader>
+              </SheetDescription>
+            </SheetHeader>
 
             <div className="grid grid-cols-2 gap-4 py-4">
               <div className="space-y-2">
