@@ -232,19 +232,19 @@ export default function Courses() {
                                         </DropdownMenu>
                                     </div>
 
-                                    <div className="p-5 flex flex-col gap-4 h-full pt-7">
+                                    <div className="p-4 flex flex-col gap-3 h-full pt-6">
                                         {/* Header */}
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="flex items-center gap-3 w-full">
-                                                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 transition-transform group-hover:scale-110 duration-300">
-                                                    <BookOpen className="h-6 w-6" />
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="flex items-center gap-2.5 w-full">
+                                                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 transition-transform group-hover:scale-110 duration-300">
+                                                    <BookOpen className="h-5 w-5" />
                                                 </div>
-                                                <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
-                                                    <h3 className="font-bold text-foreground leading-tight truncate w-full pr-6 text-lg" title={course.name}>
+                                                <div className="flex flex-col items-start min-w-0 flex-1">
+                                                    <h3 className="font-bold text-foreground leading-tight truncate w-full pr-5 text-base" title={course.name}>
                                                         {course.name}
                                                     </h3>
                                                     {course.description && (
-                                                        <p className="text-xs text-muted-foreground line-clamp-1 w-full" title={course.description}>
+                                                        <p className="text-[10px] text-muted-foreground line-clamp-1 w-full" title={course.description}>
                                                             {course.description}
                                                         </p>
                                                     )}
@@ -253,38 +253,38 @@ export default function Courses() {
                                         </div>
 
                                         {/* Body Information */}
-                                        <div className="space-y-3 mt-2">
+                                        <div className="space-y-2 mt-1">
                                             {/* Professor Padrão */}
-                                            <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
-                                                <User className="w-4 h-4 text-muted-foreground/70 shrink-0" />
-                                                <span className="truncate text-xs font-medium">
+                                            <div className="bg-muted/30 rounded-full px-3.5 py-2 flex items-center gap-2.5 text-foreground/70">
+                                                <User className="w-3.5 h-3.5 text-muted-foreground/70 shrink-0" />
+                                                <span className="truncate text-[11px] font-medium">
                                                     {course.teacher_name || "Sem prof. padrão"}
                                                 </span>
                                             </div>
 
                                             {/* Dias Sugeridos */}
-                                            <div className="bg-muted/30 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground/70">
-                                                <Calendar className="w-4 h-4 text-muted-foreground/70 shrink-0" />
-                                                <span className="truncate text-xs">
+                                            <div className="bg-muted/30 rounded-full px-3.5 py-2 flex items-center gap-2.5 text-foreground/70">
+                                                <Calendar className="w-3.5 h-3.5 text-muted-foreground/70 shrink-0" />
+                                                <span className="truncate text-[11px]">
                                                     {course.days_of_week || "Horário livre"}
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <div className="mt-auto pt-4 space-y-4">
+                                        <div className="mt-auto pt-3 space-y-3">
                                             {/* Divider */}
                                             <div className="h-px w-full bg-border/40" />
 
                                             {/* Footer: Price */}
-                                            <div className="flex items-center justify-end px-2">
+                                            <div className="flex items-center justify-end px-1">
                                                 <div className="text-right">
-                                                    <span className="font-bold text-foreground text-lg">
+                                                    <span className="font-bold text-foreground text-base">
                                                         {new Intl.NumberFormat("pt-BR", {
                                                             style: "currency",
                                                             currency: "BRL",
                                                         }).format(course.price)}
                                                     </span>
-                                                    <span className="text-xs font-medium text-muted-foreground ml-1">/mês</span>
+                                                    <span className="text-[10px] font-medium text-muted-foreground ml-1">/mês</span>
                                                 </div>
                                             </div>
                                         </div>
