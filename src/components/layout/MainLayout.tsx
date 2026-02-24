@@ -11,6 +11,10 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
+    // Remove old theme residues that might interfere
+    localStorage.removeItem('finedu-theme');
+    localStorage.removeItem('theme');
+
     const savedTheme = localStorage.getItem('vem-cantar-theme');
     if (savedTheme) {
       try {

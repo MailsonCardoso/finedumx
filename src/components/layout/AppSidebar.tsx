@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ThemeToggle } from "@/components/theme-toggle";
+
 import {
   LayoutDashboard,
   Users,
@@ -160,7 +160,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
           </Button>
           {!collapsed && (
             <>
-              <ThemeToggle />
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -178,7 +178,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
           )}
           {collapsed && (
             <div className="flex flex-col gap-2 mt-2">
-              <ThemeToggle />
+              {/* ThemeToggle removed */}
             </div>
           )}
         </div>

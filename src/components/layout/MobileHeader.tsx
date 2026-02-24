@@ -2,7 +2,7 @@ import { Menu, Wallet, BookOpen, Briefcase, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ThemeToggle } from "@/components/theme-toggle";
+
 import {
   LayoutDashboard,
   Users,
@@ -67,7 +67,7 @@ export function MobileHeader() {
 
       <div className="flex items-center gap-2">
         {user?.role === 'admin' && <NotificationBell />}
-        <ThemeToggle />
+
 
         <Sheet>
           <SheetTrigger asChild>

@@ -23,7 +23,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light" storageKey="finedu-theme" attribute="class">
+    <ThemeProvider forcedTheme="light" attribute="class">
       <TooltipProvider>
         <Toaster />
         <Sonner />
