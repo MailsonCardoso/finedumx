@@ -11,6 +11,12 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\TuitionController;
 
 // Public routes
+Route::get('/dangerzone/clear-agenda', function () {
+    \Illuminate\Support\Facades\DB::table('appointment_responses')->delete();
+    \Illuminate\Support\Facades\DB::table('appointments')->delete();
+    return "Agenda limpa com sucesso! Remova esta rota antes de ir para produção real.";
+});
+
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/mp-test', function () {
     return response()->json([

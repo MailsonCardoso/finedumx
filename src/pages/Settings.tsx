@@ -257,6 +257,45 @@ export default function Settings() {
             Salvar Configurações
           </Button>
         </motion.div>
+
+        {/* Danger Zone */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Card className="shadow-soft border-red-100 bg-red-50/30 dark:bg-red-900/10 overflow-hidden mt-12">
+            <CardHeader className="border-b border-red-100 dark:border-red-900/50">
+              <CardTitle className="text-xl text-red-600">Zona de Perigo</CardTitle>
+              <CardDescription>Ações irreversíveis para preparação de produção</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                  <p className="font-bold text-red-700 dark:text-red-400">Limpar toda a Agenda</p>
+                  <p className="text-sm text-red-600/80 dark:text-red-400/60">Remove permanentemente todos os agendamentos e respostas dos alunos.</p>
+                </div>
+                <Button
+                  variant="destructive"
+                  className="w-full md:w-auto"
+                  onClick={async () => {
+                    if (window.confirm("Tem certeza que deseja apagar TODOS os agendamentos? Esta ação não pode ser desfeita.")) {
+                      try {
+                        await apiFetch('/dangerzone/clear-agenda');
+                        toast.success("Agenda limpa com sucesso!");
+                        queryClient.invalidateQueries({ queryKey: ['appointments'] });
+                      } catch (e) {
+                        toast.error("Erro ao limpar agenda.");
+                      }
+                    }
+                  }}
+                >
+                  Apagar Tudo
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </MainLayout>
   );
