@@ -1,4 +1,5 @@
-const API_BASE_URL = "/api";
+const isProd = import.meta.env.PROD;
+const API_BASE_URL = isProd ? "https://app.platformx.com.br/api" : "/api";
 
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = localStorage.getItem('auth_token');
@@ -21,8 +22,13 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
     }
 
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || errorData.error || "Erro na requisição");
+        const text = await response.text();
+        try {
+            const errorData = JSON.parse(text);
+            throw new Error(errorData.message || errorData.error || "Erro na requisição");
+        } catch (e) {
+            throw new Error(`Erro do servidor (${response.status}).`);
+        }
     }
 
     if (response.status === 204) {
