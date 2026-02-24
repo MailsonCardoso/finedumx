@@ -133,8 +133,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
           </Avatar>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user?.name || "Admin Vem Cantar"}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email || "contato@vemcantar.com"}</p>
+              <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name || "Administrador Vem Cantar"}</p>
+              <p className="text-xs text-sidebar-foreground/60 truncate">{user?.email || "contato@vemcantar.com.br"}</p>
             </div>
           )}
         </div>
@@ -145,7 +145,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             size="sm"
             onClick={onToggle}
             className={cn(
-              "flex-1 h-9",
+              "flex-1 h-9 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               collapsed && "w-9"
             )}
           >

@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
+import { useEffect } from "react";
+import { applyTheme } from "@/lib/theme-utils";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
@@ -21,33 +23,42 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider forcedTheme="light" attribute="class">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/alunos" element={<Students />} />
-            <Route path="/funcionarios" element={<Employees />} />
-            <Route path="/turmas" element={<Classes />} />
-            <Route path="/cursos" element={<Courses />} />
-            <Route path="/mensalidades" element={<Tuition />} />
-            <Route path="/pagamentos" element={<Payments />} />
-            <Route path="/recibos" element={<Receipts />} />
-            <Route path="/configuracoes" element={<Settings />} />
-            <Route path="/agenda" element={<Agenda />} />
-            <Route path="/portal" element={<StudentPortal />} />
-            <Route path="/professor" element={<TeacherPortal />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('vem-cantar-theme');
+    if (savedTheme) {
+      applyTheme(savedTheme);
+    }
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider forcedTheme="light" attribute="class">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/alunos" element={<Students />} />
+              <Route path="/funcionarios" element={<Employees />} />
+              <Route path="/turmas" element={<Classes />} />
+              <Route path="/cursos" element={<Courses />} />
+              <Route path="/mensalidades" element={<Tuition />} />
+              <Route path="/pagamentos" element={<Payments />} />
+              <Route path="/recibos" element={<Receipts />} />
+              <Route path="/configuracoes" element={<Settings />} />
+              <Route path="/agenda" element={<Agenda />} />
+              <Route path="/portal" element={<StudentPortal />} />
+              <Route path="/professor" element={<TeacherPortal />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

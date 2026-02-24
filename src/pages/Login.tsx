@@ -7,12 +7,18 @@ import { Loader2, Music } from "lucide-react";
 import { motion } from "framer-motion";
 import { apiFetch, setAuthToken } from "@/lib/api-client";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Login() {
   const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { data: schoolData } = useQuery<any>({
+    queryKey: ['school-settings'],
+    queryFn: () => apiFetch('/settings').catch(() => null),
+  });
 
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, "");
@@ -183,14 +189,15 @@ export default function Login() {
 
         </motion.div>
 
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="text-xs text-center text-muted-foreground mt-10 font-medium"
+          className="text-xs text-center text-muted-foreground mt-10 font-medium space-y-1"
         >
-          © 2026 Vem Cantar • Software de Alto Desempenho
-        </motion.p>
+          <p>© 2026 {schoolData?.name || "Vem Cantar"} • Software de Alto Desempenho</p>
+          <p className="opacity-70">Desenvolvido por: Mailson Cardoso (98)988221217</p>
+        </motion.div>
       </div>
     </div>
   );

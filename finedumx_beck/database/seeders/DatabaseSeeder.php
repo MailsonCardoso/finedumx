@@ -22,8 +22,8 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['cpf' => '019.358.063-27'],
             [
-                'name' => 'Admin FinEdu',
-                'email' => 'admin@finedu.com',
+                'name' => 'Administrador Vem Cantar',
+                'email' => 'contato@vemcantar.com.br',
                 'password' => bcrypt('@Secur1t1@'),
             ]
         );
