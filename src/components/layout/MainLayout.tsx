@@ -22,10 +22,10 @@ export function MainLayout({ children }: MainLayoutProps) {
         const root = document.documentElement;
         root.style.setProperty('--primary', theme.primary);
         root.style.setProperty('--ring', theme.primary);
-        root.style.setProperty('--sidebar', theme.sidebar);
+        root.style.setProperty('--sidebar-background', theme.sidebar);
         root.style.setProperty('--sidebar-foreground', '0 0% 100%');
         root.style.setProperty('--sidebar-primary', theme.primary);
-        root.style.setProperty('--sidebar-accent', 'hsl(var(--sidebar) / 0.8)');
+        root.style.setProperty('--sidebar-accent', 'hsl(' + theme.sidebar + ' / 0.8)');
         root.style.setProperty('--sidebar-accent-foreground', '0 0% 100%');
       } catch (e) {
         console.error("Erro ao carregar tema:", e);

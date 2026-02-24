@@ -76,6 +76,12 @@ export default function Settings() {
 
   const themes = [
     {
+      name: "Vem Cantar (Original)",
+      primary: "262 83% 58%",
+      sidebar: "266 45% 15%",
+      description: "Identidade Visual Original (Violeta)"
+    },
+    {
       name: "Confiança Corporativa",
       primary: "221 83% 53%",
       sidebar: "222 47% 11%",
@@ -105,10 +111,10 @@ export default function Settings() {
     const root = document.documentElement;
     root.style.setProperty('--primary', theme.primary);
     root.style.setProperty('--ring', theme.primary);
-    root.style.setProperty('--sidebar', theme.sidebar);
+    root.style.setProperty('--sidebar-background', theme.sidebar);
     root.style.setProperty('--sidebar-foreground', '0 0% 100%');
     root.style.setProperty('--sidebar-primary', theme.primary);
-    root.style.setProperty('--sidebar-accent', 'hsl(var(--sidebar) / 0.8)');
+    root.style.setProperty('--sidebar-accent', 'hsl(' + theme.sidebar + ' / 0.8)');
     root.style.setProperty('--sidebar-accent-foreground', '0 0% 100%');
 
     localStorage.setItem('vem-cantar-theme', JSON.stringify(theme));
