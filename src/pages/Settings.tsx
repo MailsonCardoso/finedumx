@@ -11,7 +11,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { AlertConfirm } from "@/components/AlertConfirm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert, CheckCircle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { applyTheme as applyThemeUtil } from "@/lib/theme-utils";
 
 interface SchoolData {
@@ -28,6 +29,7 @@ interface SchoolData {
 export default function Settings() {
   const queryClient = useQueryClient();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [confirmWipe, setConfirmWipe] = useState(false);
 
   const { data: schoolData, isLoading } = useQuery<SchoolData>({
     queryKey: ['school-settings'],
@@ -204,13 +206,45 @@ export default function Settings() {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               <Card className="border-red-100 bg-red-50/20 overflow-hidden rounded-[2rem]">
                 <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="text-center md:text-left space-y-1">
+                  <div className="text-center md:text-left space-y-3">
                     <p className="font-bold text-red-600 text-lg uppercase tracking-wider flex items-center justify-center md:justify-start gap-2">
                       <ShieldAlert className="w-5 h-5" /> Zona de Perigo
                     </p>
-                    <p className="text-sm text-red-500/70 font-medium">Limpar toda a Agenda - Ação irreversível para preparação de produção.</p>
+                    <div className="space-y-4">
+                      <p className="text-sm text-red-500/70 font-medium leading-relaxed">
+                        Limpar toda a Agenda - Ação irreversível para preparação de produção.
+                      </p>
+                      <div className="flex items-start space-x-3 bg-red-500/10 p-4 rounded-xl border border-red-500/20">
+                        <Checkbox
+                          id="confirm-wipe"
+                          checked={confirmWipe}
+                          onCheckedChange={(checked) => setConfirmWipe(!!checked)}
+                          className="mt-1 border-red-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                          <label
+                            htmlFor="confirm-wipe"
+                            className="text-sm font-semibold text-red-700 cursor-pointer select-none"
+                          >
+                            Confirmação de Segurança
+                          </label>
+                          <p className="text-xs text-red-600/60">
+                            Estou ciente de que esta ação apagará permanentemente todos os registros da agenda e não poderá ser desfeita.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <Button variant="destructive" className="h-14 px-10 font-bold shadow-lg shadow-red-200" onClick={() => setIsConfirmOpen(true)}>Apagar Todos os Dados da Agenda</Button>
+                  <Button
+                    variant="destructive"
+                    className="h-16 px-10 font-bold shadow-xl shadow-red-200 transition-all active:scale-95 disabled:grayscale disabled:opacity-50"
+                    onClick={() => setIsConfirmOpen(true)}
+                    disabled={!confirmWipe}
+                  >
+                    {!confirmWipe && <ShieldAlert className="w-5 h-5 mr-2 opacity-50" />}
+                    {confirmWipe && <CheckCircle className="w-5 h-5 mr-2 animate-bounce" />}
+                    Apagar Todos os Dados da Agenda
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
