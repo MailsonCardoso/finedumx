@@ -120,68 +120,26 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         </ul>
       </nav>
 
-      {/* Footer */}
-      <div className="p-3 border-t border-sidebar-border">
-        <div className={cn(
-          "flex items-center gap-3 p-2 rounded-lg",
-          collapsed ? "justify-center" : ""
-        )}>
-          <Avatar className="w-9 h-9">
-            <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-              {user?.name?.substring(0, 2).toUpperCase() || "AD"}
-            </AvatarFallback>
-          </Avatar>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name || "Administrador Vem Cantar"}</p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">{user?.email || "contato@vemcantar.com.br"}</p>
-            </div>
+      {/* Footer - Only Toggle */}
+      <div className="p-3 border-t border-sidebar-border mt-auto">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggle}
+          className={cn(
+            "w-full h-11 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center gap-3 transition-all",
+            collapsed ? "justify-center px-0" : "px-3"
           )}
-        </div>
-
-        <div className="flex items-center gap-2 mt-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggle}
-            className={cn(
-              "flex-1 h-9 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              collapsed && "w-9"
-            )}
-          >
-            {collapsed ? (
-              <ChevronRight className="w-4 h-4" />
-            ) : (
-              <>
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                <span>Recolher</span>
-              </>
-            )}
-          </Button>
-          {!collapsed && (
+        >
+          {collapsed ? (
+            <ChevronRight className="w-5 h-5 flex-shrink-0" />
+          ) : (
             <>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                className="h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
-              >
-                {isLoggingOut ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <LogOut className="w-4 h-4" />
-                )}
-              </Button>
+              <ChevronLeft className="w-5 h-5 flex-shrink-0" />
+              <span className="font-medium">Recolher</span>
             </>
           )}
-          {collapsed && (
-            <div className="flex flex-col gap-2 mt-2">
-              {/* ThemeToggle removed */}
-            </div>
-          )}
-        </div>
+        </Button>
       </div>
     </aside>
   );
