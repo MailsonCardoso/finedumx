@@ -10,6 +10,9 @@ import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { AlertConfirm } from "@/components/AlertConfirm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ShieldAlert } from "lucide-react";
+import { applyTheme as applyThemeUtil } from "@/lib/theme-utils";
 
 interface SchoolData {
   id?: number;
@@ -19,6 +22,7 @@ interface SchoolData {
   email: string;
   address: string;
   pix_key: string;
+  theme?: string;
 }
 
 export default function Settings() {
@@ -37,6 +41,7 @@ export default function Settings() {
     email: "",
     address: "",
     pix_key: "",
+    theme: "",
   });
 
   useEffect(() => {
@@ -108,17 +113,8 @@ export default function Settings() {
   ];
 
   const applyTheme = (theme: any) => {
-    const root = document.documentElement;
-    root.style.setProperty('--primary', theme.primary);
-    root.style.setProperty('--ring', theme.primary);
-    root.style.setProperty('--sidebar-background', theme.sidebar);
-    root.style.setProperty('--sidebar-foreground', '0 0% 100%');
-    root.style.setProperty('--sidebar-primary', theme.primary);
-    root.style.setProperty('--sidebar-accent', 'hsl(' + theme.sidebar + ' / 0.8)');
-    root.style.setProperty('--sidebar-accent-foreground', '0 0% 100%');
-
-    localStorage.setItem('vem-cantar-theme', JSON.stringify(theme));
-    toast.success(`Tema ${theme.name} aplicado!`);
+    applyThemeUtil(theme);
+    setFormData(prev => ({ ...prev, theme: JSON.stringify(theme) }));
   };
 
   return (
@@ -129,80 +125,99 @@ export default function Settings() {
           <p className="text-muted-foreground mt-1 text-lg">Personalize sua experiência.</p>
         </motion.div>
 
-        {/* Themes Grid */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <Card className="shadow-soft border-border/50 bg-card overflow-hidden">
-            <CardHeader className="bg-muted/10 border-b border-border/50">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-sm"><Palette className="w-5 h-5" /></div>
-                <div>
-                  <CardTitle className="text-xl">Aparência e Temas</CardTitle>
-                  <CardDescription>Escolha a paleta de cores para o sistema altamente profissional.</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {themes.map((theme) => (
-                  <button
-                    key={theme.name}
-                    onClick={() => applyTheme(theme)}
-                    className="p-5 rounded-[2rem] border-2 transition-all flex flex-col items-center text-center gap-4 border-border/50 bg-background/50 hover:border-primary/50 hover:bg-muted/50 group relative overflow-hidden"
-                  >
-                    <div className="flex -space-x-4">
-                      <div className="w-14 h-14 rounded-full shadow-lg border-4 border-background z-10" style={{ backgroundColor: `hsl(${theme.primary})` }} />
-                      <div className="w-14 h-14 rounded-full shadow-lg border-4 border-background" style={{ backgroundColor: `hsl(${theme.sidebar})` }} />
+        <Tabs defaultValue="instituicao" className="w-full">
+          <TabsList className="bg-muted/50 p-1 rounded-xl h-14 mb-8">
+            <TabsTrigger value="instituicao" className="rounded-lg px-6 h-full font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Building2 className="w-4 h-4 mr-2" /> Instituição
+            </TabsTrigger>
+            <TabsTrigger value="aparencia" className="rounded-lg px-6 h-full font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Palette className="w-4 h-4 mr-2" /> Aparência e Temas
+            </TabsTrigger>
+            <TabsTrigger value="avancado" className="rounded-lg px-6 h-full font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <ShieldAlert className="w-4 h-4 mr-2" /> Avançado/Sistema
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="aparencia">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <Card className="shadow-soft border-border/50 bg-card overflow-hidden">
+                <CardHeader className="bg-muted/10 border-b border-border/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-sm"><Palette className="w-5 h-5" /></div>
+                    <div>
+                      <CardTitle className="text-xl">Aparência e Temas</CardTitle>
+                      <CardDescription>Escolha a paleta de cores para o sistema altamente profissional.</CardDescription>
                     </div>
-                    <div className="space-y-1">
-                      <span className="font-bold text-sm block leading-tight">{theme.name}</span>
-                      <span className="text-[10px] text-muted-foreground leading-tight block">{theme.description}</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {themes.map((theme) => (
+                      <button
+                        key={theme.name}
+                        onClick={() => applyTheme(theme)}
+                        className="p-5 rounded-[2rem] border-2 transition-all flex flex-col items-center text-center gap-4 border-border/50 bg-background/50 hover:border-primary/50 hover:bg-muted/50 group relative overflow-hidden"
+                      >
+                        <div className="flex -space-x-4">
+                          <div className="w-14 h-14 rounded-full shadow-lg border-4 border-background z-10" style={{ backgroundColor: `hsl(${theme.primary})` }} />
+                          <div className="w-14 h-14 rounded-full shadow-lg border-4 border-background" style={{ backgroundColor: `hsl(${theme.sidebar})` }} />
+                        </div>
+                        <div className="space-y-1">
+                          <span className="font-bold text-sm block leading-tight">{theme.name}</span>
+                          <span className="text-[10px] text-muted-foreground leading-tight block">{theme.description}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="instituicao">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <Card className="shadow-soft border-border/50 bg-card overflow-hidden">
+                <CardHeader className="bg-muted/10 border-b border-border/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-sm"><Building2 className="w-5 h-5" /></div>
+                    <div>
+                      <CardTitle className="text-xl">Dados da Instituição</CardTitle>
+                      <CardDescription>Informações para documentos e recibos.</CardDescription>
                     </div>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2"><Label>Nome</Label><Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>CNPJ</Label><Input value={formData.cnpj} onChange={e => setFormData({ ...formData, cnpj: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Telefone</Label><Input value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>E-mail</Label><Input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Chave PIX</Label><Input value={formData.pix_key} onChange={e => setFormData({ ...formData, pix_key: e.target.value })} /></div>
+                  </div>
+                  <div className="space-y-2"><Label>Endereço</Label><Input value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} /></div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
 
-        {/* Institution Data */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <Card className="shadow-soft border-border/50 bg-card overflow-hidden">
-            <CardHeader className="bg-muted/10 border-b border-border/50">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-sm"><Building2 className="w-5 h-5" /></div>
-                <div>
-                  <CardTitle className="text-xl">Dados da Instituição</CardTitle>
-                  <CardDescription>Informações para documentos e recibos.</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Nome</Label><Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} /></div>
-                <div className="space-y-2"><Label>CNPJ</Label><Input value={formData.cnpj} onChange={e => setFormData({ ...formData, cnpj: e.target.value })} /></div>
-                <div className="space-y-2"><Label>Telefone</Label><Input value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} /></div>
-                <div className="space-y-2"><Label>E-mail</Label><Input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} /></div>
-                <div className="space-y-2"><Label>Chave PIX</Label><Input value={formData.pix_key} onChange={e => setFormData({ ...formData, pix_key: e.target.value })} /></div>
-              </div>
-              <div className="space-y-2"><Label>Endereço</Label><Input value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} /></div>
-            </CardContent>
-          </Card>
-        </motion.div>
+          <TabsContent value="avancado">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <Card className="border-red-100 bg-red-50/20 overflow-hidden rounded-[2rem]">
+                <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="text-center md:text-left space-y-1">
+                    <p className="font-bold text-red-600 text-lg uppercase tracking-wider flex items-center justify-center md:justify-start gap-2">
+                      <ShieldAlert className="w-5 h-5" /> Zona de Perigo
+                    </p>
+                    <p className="text-sm text-red-500/70 font-medium">Limpar toda a Agenda - Ação irreversível para preparação de produção.</p>
+                  </div>
+                  <Button variant="destructive" className="h-14 px-10 font-bold shadow-lg shadow-red-200" onClick={() => setIsConfirmOpen(true)}>Apagar Todos os Dados da Agenda</Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+        </Tabs>
 
-        <div className="flex justify-end"><Button onClick={handleSave} className="h-12 px-8 font-bold" disabled={updateMutation.isPending}>{updateMutation.isPending ? <Loader2 className="animate-spin" /> : <Save className="mr-2" />} Salvar Configurações</Button></div>
-
-        {/* Danger Zone */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <Card className="border-red-100 bg-red-50/20 mt-12 overflow-hidden rounded-[2rem]">
-            <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="text-center md:text-left">
-                <p className="font-bold text-red-600">Limpar toda a Agenda</p>
-                <p className="text-sm text-red-500/70">Ação irreversível para preparação de produção.</p>
-              </div>
-              <Button variant="destructive" className="h-12 px-8 font-bold" onClick={() => setIsConfirmOpen(true)}>Apagar Tudo</Button>
-            </CardContent>
-          </Card>
-        </motion.div>
+        <div className="flex justify-end pt-4"><Button onClick={handleSave} className="h-14 px-10 font-bold text-lg shadow-xl shadow-primary/20" disabled={updateMutation.isPending}>{updateMutation.isPending ? <Loader2 className="animate-spin" /> : <Save className="mr-2" />} Salvar Configurações</Button></div>
 
         <AlertConfirm
           isOpen={isConfirmOpen}

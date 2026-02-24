@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { MobileHeader } from "./MobileHeader";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api-client";
+import { applyTheme } from "@/lib/theme-utils";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -10,28 +13,30 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  const { data: schoolData } = useQuery<any>({
+    queryKey: ['school-settings'],
+    queryFn: () => apiFetch('/settings'),
+    staleTime: Infinity, // Só precisa carregar uma vez
+  });
+
   useEffect(() => {
-    // Remove old theme residues that might interfere
+    // 1. Tenta carregar do localStorage primeiro para velocidade (instantâneo)
+    const localTheme = localStorage.getItem('vem-cantar-theme');
+    if (localTheme) {
+      applyTheme(localTheme);
+    }
+
+    // 2. Limpeza residues
     localStorage.removeItem('finedu-theme');
     localStorage.removeItem('theme');
-
-    const savedTheme = localStorage.getItem('vem-cantar-theme');
-    if (savedTheme) {
-      try {
-        const theme = JSON.parse(savedTheme);
-        const root = document.documentElement;
-        root.style.setProperty('--primary', theme.primary);
-        root.style.setProperty('--ring', theme.primary);
-        root.style.setProperty('--sidebar-background', theme.sidebar);
-        root.style.setProperty('--sidebar-foreground', '0 0% 100%');
-        root.style.setProperty('--sidebar-primary', theme.primary);
-        root.style.setProperty('--sidebar-accent', 'hsl(' + theme.sidebar + ' / 0.8)');
-        root.style.setProperty('--sidebar-accent-foreground', '0 0% 100%');
-      } catch (e) {
-        console.error("Erro ao carregar tema:", e);
-      }
-    }
   }, []);
+
+  // 3. Aplica o tema vindo do banco (sincronização global)
+  useEffect(() => {
+    if (schoolData?.theme) {
+      applyTheme(schoolData.theme);
+    }
+  }, [schoolData]);
 
   return (
     <div className="min-h-screen flex w-full bg-background">

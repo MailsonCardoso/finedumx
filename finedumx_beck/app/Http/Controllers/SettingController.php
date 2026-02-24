@@ -31,6 +31,8 @@ class SettingController extends Controller
             'phone' => 'nullable|string',
             'email' => 'nullable|email',
             'address' => 'nullable|string',
+            'pix_key' => 'nullable|string',
+            'theme' => 'nullable|string',
         ]);
 
         $settings->update($validated);
