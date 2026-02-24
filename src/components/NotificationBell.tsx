@@ -90,7 +90,7 @@ export function NotificationBell() {
         <>
             <Popover>
                 <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="relative group">
+                    <Button variant="ghost" size="icon" className="relative group text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                         <Bell className="w-5 h-5 transition-transform group-hover:scale-110" />
                         {pendingNotifications.length > 0 && (
                             <span className="absolute top-1.5 right-1.5 flex h-3 w-3">
