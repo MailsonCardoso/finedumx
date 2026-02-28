@@ -15,7 +15,6 @@ import {
   LogOut,
   Wallet,
   Loader2,
-  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,6 @@ const menuItems = [
   { icon: Calendar, label: "Mensalidades", path: "/mensalidades", roles: ["admin", "financeiro"] },
   { icon: CreditCard, label: "Pagamentos", path: "/pagamentos", roles: ["admin", "financeiro"] },
   { icon: Receipt, label: "Recibos", path: "/recibos", roles: ["admin", "financeiro"] },
-  { icon: MessageCircle, label: "WhatsApp", path: "/whatsapp", roles: ["admin", "financeiro", "administrativo"] },
   { icon: Settings, label: "Configurações", path: "/configuracoes", roles: ["admin", "financeiro", "administrativo"] },
   { icon: LayoutDashboard, label: "Meu Portal", path: "/portal", roles: ["student"] },
   { icon: LayoutDashboard, label: "Meu Portal", path: "/professor", roles: ["teacher"] },
