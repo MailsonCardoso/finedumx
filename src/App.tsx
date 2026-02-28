@@ -19,6 +19,7 @@ import Settings from "./pages/Settings";
 import Agenda from "./pages/Agenda";
 import StudentPortal from "./pages/StudentPortal";
 import TeacherPortal from "./pages/TeacherPortal";
+import WhatsApp from "./pages/WhatsApp";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const App = () => {
               <Route path="/recibos" element={<Receipts />} />
               <Route path="/configuracoes" element={<Settings />} />
               <Route path="/agenda" element={<Agenda />} />
+              <Route path="/whatsapp" element={<WhatsApp />} />
               <Route path="/portal" element={<StudentPortal />} />
               <Route path="/professor" element={<TeacherPortal />} />
               <Route path="*" element={<NotFound />} />
