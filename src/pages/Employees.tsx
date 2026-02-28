@@ -385,20 +385,6 @@ export default function Employees() {
                                         </div>
 
                                         <div className="mt-auto pt-4 space-y-4">
-                                            {/* Salary */}
-                                            <div className="flex items-center justify-between px-2">
-                                                <div className="flex items-center gap-2 text-muted-foreground">
-                                                    <DollarSign className="w-4 h-4" />
-                                                    <span className="text-sm font-medium">Salário</span>
-                                                </div>
-                                                <span className="font-bold text-emerald-600">
-                                                    {formatCurrency(employee.salary)}
-                                                </span>
-                                            </div>
-
-                                            {/* Divider */}
-                                            <div className="h-px w-full bg-border/40" />
-
                                             {/* Footer: Date & Status */}
                                             <div className="flex items-center justify-between text-xs text-muted-foreground px-2">
                                                 {/* Status Badge Customization to fit card */}
@@ -407,7 +393,7 @@ export default function Employees() {
                                                 </div>
                                                 <div className="flex items-center gap-1.5 opacity-70">
                                                     <CalendarDays className="w-3.5 h-3.5" />
-                                                    <span>Pgto. dia {employee.payment_day || 5}</span>
+                                                    <span>Admissão: {formatDate(employee.hire_date)}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -488,8 +474,8 @@ export default function Employees() {
                                     </Select>
                                 </div>
 
-                                {/* CPF, Contato, Salário e Dia Pagto */}
-                                <div className="col-span-2 grid grid-cols-4 gap-4">
+                                {/* CPF, Contato */}
+                                <div className="col-span-2 grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="cpf" className="text-sm font-medium">CPF</Label>
                                         <Input
@@ -530,36 +516,9 @@ export default function Employees() {
                                             />
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="salary" className="text-sm font-medium">Salário (R$)</Label>
-                                        <div className="relative">
-                                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                                            <Input
-                                                id="salary"
-                                                type="number"
-                                                value={formData.salary}
-                                                onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                                                placeholder="0,00"
-                                                className="h-10 pl-8 bg-background focus:ring-1 focus:ring-primary transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="payment_day" className="text-sm font-medium">Dia Pagto.</Label>
-                                        <div className="relative">
-                                            <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                                            <Input
-                                                id="payment_day"
-                                                type="number"
-                                                min="1"
-                                                max="31"
-                                                value={formData.payment_day}
-                                                onChange={(e) => setFormData({ ...formData, payment_day: e.target.value })}
-                                                placeholder="5"
-                                                className="h-10 pl-8 bg-background focus:ring-1 focus:ring-primary transition-all"
-                                            />
-                                        </div>
-                                    </div>
+                                    {/* Campos Ocultos para os valores defaults */}
+                                    <input type="hidden" name="salary" value={formData.salary} />
+                                    <input type="hidden" name="payment_day" value={formData.payment_day} />
                                 </div>
 
                                 {/* Email e Disponibilidade */}

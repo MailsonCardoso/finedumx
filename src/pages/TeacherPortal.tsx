@@ -54,9 +54,10 @@ export default function TeacherPortal() {
     }
 
     const filteredAppointments = data?.appointments.filter(app =>
-        app.student?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.course?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.school_class?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        app.type === 'individual' &&
+        (app.student?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            app.course?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            app.school_class?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
     ) || [];
 
     return (
@@ -169,13 +170,18 @@ export default function TeacherPortal() {
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             {app.type === 'individual' ? (
-                                                                <div className="flex items-center gap-2">
-                                                                    <GraduationCap className="w-4 h-4 text-muted-foreground" />
-                                                                    <span className={app.student_response === 'declined' ? 'text-red-500 font-bold' : app.student_response === 'confirmed' ? 'text-emerald-500 font-bold' : ''}>
-                                                                        {app.student?.name || "Não informado"}
-                                                                        {app.student_response === 'declined' && " (NÃO VEM)"}
-                                                                        {app.student_response === 'confirmed' && " (CONFIRMADO)"}
-                                                                    </span>
+                                                                <div className="flex flex-col gap-1">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                                                                        <span className="font-semibold text-foreground">
+                                                                            {app.student?.name || "Não informado"}
+                                                                        </span>
+                                                                    </div>
+                                                                    {app.student_response === 'declined' && (
+                                                                        <span className="inline-flex w-fit items-center gap-1 text-[10px] font-bold text-rose-600 bg-rose-500/15 border border-rose-200 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                                                                            Não Comparecerá 🚫
+                                                                        </span>
+                                                                    )}
                                                                 </div>
                                                             ) : (
                                                                 <div className="flex flex-col gap-1">

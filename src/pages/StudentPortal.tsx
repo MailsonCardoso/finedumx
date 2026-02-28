@@ -212,16 +212,11 @@ export default function StudentPortal() {
                                                         ) : (
                                                             <div className="flex items-center gap-2">
                                                                 <button
-                                                                    onClick={() => handleRespond(app.id, 'confirmed')}
-                                                                    className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-[10px] font-bold hover:bg-emerald-600 transition-all shadow-sm"
-                                                                >
-                                                                    CONFIRMAR
-                                                                </button>
-                                                                <button
                                                                     onClick={() => handleRespond(app.id, 'declined')}
-                                                                    className="px-3 py-1.5 rounded-lg border border-border text-muted-foreground text-[10px] font-bold hover:bg-muted transition-all"
+                                                                    className="px-4 py-2 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-200 text-[10px] font-bold hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5"
                                                                 >
-                                                                    NÃO VOU
+                                                                    <ThumbsDown className="w-3 h-3" />
+                                                                    AVISAR QUE NÃO VOU
                                                                 </button>
                                                             </div>
                                                         )}
